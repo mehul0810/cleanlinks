@@ -1,0 +1,41 @@
+{
+	"name": "simplifiedwp/links",
+	"description": "The most robust, flexible, and intuitive way to build your brand using link building strategy.",
+	"authors": [
+		{
+			"name": "SimplifiedWP",
+			"email": "hello@simplifiedwp.com"
+		}
+	],
+	"require": {
+		"composer/installers": "*"
+	},
+	"require-dev": {
+		"dealerdirect/phpcodesniffer-composer-installer": "*",
+		"phpcompatibility/phpcompatibility-wp": "*",
+		"wp-coding-standards/wpcs": "*"
+	},
+	"scripts": {
+		"post-install-cmd": [
+			"\"vendor/bin/phpcs\" --config-set installed_paths vendor/wp-coding-standards/wpcs || true",
+			"@install-codestandards"
+		],
+		"post-update-cmd": [
+			"\"vendor/bin/phpcs\" --config-set installed_paths vendor/wp-coding-standards/wpcs || true"
+		],
+		"install-codestandards": [
+			"Dealerdirect\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\Plugin::run"
+		]
+	},
+	"autoload": {
+		"psr-4": {
+			"SimplifiedWP\\Links\\": "src/"
+		}
+	},
+	"config": {
+		"allow-plugins": {
+			"composer/installers": true,
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
+	}
+}
