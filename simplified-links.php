@@ -7,7 +7,7 @@
  * Author URI: https://simplifiedwp.com/
  * Version: 1.0.0
  * Requires at least: 5.0
- * Requires PHP: 8.2
+ * Requires PHP: 8.0
  * Text Domain: simplified-links
  * Domain Path: /languages
  *
