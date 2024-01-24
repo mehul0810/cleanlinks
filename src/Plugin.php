@@ -50,7 +50,14 @@ final class Plugin {
 	 * @return void
 	 */
 	public function register_services() {
-		
+		new Includes\PostType();
+		new Includes\Filters();
+		new Includes\Actions();
+
+		if ( is_admin() ) {
+			new Admin\Filters();
+			new Admin\Actions();
+		}
 	}
 
 	/**
