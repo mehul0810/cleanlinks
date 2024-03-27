@@ -40,7 +40,7 @@ class Filters {
 	 */
 	public function add_admin_footer_text( $footer_text ) {
 		$current_screen = get_current_screen();
-
+		
 		if ( true === stristr( $current_screen->base, 'simplified-links' ) ) {
 			return sprintf(
 				/* translators: %s: Link to 5 star rating */
@@ -67,7 +67,7 @@ class Filters {
 		if ( $file === SIMPLIFIED_LINKS_PLUGIN_BASENAME ) {
 			$links[] = sprintf(
 				'<a href="%s">%s</a>',
-				esc_url( admin_url( 'edit.php?post_type=simplified-links' ) ),
+				esc_url( admin_url( 'edit.php?post_type=simplifiedwp_links' ) ),
 				esc_html__( 'Manage Links', 'simplified-links' )
 			);
 		}

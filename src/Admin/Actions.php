@@ -37,7 +37,7 @@ class Actions {
 	 */
 	public function add_admin_pages() {
 		add_submenu_page(
-			'edit.php?post_type=simplified-links',
+			'edit.php?post_type=simplifiedwp_links',
 			esc_html__( 'Dashboard', 'simplified-links' ),
 			esc_html__( 'Dashboard', 'simplified-links' ),
 			'manage_options',
@@ -47,7 +47,7 @@ class Actions {
 		);
 
 		add_submenu_page(
-			'edit.php?post_type=simplified-links',
+			'edit.php?post_type=simplifiedwp_links',
 			esc_html__( 'Settings', 'simplified-links' ),
 			esc_html__( 'Settings', 'simplified-links' ),
 			'manage_options',
@@ -57,7 +57,7 @@ class Actions {
 		);
 
 		add_submenu_page(
-			'edit.php?post_type=simplified-links',
+			'edit.php?post_type=simplifiedwp_links',
 			esc_html__( 'Support', 'simplified-links' ),
 			esc_html__( 'Support', 'simplified-links' ),
 			'manage_options',
@@ -67,12 +67,12 @@ class Actions {
 		);
 
 		add_submenu_page(
-			'edit.php?post_type=simplified-links',
+			'edit.php?post_type=simplifiedwp_links',
 			esc_html__( 'More Plugins', 'simplified-links' ),
 			esc_html__( 'More Plugins', 'simplified-links' ),
 			'manage_options',
 			'simplified_links_more_plugins',
-			[ $this, 'other_plugins_page' ],
+			[ $this, 'more_plugins_page' ],
 			5
 		);
 	}
