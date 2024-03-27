@@ -41,7 +41,7 @@ class PostType {
 			'singular_name'         => _x( 'Simplified Link', 'Post type singular name', 'simplified-links' ),
 			'menu_name'             => _x( 'Simplified Links', 'Admin Menu text', 'simplified-links' ),
 			'name_admin_bar'        => _x( 'Simplified Link', 'Add New on Toolbar', 'simplified-links' ),
-			'add_new'               => __( 'Add New', 'simplified-links' ),
+			'add_new'               => __( 'Add New Link', 'simplified-links' ),
 			'add_new_item'          => __( 'Add New Link', 'simplified-links' ),
 			'new_item'              => __( 'New Simplified Link', 'simplified-links' ),
 			'edit_item'             => __( 'Edit Simplified Link', 'simplified-links' ),
@@ -80,12 +80,13 @@ class PostType {
 			'show_ui'            => true,
 			'show_in_menu'       => true,
 			'query_var'          => true,
-			'rewrite'            => array( 'slug' => 'simplified-links' ),
+			'rewrite'            => array( 'slug' => 'simplifiedwp_links' ),
 			'capability_type'    => 'post',
 			'has_archive'        => true,
 			'hierarchical'       => false,
 			'menu_position'      => null,
-			'supports'           => array( 'title', 'thumbnail', 'excerpt', 'custom-fields' ),
+			'menu_icon'          => 'dashicons-admin-links',
+			'supports'           => array( 'title', 'editor', 'thumbnail', 'excerpt', 'custom-fields', 'revisions' ),
 		);
 	}
 
@@ -98,6 +99,6 @@ class PostType {
 	 * @return void
 	 */
 	public function register_post_type() {
-		register_post_type( 'simplified-links', $this->get_args() );
+		register_post_type( 'simplifiedwp_links', $this->get_args() );
 	}
 }
