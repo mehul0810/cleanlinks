@@ -25,6 +25,7 @@ class PostType {
 	 */
 	public function __construct() {
 		add_action( 'init', [ $this, 'register_post_type' ] );
+		add_action( 'save_post', [ $this, 'save_link_meta' ] );
 	}
 
 	/**
@@ -86,6 +87,7 @@ class PostType {
 			'hierarchical'       => false,
 			'menu_position'      => null,
 			'menu_icon'          => 'dashicons-admin-links',
+			'register_meta_box_cb' => array( $this, 'action_add_url_metabox' ),
 			'supports'           => array( 'title', 'custom-fields', 'revisions' ),
 		);
 	}
@@ -100,5 +102,65 @@ class PostType {
 	 */
 	public function register_post_type() {
 		register_post_type( 'simplifiedwp_links', $this->get_args() );
+	}
+
+	/**
+	 * Saves meta info for simplifiedwp links
+	 *
+	 * @since 1.0
+	 * @param int $post_id Post ID
+	 * @return void
+	 */
+	public function save_link_meta( $post_id ) {
+		if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) ) {
+			return;
+		}
+
+		// Update post meta for simplifiedwp links
+		if ( ! empty( $_POST['simplified_redirect_nonce'] ) && wp_verify_nonce( $_POST['simplified_redirect_nonce'], 'simplified-save-redirect-meta' ) && current_user_can( 'edit_post', $post_id ) ) {
+
+			if ( ! empty( $_POST['simplified_url'] ) ) {
+
+				// Remove all illegal characters from a url
+				$url = filter_var( $_POST['simplified_url'], FILTER_SANITIZE_URL );
+
+				// Validate url
+				if ( filter_var($url, FILTER_VALIDATE_URL ) ) {
+					update_post_meta( $post_id, 'simplified_url', esc_url( $url ) );
+				}
+			}
+		}
+	}
+
+	/**
+	 * Registers meta boxes for simplifiedwp links post
+	 *
+	 * @since 1.0
+	 * @return void
+	 */
+	public function action_add_url_metabox() {
+		add_meta_box( 'simplifiedwp_redirection_settings', esc_html__( 'Redirection Settings', 'simplified-links' ), array( $this, 'link_metabox' ), 'simplifiedwp_links', 'normal', 'core' );
+	}
+
+	/**
+	 * Echoes HTML for link meta box
+	 *
+	 * @since 1.0
+	 * @param WP_Post $post Post object
+	 * @return void
+	 */
+	public function link_metabox( $post ) {
+		
+		wp_nonce_field( 'simplified-save-redirect-meta', 'simplified_redirect_nonce' );
+		
+		$url = get_post_meta( $post->ID, 'simplified_url', true );
+		?>
+		
+		<p>
+			<label for="simplified_url"><strong><?php esc_html_e( 'Enter URL:', 'simplified-links' ); ?></strong></label><br />
+			<input class="widefat" type="url" name="simplified_url" id="simplified_url" value="<?php echo esc_attr( $url ); ?>" />
+		</p>
+
+		<?php
 	}
 }
