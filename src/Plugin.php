@@ -51,6 +51,7 @@ final class Plugin {
 	 */
 	public function register_services() {
 		new Includes\PostType();
+		new Includes\TaxoNomy();
 		new Includes\Filters();
 		new Includes\Actions();
 

@@ -86,7 +86,7 @@ class PostType {
 			'hierarchical'       => false,
 			'menu_position'      => null,
 			'menu_icon'          => 'dashicons-admin-links',
-			'supports'           => array( 'title', 'editor', 'thumbnail', 'excerpt', 'custom-fields', 'revisions' ),
+			'supports'           => array( 'title', 'custom-fields', 'revisions' ),
 		);
 	}
 
