@@ -26,6 +26,7 @@ class Filters {
 	public function __construct() {
 		add_filter( 'admin_footer_text', [ $this, 'add_admin_footer_text' ] );
 		add_filter( 'plugin_action_links', [ $this, 'add_plugin_action_links' ], 10, 2 );
+		add_filter('manage_edit-simplifiedwp_links_columns', [ $this,'add_custom_columns_to_simplifiedwp_links' ] );
 	}
 
 	/**
@@ -73,5 +74,25 @@ class Filters {
 		}
 
 		return $links;
+	}
+
+	/**
+	 * Add custom columns to the simplifiedwp_links admin listing page.
+	 *
+	 * @param array $columns An array of column names.
+	 * @return array Modified array of column names.
+	 */
+	public function add_custom_columns_to_simplifiedwp_links( $columns ) {
+
+		$columns = array(
+			'cb'     		=> '<input type="checkbox" />',
+			'title'     	=> esc_html__( 'Title', 'simplified-links' ),
+			'permalink' 	=> esc_html__( 'Permalink', 'simplified-links' ),
+			'redirect_url'	=> esc_html__( 'Redirect Link', 'simplified-links' ),
+			'clicks_count'	=> esc_html__( 'Clicks Count', 'simplified-links' ),
+			'date'			=> esc_html__( 'Date', 'simplified-links' ),
+		);
+
+		return $columns;
 	}
 }

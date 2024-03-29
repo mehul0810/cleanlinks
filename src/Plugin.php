@@ -9,6 +9,8 @@
 
 namespace SimplifiedWP\Links;
 
+use SimplifiedWP\Links\Includes\PostType;
+
 // Bailout, if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -88,7 +90,11 @@ final class Plugin {
 	 *
 	 * @return void
 	 */
-	public function activate( $network_wide = false ) {}
+	public function activate( $network_wide = false ) {
+		$post_type = new Includes\PostType();
+		$post_type->register_post_type();
+		flush_rewrite_rules();
+	}
 
 	/**
 	 * Handles deactivation procedures.

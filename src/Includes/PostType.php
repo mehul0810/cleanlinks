@@ -25,7 +25,7 @@ class PostType {
 	 */
 	public function __construct() {
 		add_action( 'init', [ $this, 'register_post_type' ] );
-		add_action( 'save_post', [ $this, 'save_link_meta' ] );
+		add_action( 'save_post', [ $this, 'save_link_meta' ], 10, 2 );
 	}
 
 	/**
@@ -74,6 +74,13 @@ class PostType {
 	 * @return array
 	 */
 	public function get_args() {
+
+		$rewrite_slug_default = 'recommends';
+		
+		$rewrite_slug = apply_filters( 'simplified_urls_slug', $rewrite_slug_default );
+
+		$rewrite_slug = sanitize_title( $rewrite_slug, $rewrite_slug_default );
+
 		return array(
 			'labels'             => $this->get_labels(),
 			'public'             => true,
@@ -81,14 +88,15 @@ class PostType {
 			'show_ui'            => true,
 			'show_in_menu'       => true,
 			'query_var'          => true,
-			'rewrite'            => array( 'slug' => 'simplifiedwp_links' ),
+			'rewrite'            => array( 'slug' => $rewrite_slug ),
 			'capability_type'    => 'post',
-			'has_archive'        => true,
+			'has_archive'        => false,
 			'hierarchical'       => false,
 			'menu_position'      => null,
+			'show_in_rest'       => true,
 			'menu_icon'          => 'dashicons-admin-links',
 			'register_meta_box_cb' => array( $this, 'action_add_url_metabox' ),
-			'supports'           => array( 'title', 'custom-fields', 'revisions' ),
+			'supports'           => array( 'title' ),
 		);
 	}
 
@@ -102,6 +110,8 @@ class PostType {
 	 */
 	public function register_post_type() {
 		register_post_type( 'simplifiedwp_links', $this->get_args() );
+
+		// https://developer.wordpress.org/reference/functions/register_post_type/#flushing-rewrite-on-activation
 	}
 
 	/**
@@ -111,23 +121,33 @@ class PostType {
 	 * @param int $post_id Post ID
 	 * @return void
 	 */
-	public function save_link_meta( $post_id ) {
+	public function save_link_meta( $post_id, $post ) {
 		if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) ) {
 			return;
 		}
 
-		// Update post meta for simplifiedwp links
-		if ( ! empty( $_POST['simplified_redirect_nonce'] ) && wp_verify_nonce( $_POST['simplified_redirect_nonce'], 'simplified-save-redirect-meta' ) && current_user_can( 'edit_post', $post_id ) ) {
+		if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+			return;
+		};
 
-			if ( ! empty( $_POST['simplified_url'] ) ) {
+		if ( defined( 'DOING_CRON' ) && DOING_CRON ) {
+			return;
+		};
+
+		// Update post meta for simplifiedwp links
+		if ( ! empty( $_POST['simplified_redirect_nonce'] ) && wp_verify_nonce( $_POST['simplified_redirect_nonce'], 'simplified-save-redirect-meta' ) && current_user_can( 'edit_post', $post_id ) && 'simplifiedwp_links' === $post->post_type ) {
+			
+			if ( ! empty( $_POST['simplified_redirect_url'] ) ) {
 
 				// Remove all illegal characters from a url
-				$url = filter_var( $_POST['simplified_url'], FILTER_SANITIZE_URL );
+				$url = filter_var( $_POST['simplified_redirect_url'], FILTER_SANITIZE_URL );
 
 				// Validate url
 				if ( filter_var($url, FILTER_VALIDATE_URL ) ) {
-					update_post_meta( $post_id, 'simplified_url', esc_url( $url ) );
+					update_post_meta( $post_id, 'simplified_redirect_url', esc_url( $url ) );
 				}
+			} else {
+				delete_post_meta( $post_id, 'simplified_redirect_url' );
 			}
 		}
 	}
@@ -153,14 +173,17 @@ class PostType {
 		
 		wp_nonce_field( 'simplified-save-redirect-meta', 'simplified_redirect_nonce' );
 		
-		$url = get_post_meta( $post->ID, 'simplified_url', true );
+		$url = get_post_meta( $post->ID, 'simplified_redirect_url', true );
 		?>
 		
 		<p>
-			<label for="simplified_url"><strong><?php esc_html_e( 'Enter URL:', 'simplified-links' ); ?></strong></label><br />
-			<input class="widefat" type="url" name="simplified_url" id="simplified_url" value="<?php echo esc_attr( $url ); ?>" />
+			<label for="simplified_redirect_url"><strong><?php esc_html_e( 'Redirect to:', 'simplified-links' ); ?></strong></label><br />
+			<input class="widefat" type="url" name="simplified_redirect_url" id="simplified_redirect_url" value="<?php echo esc_attr( $url ); ?>" />
 		</p>
-
+		<p><span class="description"><?php esc_html_e( 'This is the URL that the Redirect Link you create on this page will redirect to when accessed in a web browser.', 'simplified-links' ); ?> </span></p> 
 		<?php
+		$count = isset( $post->ID ) ? get_post_meta( $post->ID, 'simplified_redirect_count', true ) : 0;
+		/* translators: %d is the counter of clicks. */
+		echo '<p>' . sprintf( esc_html__( 'This URL has been accessed %d times', 'simplified-links' ), esc_attr( $count ) ) . '</p>';
 	}
 }
