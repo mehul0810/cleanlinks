@@ -27,6 +27,7 @@ class Actions {
 		add_action( 'admin_enqueue_scripts', [ $this, 'register_assets' ] );
 		add_action( 'admin_menu', [ $this, 'add_admin_pages' ] );
 		add_action( 'manage_simplifiedwp_links_posts_custom_column', [ $this, 'simplifiedwp_links_custom_column_values' ], 10, 2 );
+		add_action ('post_submitbox_minor_actions', [ $this, 'before_preview_changes'] );
 	}
 
 	/**
@@ -185,5 +186,18 @@ class Actions {
 				echo esc_html( $count_click ? $count_click : 0 );
 				break;
 		}	
+	}
+
+	public function before_preview_changes($post) {
+		if ( $post->post_type == 'simplifiedwp_links') { 
+			$count = isset( $post->ID ) ? get_post_meta( $post->ID, 'simplified_redirect_count', true ) : 0;
+			?>
+			
+			<div class="simplified-click-count" style="text-align:left;">
+				<?php /* translators: %d is the counter of clicks. */
+				echo '<p>' . sprintf( esc_html__( 'This URL has been accessed %d times', 'simplified-links' ), esc_attr( $count ) ) . '</p>'; ?>
+			</div>
+		<?php
+		}
 	}
 }
