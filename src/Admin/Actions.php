@@ -187,7 +187,9 @@ class Actions {
 				break;
 		}	
 	}
-
+	/**
+	 * This function is used for display click count to post meta box
+	 */
 	public function before_preview_changes($post) {
 		if ( $post->post_type == 'simplifiedwp_links') { 
 			$count = isset( $post->ID ) ? get_post_meta( $post->ID, 'simplified_redirect_count', true ) : 0;
