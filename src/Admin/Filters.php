@@ -24,7 +24,7 @@ class Filters {
 	 * @return void
 	 */
 	public function __construct() {
-		add_filter( 'admin_footer_text', [ $this, 'add_admin_footer_text' ] );
+		add_filter( 'admin_footer_text', [ $this, 'add_admin_footer_text' ], 100, 1 );
 		add_filter( 'plugin_action_links', [ $this, 'add_plugin_action_links' ], 10, 2 );
 		add_filter('manage_edit-simplifiedwp_links_columns', [ $this,'add_custom_columns_to_simplifiedwp_links' ] );
 	}
@@ -42,14 +42,15 @@ class Filters {
 	public function add_admin_footer_text( $footer_text ) {
 		$current_screen = get_current_screen();
 		
-		if ( true === stristr( $current_screen->base, 'simplified-links' ) ) {
+		if ( isset( $current_screen->post_type ) && $current_screen->post_type === 'simplifiedwp_links' ) {
+			
 			return sprintf(
 				/* translators: %s: Link to 5 star rating */
 				__( 'If you like <strong>Simplified Links</strong> please leave us a %s rating. It takes a minute and helps a lot. Thanks in advance!', 'simplified-links' ),
 				'<a href="https://wordpress.org/support/view/plugin-reviews/simplified-links?filter=5#postform" target="_blank" class="simplified-links-rating-link" style="text-decoration:none;" data-rated="' . esc_attr__( 'Thanks :)', 'simplified-links' ) . '">&#9733;&#9733;&#9733;&#9733;&#9733;</a>'
 			);
 		}
-
+		
 		return $footer_text;
 	}
 
@@ -87,7 +88,7 @@ class Filters {
 		$columns = array(
 			'cb'     		=> '<input type="checkbox" />',
 			'title'     	=> esc_html__( 'Title', 'simplified-links' ),
-			'permalink' 	=> esc_html__( 'Permalink', 'simplified-links' ),
+			'simplified_permalink' 	=> esc_html__( 'Permalink', 'simplified-links' ),
 			'redirect_url'	=> esc_html__( 'Redirect Link', 'simplified-links' ),
 			'clicks_count'	=> esc_html__( 'Clicks Count', 'simplified-links' ),
 			'date'			=> esc_html__( 'Date', 'simplified-links' ),

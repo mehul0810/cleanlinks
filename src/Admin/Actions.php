@@ -24,6 +24,7 @@ class Actions {
 	 * @return void
 	 */
 	public function __construct() {
+		add_action( 'admin_enqueue_scripts', [ $this, 'register_assets' ] );
 		add_action( 'admin_menu', [ $this, 'add_admin_pages' ] );
 		add_action( 'manage_simplifiedwp_links_posts_custom_column', [ $this, 'simplifiedwp_links_custom_column_values' ], 10, 2 );
 	}
@@ -127,6 +128,18 @@ class Actions {
 	}
 
 	/**
+	 * Register Assets.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 *
+	 * @return void
+	 */
+	public function register_assets() {
+		wp_enqueue_script( 'simplified-admin', SIMPLIFIED_LINKS_PLUGIN_URL . 'assets/src/js/admin/simplified-admin.js', '', SIMPLIFIED_LINKS_VERSION, true );
+	}
+
+	/**
 	 * Populate custom columns with data on the simplifiedwp_links admin listing page.
 	 *
 	 * @param string $column_name The name of the column to display.
@@ -135,6 +148,26 @@ class Actions {
 	 */
 	public function simplifiedwp_links_custom_column_values( $column, $post_id ) {
 		switch ( $column ) {
+			case 'simplified_permalink':
+				
+				$link = get_the_permalink();
+				printf(
+					'<button
+							type="button"
+							id="simplifedbutton"
+							class="button js-simplified-link-button"
+							aria-label="%1$s"
+							data-default-text="Copy URL"
+							data-copied-text="Copied!"
+							data-url="%2$s">
+						<span class="dashicons dashicons-admin-page" style="font-size: 16px; margin-right: 2px; vertical-align: middle; width: 16px;"></span> <span class="simplified-button-text"> %3$s </span> 
+					</button>',
+					esc_attr( $link ),
+					esc_attr( $link ),
+					esc_html__( 'Copy URL', 'simplified-links' )
+				);
+				break;
+
 			case 'redirect_url':
 				
 				$redirect_url = get_post_meta( $post_id , 'simplified_redirect_url' , true );
