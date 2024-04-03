@@ -13,7 +13,8 @@
 	"require-dev": {
 		"dealerdirect/phpcodesniffer-composer-installer": "*",
 		"phpcompatibility/phpcompatibility-wp": "*",
-		"wp-coding-standards/wpcs": "*"
+		"wp-coding-standards/wpcs": "*",
+		"phpunit/phpunit": "11"
 	},
 	"scripts": {
 		"post-install-cmd": [
