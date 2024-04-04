@@ -13,4 +13,10 @@
 			<exclude>./tests/test-sample.php</exclude>
 		</testsuite>
 	</testsuites>
+	<coverage>
+		<include>
+			<directory suffix=".php">src</directory>
+			<file>simplified-links.php</file>
+		</include>
+	</coverage>
 </phpunit>

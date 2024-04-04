@@ -12,11 +12,6 @@ namespace SimplifiedWP\Links\Admin\Tests;
 use SimplifiedWP\Plugin;
 use SimplifiedWP\Admin;
 
-// Bailout, if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
-
 class Test_Admin extends WP_UnitTestCase {
 	/**
 	 * Initialize the class.
