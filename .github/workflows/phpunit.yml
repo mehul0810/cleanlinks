@@ -1,4 +1,4 @@
-name: Test
+name: Phpunit
 
 on:
   # Run on pushes to select branches and on all pull requests.
@@ -21,11 +21,39 @@ jobs:
       matrix:
         include:
           - php_version: '8.1'
-            wp_version: '6.4'
+            wp_version: '6.0'
             multisite: false
 
           - php_version: '8.1'
-            wp_version: 'latest'
+            wp_version: '6.1'
+            multisite: false
+
+          - php_version: '8.1'
+            wp_version: '6.2'
+            multisite: false
+
+          - php_version: '8.1'
+            wp_version: '6.3'
+            multisite: false
+
+          - php_version: '8.1'
+            wp_version: '6.4'
+            multisite: false
+
+          - php_version: '8.2'
+            wp_version: '6.0'
+            multisite: false
+
+          - php_version: '8.2'
+            wp_version: '6.1'
+            multisite: false
+
+          - php_version: '8.2'
+            wp_version: '6.2'
+            multisite: false
+
+          - php_version: '8.2'
+            wp_version: '6.3'
             multisite: false
 
           - php_version: '8.2'
@@ -33,9 +61,17 @@ jobs:
             multisite: false
 
           - php_version: '8.2'
+            wp_version: '6.4'
+            multisite: true
+
+          - php_version: '8.2'
             wp_version: 'latest'
             multisite: false
 
+          - php_version: '8.2'
+            wp_version: 'latest'
+            multisite: true
+            
     name: "Integration Test: PHP ${{ matrix.php_version }} | WP ${{ matrix.wp_version }}${{ matrix.multisite == true && ' (+ ms)' || '' }}"
 
     # Allow builds to fail on as-of-yet unreleased WordPress versions.
