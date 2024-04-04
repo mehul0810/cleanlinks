@@ -11,7 +11,7 @@ namespace SimplifiedWP\Links\Admin\Tests;
 
 use SimplifiedWP\Plugin;
 use SimplifiedWP\Admin;
-
+use WP_UnitTestCase;
 class Test_Admin extends WP_UnitTestCase {
 	/**
 	 * Initialize the class.
