@@ -1,15 +1,11 @@
 name: Test
 
 on:
-  # Run on pushes to select branches and on all pull requests.
   push:
   pull_request:
-  # Allow manually triggering the workflow.
   workflow_dispatch:
 
-# Cancels all previous workflow runs for the same branch that have not yet completed.
 concurrency:
-  # The concurrency group contains the workflow name and the branch name.
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
@@ -23,45 +19,38 @@ jobs:
           - php_version: '8.2'
             wp_version: '6.2'
             multisite: false
-
           - php_version: '8.2'
             wp_version: '6.3'
             multisite: false
-
           - php_version: '8.2'
             wp_version: '6.4'
             multisite: false
-
           - php_version: '8.2'
             wp_version: 'latest'
             multisite: false
-
           - php_version: '8.2'
             wp_version: '6.2'
             multisite: true
-
           - php_version: '8.2'
             wp_version: '6.3'
             multisite: true
-
           - php_version: '8.2'
             wp_version: '6.4'
             multisite: true
-
           - php_version: '8.2'
             wp_version: 'latest'
             multisite: true
 
     name: "Integration Test: PHP ${{ matrix.php_version }} | WP ${{ matrix.wp_version }}${{ matrix.multisite == true && ' (+ ms)' || '' }}"
 
-    # Allow builds to fail on as-of-yet unreleased WordPress versions.
     continue-on-error: ${{ matrix.wp_version == 'trunk' }}
 
     services:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: false
+          MYSQL_ROOT_PASSWORD: root # Change this to your desired MySQL root password
+          MYSQL_DATABASE: wordpress_tests
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=10s --health-retries=10
@@ -77,19 +66,14 @@ jobs:
           ini-values: zend.assertions=1, error_reporting=-1, display_errors=On
           coverage: none
 
-      # Install dependencies and handle caching in one go.
-      # @link https://github.com/marketplace/actions/install-composer-dependencies
       - name: "Composer: remove the PHP platform requirement"
         run: composer config --unset platform.php
 
       - name: "Install Composer dependencies"
         uses: ramsey/composer-install@v2
         with:
-          # Force a `composer update` run.
           dependency-versions: "highest"
-          # But make it selective.
           composer-options: "yoast/wp-test-utils --with-dependencies"
-          # Bust the cache at least once a month - output format: YYYY-MM-DD.
           custom-cache-suffix: $(date -u -d "-0 month -$(($(date +%d)-1)) days" "+%F")
 
       - name: Change permissions for install-wp-tests.sh
