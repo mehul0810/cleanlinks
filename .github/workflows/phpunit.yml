@@ -24,7 +24,7 @@ jobs:
             wp_version: '6.2'
             multisite: false
 
-          - php_version: '8.2'
+					- php_version: '8.2'
             wp_version: '6.3'
             multisite: false
 
