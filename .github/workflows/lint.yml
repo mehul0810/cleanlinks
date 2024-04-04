@@ -37,7 +37,7 @@ jobs:
       - name: Install PHP for the composer install
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.1
+          php-version: ${{ matrix.php_version }}
           coverage: none
 
       # The lint stage doesn't use code style, so no need for WPCS or phpcompatibility.
@@ -64,6 +64,3 @@ jobs:
 
       - name: Lint against parse errors
         run: composer lint -- --checkstyle | cs2pr
-
-      - name: Lint blueprint file
-        run: composer lint-blueprint
