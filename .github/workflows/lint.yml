@@ -37,7 +37,7 @@ jobs:
       - name: Install PHP for the composer install
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 7.4
+          php-version: 8.1
           coverage: none
 
       # The lint stage doesn't use code style, so no need for WPCS or phpcompatibility.
