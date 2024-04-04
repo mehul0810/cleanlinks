@@ -39,7 +39,7 @@ class Test_Admin extends WP_UnitTestCase {
 
 	public function __construct() {
 		
-		self::$class_instance->register_hooks();
+		//self::$class_instance->register_hooks();
 		
 		//add_action( 'admin_enqueue_scripts', [ $this, 'register_assets' ] );
 
