@@ -76,6 +76,9 @@ jobs:
           # Bust the cache at least once a month - output format: YYYY-MM-DD.
           custom-cache-suffix: $(date -u -d "-0 month -$(($(date +%d)-1)) days" "+%F")
 
+      - name: Change permissions for install-wp-tests.sh
+        run: chmod +x tests/bin/install-wp-tests.sh
+
       - name: Install WP
         shell: bash
         run: tests/bin/install-wp-tests.sh wordpress_tests root '' 127.0.0.1:3306 ${{ matrix.wp_version }}
