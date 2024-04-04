@@ -51,6 +51,8 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: root # Change this to your desired MySQL root password
           MYSQL_DATABASE: wordpress_tests
+          MYSQL_USER: root
+          MYSQL_PASSWORD: root # Change this to your desired MySQL root password
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=10s --health-retries=10
