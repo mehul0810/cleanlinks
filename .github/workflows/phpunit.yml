@@ -1,95 +1,128 @@
-name: Test
+name: PHPUnit Tests
 
 on:
   push:
+    branches:
+      - main
+      - '3.[7-9]'
+      - '[4-9].[0-9]'
+    tags:
+      - '[0-9]+.[0-9]'
+      - '[0-9]+.[0-9].[0-9]+'
   pull_request:
+    branches:
+      - main
+      - '3.[7-9]'
+      - '[4-9].[0-9]'
   workflow_dispatch:
+  # Once weekly On Sundays at 00:00 UTC.
+  schedule:
+    - cron: '0 0 * * 0'
 
+# Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  # The concurrency group contains the workflow name and the branch name for pull requests
+  # or the commit hash for any other events.
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
   cancel-in-progress: true
 
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
 jobs:
-  integration:
-    runs-on: ubuntu-latest
-
+  #
+  # Creates a PHPUnit test job for each PHP/MySQL combination.
+  #
+  test-with-mysql:
+    name: PHP ${{ matrix.php }}
+    uses: WordPress/wordpress-develop/.github/workflows/phpunit-tests-run.yml@trunk
+    permissions:
+      contents: read
+    secrets: inherit
+    if: ${{ github.repository == 'WordPress/wordpress-develop' || github.event_name == 'pull_request' }}
     strategy:
+      fail-fast: false
       matrix:
+        os: [ ubuntu-latest ]
+        php: [ '7.0', '7.1', '7.2', '7.3', '7.4', '8.0', '8.1', '8.2', '8.3' ]
+        db-type: [ 'mysql' ]
+        db-version: [ '5.7', '8.0', '8.1', '8.2', '8.3' ]
+        multisite: [ false, true ]
+        memcached: [ false ]
+
         include:
-          - php_version: '8.2'
-            wp_version: '6.2'
+          # Include jobs for PHP 7.4 with memcached.
+          - os: ubuntu-latest
+            php: '7.4'
+            db-type: 'mysql'
+            db-version: '5.7'
             multisite: false
-          - php_version: '8.2'
-            wp_version: '6.3'
+            memcached: true
+          - os: ubuntu-latest
+            php: '7.4'
+            db-type: 'mysql'
+            db-version: '5.7'
+            multisite: true
+            memcached: true
+          # Report test results to the Host Test Results.
+          - os: ubuntu-latest
+            php: '7.4'
+            db-type: 'mysql'
+            db-version: '5.7'
             multisite: false
-          - php_version: '8.2'
-            wp_version: '6.4'
-            multisite: false
-          - php_version: '8.2'
-            wp_version: 'latest'
-            multisite: false
-          - php_version: '8.2'
-            wp_version: '6.2'
-            multisite: true
-          - php_version: '8.2'
-            wp_version: '6.3'
-            multisite: true
-          - php_version: '8.2'
-            wp_version: '6.4'
-            multisite: true
-          - php_version: '8.2'
-            wp_version: 'latest'
-            multisite: true
+            memcached: false
+            report: true
+    with:
+      os: ${{ matrix.os }}
+      php: ${{ matrix.php }}
+      db-type: ${{ matrix.db-type }}
+      db-version: ${{ matrix.db-version }}
+      multisite: ${{ matrix.multisite }}
+      memcached: ${{ matrix.memcached }}
+      phpunit-config: ${{ matrix.multisite && 'tests/phpunit/multisite.xml' || 'phpunit.xml.dist' }}
+      report: ${{ matrix.report || false }}
 
-    name: "Integration Test: PHP ${{ matrix.php_version }} | WP ${{ matrix.wp_version }}${{ matrix.multisite == true && ' (+ ms)' || '' }}"
+  #
+  # Creates a PHPUnit test job for each PHP/MariaDB combination.
+  #
+  test-with-mariadb:
+    name: PHP ${{ matrix.php }}
+    uses: SimplifiedWP/simplified-links/.github/workflows/phpunit-tests-run.yml@main
+    permissions:
+      contents: read
+    secrets: inherit
+    if: ${{ github.repository == 'SimplifiedWP/simplified-links' || github.event_name == 'pull_request' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest ]
+        php: [ '7.0', '7.1', '7.2', '7.3', '7.4', '8.0', '8.1', '8.2', '8.3' ]
+        db-type: [ 'mariadb' ]
+        db-version: [ '10.4', '10.6', '10.11', '11.2' ]
+        multisite: [ false, true ]
+        memcached: [ false ]
 
-    continue-on-error: ${{ matrix.wp_version == 'trunk' }}
-
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: root # Change this to your desired MySQL root password
-          MYSQL_DATABASE: wordpress_tests
-          MYSQL_USER: root
-          MYSQL_PASSWORD: root # Change this to your desired MySQL root password
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=10s --health-retries=10
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Install PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php_version }}
-          ini-values: zend.assertions=1, error_reporting=-1, display_errors=On
-          coverage: none
-
-      - name: "Composer: remove the PHP platform requirement"
-        run: composer config --unset platform.php
-
-      - name: "Install Composer dependencies"
-        uses: ramsey/composer-install@v2
-        with:
-          dependency-versions: "highest"
-          composer-options: "yoast/wp-test-utils --with-dependencies"
-          custom-cache-suffix: $(date -u -d "-0 month -$(($(date +%d)-1)) days" "+%F")
-
-      - name: Change permissions for install-wp-tests.sh
-        run: chmod +x tests/bin/install-wp-tests.sh
-
-      - name: Install WP
-        shell: bash
-        run: tests/bin/install-wp-tests.sh wordpress_tests root '' 127.0.0.1:3306 ${{ matrix.wp_version }}
-
-      - name: Run unit tests - single site
-        run: composer test
-
-      - name: Run unit tests - multisite
-        if: ${{ matrix.multisite == true }}
-        run: composer test
-        env:
-          WP_MULTISITE: 1
+        include:
+        # Include jobs for PHP 7.4 with memcached.
+        - os: ubuntu-latest
+          php: '7.4'
+          db-type: 'mariadb'
+          db-version: '11.2'
+          multisite: false
+          memcached: true
+        - os: ubuntu-latest
+          php: '7.4'
+          db-type: 'mariadb'
+          db-version: '11.2'
+          multisite: true
+          memcached: true
+    with:
+      os: ${{ matrix.os }}
+      php: ${{ matrix.php }}
+      db-type: ${{ matrix.db-type }}
+      db-version: ${{ matrix.db-version }}
+      multisite: ${{ matrix.multisite }}
+      memcached: ${{ matrix.memcached }}
+      phpunit-config: ${{ matrix.multisite && 'tests/phpunit/multisite.xml' || 'phpunit.xml.dist' }}
+      report: ${{ matrix.report || false }}
