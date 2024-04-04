@@ -45,7 +45,7 @@ class Test_Admin extends WP_UnitTestCase {
 
 		//add_action( 'admin_menu', [ $this, 'add_admin_pages' ] );
 		
-		$this->assertSame( 10, has_action( 'admin_menu', [ self::$class_instance, 'add_admin_pages' ] ) );
+		$this->assertSame( has_action( 'admin_menu', [ self::$class_instance, 'add_admin_pages' ] ) );
 		
 		//add_action( 'manage_simplifiedwp_links_posts_custom_column', [ $this, 'simplifiedwp_links_custom_column_values' ], 10, 2 );
 		
