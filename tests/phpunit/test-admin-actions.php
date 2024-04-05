@@ -67,7 +67,7 @@ class Test_Admin_Actions extends WP_UnitTestCase {
 	 /**
      * Test adding admin pages.
      */
-    /* public function test_add_admin_pages() {
+    public function test_add_admin_pages() {
         // Create a new instance of the Actions class
         self::$class_instance->add_admin_pages();
 
@@ -75,7 +75,7 @@ class Test_Admin_Actions extends WP_UnitTestCase {
         $this->assertTrue( $this->admin_page_exists( 'simplified_links_reports' ) );
         $this->assertTrue( $this->admin_page_exists( 'simplified_links_support' ) );
         $this->assertTrue( $this->admin_page_exists( 'simplified_links_more_plugins' ) );
-    } */
+    }
 
 	/**
      * Check if a specific admin page exists.
@@ -83,7 +83,7 @@ class Test_Admin_Actions extends WP_UnitTestCase {
      * @param string $page_slug The slug of the admin page to check.
      * @return bool True if the page exists, false otherwise.
      */
-    /* private function admin_page_exists( $page_slug ) {
+    private function admin_page_exists( $page_slug ) {
         global $submenu;
 
         if ( isset( $submenu['edit.php?post_type=simplifiedwp_links'] ) ) {
@@ -95,5 +95,5 @@ class Test_Admin_Actions extends WP_UnitTestCase {
         }
 
         return false;
-    } */
+    }
 }
