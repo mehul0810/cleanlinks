@@ -63,4 +63,5 @@ class Test_Admin_Actions extends WP_UnitTestCase {
 
 		$this->assertTrue( wp_script_is( 'simplified-admin', 'enqueued' ) );
 	}
+	
 }
