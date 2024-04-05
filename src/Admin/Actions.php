@@ -9,7 +9,9 @@
 
 namespace SimplifiedWP\Links\Admin;
 
-// Bailout, if accessed directly.
+/** 
+ *  Bailout, if accessed directly. 
+ */ 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }

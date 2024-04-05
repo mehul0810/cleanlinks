@@ -1,5 +1,7 @@
 <?php
-/* Bailout, if accessed directly. */
+/**
+ *  Bailout, if accessed directly
+ */ 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
