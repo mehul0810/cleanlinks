@@ -1,5 +1,5 @@
 <?php
-// Bailout, if accessed directly.
+/* Bailout, if accessed directly. */
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -9,7 +9,7 @@ if ( ! defined( 'SIMPLIFIED_LINKS_VERSION' ) ) {
 }
 
 if ( ! defined( 'SIMPLIFIED_LINKS_PLUGIN_FILE' ) ) {
-	define( 'SIMPLIFIED_LINKS_PLUGIN_FILE', dirname( dirname( __FILE__ ) ) . '/simplified-links.php' );
+	define( 'SIMPLIFIED_LINKS_PLUGIN_FILE', dirname( __DIR__ ) . '/simplified-links.php' );
 }
 
 if ( ! defined( 'SIMPLIFIED_LINKS_PLUGIN_BASENAME' ) ) {
