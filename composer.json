@@ -39,10 +39,21 @@
 			"SimplifiedWP\\Links\\": "src/"
 		}
 	},
+	"autoload-dev": {
+        "psr-4": {
+            "SimplifiedWP\\Links\\Tests\\": "tests/"
+        }
+    },
 	"config": {
 		"allow-plugins": {
 			"composer/installers": true,
 			"dealerdirect/phpcodesniffer-composer-installer": true
 		}
-	}
+	},
+	"repositories": [
+		{
+			"type": "git",
+			"url": "https://github.com/wordpress/wordpress-develop.git"
+		}
+	]
 }
