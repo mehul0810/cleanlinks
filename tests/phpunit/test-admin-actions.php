@@ -35,16 +35,8 @@ class Test_Admin_Actions extends WP_UnitTestCase {
 	public static function set_up_before_class() {
 		parent::set_up_before_class();
 		self::$class_instance = new Admin\Actions();
-	}
 
-	/**
-	 * Tests hooks registration.
-	 *
-	 * @covers FewerTags\Admin::register_hooks
-	 */
-	public function test_register_hooks() {
-		self::$class_instance->register_hooks();
-
+		// These assertions should be checked here as these actions will be called on construct of Admin\Actions class.
 		$this->assertSame( 10, has_action( 'admin_enqueue_scripts', [ self::$class_instance, 'register_assets' ] ) );
 		$this->assertSame( 10, has_action( 'admin_menu', [ self::$class_instance, 'add_admin_pages' ] ) );
 		$this->assertSame( 10, has_action( 'manage_simplifiedwp_links_posts_custom_column', [ self::$class_instance, 'simplifiedwp_links_custom_column_values' ] ), 10, 3 );
