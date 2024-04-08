@@ -1,6 +1,7 @@
 <?php
 
-//namespace SimplifiedWP\Links;
+namespace SimplifiedWP\Links;
+
 use SimplifiedWP\Links\Tests\Framework\TestHooks;
 use SimplifiedWP\Links\Tests\TestEnvironment;
 
