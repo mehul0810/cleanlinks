@@ -24,14 +24,13 @@ define('WP_TESTS_CONFIG_FILE_PATH', $currentTestEnvironment->config());
 /**
  * Manually load the plugin being tested.
  */
-function _manually_load_plugin() {
-	require dirname( __DIR__ ) . '/simplified-links.php';
-}
+TestHooks::addFilter('muplugins_loaded', static function () {
+    require_once __DIR__ . '/../simplified-links.php';
+});
 
-add_filter( 'muplugins_loaded', '_manually_load_plugin' );
 
 // install GiveWP
-add_action('setup_theme', static function () {
+TestHooks::addFilter('setup_theme', static function () {
     echo 'Installing SimplifiedWP.....' . PHP_EOL;
     // Initialize the plugin.
     $plugin = new Plugin();
