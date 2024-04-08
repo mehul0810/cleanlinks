@@ -28,10 +28,10 @@ function _manually_load_plugin() {
 	require dirname( __DIR__ ) . '/simplified-links.php';
 }
 
-tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
+add_filter( 'muplugins_loaded', '_manually_load_plugin' );
 
 // install GiveWP
-tests_add_action('setup_theme', static function () {
+add_action('setup_theme', static function () {
     echo 'Installing SimplifiedWP.....' . PHP_EOL;
     // Initialize the plugin.
     $plugin = new Plugin();
