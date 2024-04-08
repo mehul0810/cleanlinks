@@ -63,6 +63,9 @@ class Test_PostType extends WP_UnitTestCase {
 	 */
 	public function test_payment_post_type_labels() {
 		$wp_post_types = get_post_types( array(), 'objects' );
+		echo "<pre>";
+		print_r($wp_post_types);
+		exit("teetet");
 		$this->assertEquals( 'Simplified Links', $wp_post_types['simplifiedwp_links']->labels->name );
 		$this->assertEquals( 'Simplified Link', $wp_post_types['simplifiedwp_links']->labels->singular_name );
 		$this->assertEquals( 'Add New Link', $wp_post_types['simplifiedwp_links']->labels->add_new );
