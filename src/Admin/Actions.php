@@ -31,7 +31,7 @@ class Actions {
 		add_action( 'manage_simplifiedwp_links_posts_custom_column', [ $this, 'simplifiedwp_links_custom_column_values' ], 10, 2 );
 		add_action ('post_submitbox_minor_actions', [ $this, 'before_preview_changes'] );
 	}
-
+		
 	/**
 	 * Add Essential Admin Pages.
 	 *
@@ -41,15 +41,18 @@ class Actions {
 	 * @return void
 	 */
 	public function add_admin_pages() {
-		/* add_submenu_page(
-			'edit.php?post_type=simplifiedwp_links',
-			esc_html__( 'Dashboard', 'simplified-links' ),
-			esc_html__( 'Dashboard', 'simplified-links' ),
-			'manage_options',
-			'simplified_links_dashboard',
-			[ $this, 'dashboard_page' ],
-			0
-		); */
+		
+		if ( is_plugin_active( 'simple-urls/plugin.php' ) ) {
+			add_submenu_page(
+				'edit.php?post_type=simplifiedwp_links',
+				esc_html__( 'Import & Export', 'simplified-links' ),
+				esc_html__( 'Import & Export', 'simplified-links' ),
+				'manage_options',
+				'simplified_links_import_export',
+				[ $this, 'import_export_page' ],
+				5
+			);
+		} 
 
 		add_submenu_page(
 			'edit.php?post_type=simplifiedwp_links',
@@ -92,6 +95,47 @@ class Actions {
 	 */
 	public function dashboard_page() {
 		return 'Dashboard Page';
+	}
+
+	/**
+	 * Import & Export Page for Simplified Links.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 *
+	 * @return mixed
+	 */
+	public function import_export_page() {
+		// check user capabilities
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		
+		//Get the active tab from the $_GET param
+		$default_tab = null;
+		$tab = isset($_GET['tab']) ? $_GET['tab'] : $default_tab;
+		?>
+		
+		<div class="wrap">
+			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
+			<!-- Here are our tabs -->
+			<nav class="nav-tab-wrapper">
+				<a href="?post_type=simplifiedwp_links&page=simplified_links_import_export" class="nav-tab <?php if( $tab === null ): ?>nav-tab-active <?php endif; ?>"> Import </a>
+				<a href="?post_type=simplifiedwp_links&page=simplified_links_import_export&tab=export" class="nav-tab <?php if( $tab === 'export' ):?>nav-tab-active <?php endif; ?>"> Export </a>
+			</nav>
+		
+			<div class="tab-content">
+				<?php switch($tab) :
+				case 'export':
+					echo 'Exports';
+					break;
+				default:
+					echo 'Import tab';
+					break;
+				endswitch; ?>
+			</div>
+		</div>
+		<?php
 	}
 
 	/**
