@@ -97,6 +97,7 @@ class PostType {
 			'menu_icon'          => 'dashicons-admin-links',
 			'register_meta_box_cb' => array( $this, 'action_add_url_metabox' ),
 			'supports'           => array( 'title' ),
+			'can_export'      	 => true,
 		);
 	}
 
