@@ -1,7 +1,7 @@
 <?php
 
 //namespace SimplifiedWP\Links;
-
+use SimplifiedWP\Links\Tests\Framework\TestHooks;
 use SimplifiedWP\Links\Tests\TestEnvironment;
 
 require __DIR__ . '/../vendor/autoload.php';
