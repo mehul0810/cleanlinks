@@ -9,6 +9,9 @@
 
 namespace SimplifiedWP\Links\Admin;
 
+use SimplifiedWP\Links\includes\Database;
+use SimplifiedWP\Links\includes\Helpers;
+use SimplifiedWP\Links\includes\Import;
 /** 
  *  Bailout, if accessed directly. 
  */ 
@@ -17,6 +20,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class Actions {
+	const LIMIT   = 100;
+	const OPTION        = 'simplifiedwp_links_import_all_enable';
+	const FILTER_PLUGIN = 'simplifiedwp_links_import_all_filter_plugin';
+
 	/**
 	 * Initialize the class.
 	 *
@@ -27,6 +34,7 @@ class Actions {
 	 */
 	public function __construct() {
 		add_action( 'admin_enqueue_scripts', [ $this, 'register_assets' ] );
+		add_action( 'wp_ajax_simplified_import', [ $this, 'simplified_import_all_links' ] );
 		add_action( 'admin_menu', [ $this, 'add_admin_pages' ] );
 		add_action( 'manage_simplifiedwp_links_posts_custom_column', [ $this, 'simplifiedwp_links_custom_column_values' ], 10, 2 );
 		add_action ('post_submitbox_minor_actions', [ $this, 'before_preview_changes'] );
@@ -109,31 +117,26 @@ class Actions {
 		// check user capabilities
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
-		}
-		
-		//Get the active tab from the $_GET param
-		$default_tab = null;
-		$tab = isset($_GET['tab']) ? $_GET['tab'] : $default_tab;
-		?>
-		
+		} ?>
 		<div class="wrap">
 			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
-			<!-- Here are our tabs -->
-			<nav class="nav-tab-wrapper">
-				<a href="?post_type=simplifiedwp_links&page=simplified_links_import_export" class="nav-tab <?php if( $tab === null ): ?>nav-tab-active <?php endif; ?>"> Import </a>
-				<a href="?post_type=simplifiedwp_links&page=simplified_links_import_export&tab=export" class="nav-tab <?php if( $tab === 'export' ):?>nav-tab-active <?php endif; ?>"> Export </a>
-			</nav>
-		
-			<div class="tab-content">
-				<?php switch($tab) :
-				case 'export':
-					echo 'Exports';
-					break;
-				default:
-					echo 'Import tab';
-					break;
-				endswitch; ?>
+
+			<div class="migrate-content white-bg rounded shadow">
+				<h2>Migrate From Lasso Lite</h2>
+				
+				<div class="progress mt-3 mb-3 d-none" id="progress" >
+					<div class="progress-bar progress-bar-striped progress-bar-animated green-bg" role="progressbar" id="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 10%;transition: width 1s ease !important; background-color:#22baa0;animation: progress-bar-stripes 1s linear infinite;background-image: linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);background-size: 1rem 1rem;display: flex;-webkit-box-orient: vertical;-webkit-box-direction: normal;flex-direction: column;-webkit-box-pack: center;justify-content: center;color: #fff;text-align: center;"></div>
+				</div>
+				<p class="js-message"></p>
+
+				<p class="submit">
+					<button name="migrate-button" id="migrate-btn" class="button button-primary">
+						<?php esc_html_e( 'Migrate', 'simplified-links' ); ?>
+					</button>
+				</p>
+				<div class="errormessage d-none" id="errormessage"></div>
 			</div>
+
 		</div>
 		<?php
 	}
@@ -147,7 +150,14 @@ class Actions {
 	 * @return mixed
 	 */
 	public function reports_page() {
-		return 'Reports Page';
+		// check user capabilities
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		} ?>
+		<div class="wrap">
+			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
+		</div>
+		<?php
 	}
 
 	/**
@@ -159,7 +169,14 @@ class Actions {
 	 * @return mixed
 	 */
 	public function support_page() {
-		return 'Support Page';
+		// check user capabilities
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		} ?>
+		<div class="wrap">
+			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
+		</div>
+		<?php
 	}
 
 	/**
@@ -171,7 +188,14 @@ class Actions {
 	 * @return mixed
 	 */
 	public function more_plugins_page() {
-		return 'More Plugins Page';
+		// check user capabilities
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		} ?>
+		<div class="wrap">
+			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
+		</div>
+		<?php
 	}
 
 	/**
@@ -247,5 +271,61 @@ class Actions {
 			</div>
 		<?php
 		}
+	}
+
+	/**
+	 * Ajax callback function
+	 */
+	public function simplified_import_all_links() {
+		
+		global $wpdb;
+		$simplified_db = new Database();
+		$simplified_import = new Import();
+		// $lasso_post_type = 'surl';
+
+		$filter_plugin = 'simple-urls';
+
+		$sql = $simplified_db->get_import_urls_query( $filter_plugin );
+		
+		$sql = $simplified_db->paginate( $sql, 1, self::LIMIT );
+		
+		$all_imports = $wpdb->get_results( $sql );
+		
+		$count = count( $all_imports );
+		
+		// echo "<pre>";
+		// print_r($all_imports);
+		//exit("czcz");
+		
+		if( $count <= 0 ) {
+			update_option( self::OPTION, '0' );
+			
+			wp_send_json_error(
+				array(
+					'status' => false,
+				)
+			);
+
+		} else {
+			foreach ( $all_imports as $import ) {
+				$import = Helpers::format_importable_data( $import );
+				///echo "<pre>";
+				//print_r($import);
+				//exit("import");
+				if( $import->id && $import->post_type ) {
+					$simplified_import->process_single_link_data_import( $import->id, $import->post_type );
+				}
+			}
+
+			update_option( self::OPTION, '1' );
+
+			wp_send_json_success(
+				array(
+					'status' => true,
+				)
+			);
+		}
+
+		wp_die();
 	}
 }

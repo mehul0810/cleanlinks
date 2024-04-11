@@ -15,5 +15,71 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class Helpers {
+	/**
+	 * Format importable data before showing/importing/reverting
+	 *
+	 * @param object $p Importable post.
+	 */
+	public static function format_importable_data( $p ) {
+		//$simpli_db         = new Database();
+		//$lasso_helper     = new Helper();
+		//$home_url            = home_url();
+		$p->import_permalink = get_permalink( $p->id );
+		
+		//$import_data = $this->get_simple_url_link_data( $p->id, $p->post_title, $p->import_permalink );
+
+		return $p;
+	}
+
 	
+
+	/**
+	 * Check whether slug exists or not
+	 *
+	 * @param string $post_name Post name.
+	 * @param int    $post_id   Post id. Default to 0.
+	 */
+	public static function the_slug_exists( $post_name, $post_id = 0 ) {
+		global $wpdb;
+		if ( empty( $post_name ) ) {
+			return false;
+		}
+		
+		$posts_tbl = $wpdb->posts;
+		$sql       = '
+			SELECT 
+				ID,
+				post_name,
+				post_type
+			FROM '
+				. $posts_tbl . ' 
+			WHERE 
+				post_name = %s 
+				AND ID != %d 
+				AND post_status <> "trash"
+				AND post_type = %s
+			LIMIT 1
+		';
+
+		$sql_prepare = $wpdb->prepare( $sql, $post_name, $post_id, 'simplifiedwp_links' );
+
+		$row     = $wpdb->get_row( $sql_prepare, 'ARRAY_A' ); // phpcs:ignore
+
+		return $row ? $row : false;
+	}
+
+	/**
+	 * Get unique post name of Simplifiedwp_links post
+	 *
+	 * @param int    $post_id   Post id.
+	 * @param string $post_name Post name.
+	 */
+	public static function simplified_unique_post_name( $post_id, $post_name ) {
+		if ( intval( $post_id ) > 0 && ! empty( $post_name ) && self::the_slug_exists( $post_name, $post_id ) ) {
+			$post_name = rtrim( $post_name, '-link' ); // ? Fix the issue adding multiple "-link" string to the end.
+			$post_name = wp_unique_post_slug( $post_name, $post_id, 'publish', 'simplifiedwp_links', 0 );
+		}
+
+		return $post_name;
+	}
 }
