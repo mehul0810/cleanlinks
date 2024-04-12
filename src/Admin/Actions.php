@@ -12,9 +12,9 @@ namespace SimplifiedWP\Links\Admin;
 use SimplifiedWP\Links\includes\Database;
 use SimplifiedWP\Links\includes\Helpers;
 use SimplifiedWP\Links\includes\Import;
-/** 
- *  Bailout, if accessed directly. 
- */ 
+/**
+ *  Bailout, if accessed directly.
+ */
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -40,7 +40,7 @@ class Actions {
 		add_action ('post_submitbox_minor_actions', [ $this, 'before_preview_changes'] );
 		add_action( 'admin_post_export', [ $this, 'export_csv' ] );
 	}
-	
+
 	/**
 	 * Add Essential Admin Pages.
 	 *
@@ -50,7 +50,7 @@ class Actions {
 	 * @return void
 	 */
 	public function add_admin_pages() {
-		
+
 		if ( is_plugin_active( 'simple-urls/plugin.php' ) ) {
 			add_submenu_page(
 				'edit.php?post_type=simplifiedwp_links',
@@ -61,7 +61,7 @@ class Actions {
 				[ $this, 'import_export_page' ],
 				5
 			);
-		} 
+		}
 
 		add_submenu_page(
 			'edit.php?post_type=simplifiedwp_links',
@@ -125,7 +125,7 @@ class Actions {
 			<div class="migrate-content white-bg rounded shadow">
 				<h2>Import</h2>
 				<h2>Migrate From Lasso Lite</h2>
-				
+
 				<div class="progress mt-3 mb-3 sl-hidden" id="progress" >
 					<div class="progress-bar progress-bar-striped progress-bar-animated green-bg" role="progressbar" id="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
 				</div>
@@ -140,10 +140,10 @@ class Actions {
 			</div>
 
 			<hr class="differ">
-			
+
 			<div class="migrate-content white-bg rounded shadow section-2">
 				<h2>Export</h2>
-				
+
 				<form id="export-form" action="<?php echo admin_url( 'admin-post.php' ); ?>" method="post">
 					<?php wp_nonce_field( 'export_data', 'export_nonce' ); ?>
 					<input type="hidden" name="action" value="export"/>
@@ -221,8 +221,8 @@ class Actions {
 	 * @return void
 	 */
 	public function register_assets() {
-		wp_enqueue_style( 'simplified-admin', SIMPLIFIED_LINKS_PLUGIN_URL . 'assets/src/css/admin/simplified-admin.css', '', SIMPLIFIED_LINKS_VERSION );
-		wp_enqueue_script( 'simplified-admin', SIMPLIFIED_LINKS_PLUGIN_URL . 'assets/src/js/admin/simplified-admin.js', '', SIMPLIFIED_LINKS_VERSION, true );
+		wp_enqueue_style( 'simplified-admin', SIMPLIFIED_LINKS_PLUGIN_URL . 'assets/dist/css/admin.css', '', SIMPLIFIED_LINKS_VERSION );
+		wp_enqueue_script( 'simplified-admin', SIMPLIFIED_LINKS_PLUGIN_URL . 'assets/dist/js/admin.js', '', SIMPLIFIED_LINKS_VERSION, true );
 	}
 
 	/**
@@ -235,7 +235,7 @@ class Actions {
 	public function simplifiedwp_links_custom_column_values( $column, $post_id ) {
 		switch ( $column ) {
 			case 'simplified_permalink':
-				
+
 				$link = get_the_permalink();
 				printf(
 					'<button
@@ -246,7 +246,7 @@ class Actions {
 							data-default-text="Copy URL"
 							data-copied-text="Copied!"
 							data-url="%2$s">
-						<span class="dashicons dashicons-admin-page"></span> <span class="simplified-button-text"> %3$s </span> 
+						<span class="dashicons dashicons-admin-page"></span> <span class="simplified-button-text"> %3$s </span>
 					</button>',
 					esc_attr( $link ),
 					esc_attr( $link ),
@@ -255,7 +255,7 @@ class Actions {
 				break;
 
 			case 'redirect_url':
-				
+
 				$redirect_url = get_post_meta( $post_id , 'simplified_redirect_url' , true );
 				$allowed_tags = array(
 					'a' => array(
@@ -265,21 +265,21 @@ class Actions {
 				);
 				echo wp_kses( make_clickable( esc_url( $redirect_url ? $redirect_url : '' ) ), $allowed_tags );
 				break;
-			
+
 			case 'clicks_count':
 				$count_click = get_post_meta( $post_id , 'simplified_redirect_count' , true );
 				echo esc_html( $count_click ? $count_click : 0 );
 				break;
-		}	
+		}
 	}
 	/**
 	 * This function is used for display click count to post meta box
 	 */
 	public function before_preview_changes($post) {
-		if ( $post->post_type == 'simplifiedwp_links') { 
+		if ( $post->post_type == 'simplifiedwp_links') {
 			$count = isset( $post->ID ) ? get_post_meta( $post->ID, 'simplified_redirect_count', true ) : 0;
 			?>
-			
+
 			<div class="simplified-click-count">
 				<?php /* translators: %d is the counter of clicks. */
 				echo '<p>' . sprintf( esc_html__( 'This URL has been accessed %d times', 'simplified-links' ), esc_attr( $count ) ) . '</p>'; ?>
@@ -292,7 +292,7 @@ class Actions {
 	 * Ajax callback function
 	 */
 	public function simplified_import_all_links() {
-		
+
 		global $wpdb;
 		$simplified_db = new Database();
 		$simplified_import = new Import();
@@ -300,16 +300,16 @@ class Actions {
 		$filter_plugin = 'simple-urls';
 
 		$sql = $simplified_db->get_import_urls_query( $filter_plugin );
-		
+
 		$sql = $simplified_db->paginate( $sql, 1, self::LIMIT );
-		
+
 		$all_imports = $wpdb->get_results( $sql );
-		
+
 		$count = count( $all_imports );
-		
+
 		if( $count <= 0 ) {
 			update_option( self::OPTION, '0' );
-			
+
 			wp_send_json_error(
 				array(
 					'status' => false,
@@ -319,7 +319,7 @@ class Actions {
 		} else {
 			foreach ( $all_imports as $import ) {
 				$import = Helpers::format_importable_data( $import );
-				
+
 				if( $import->id && $import->post_type ) {
 					$simplified_import->process_single_link_data_import( $import->id, $import->post_type );
 				}
@@ -362,13 +362,13 @@ class Actions {
 
 		// Create a file pointer with PHP.
 		$output = fopen( 'php://output', 'w' );
-		
+
 		// Write headers to CSV file.
 		fputcsv( $output, $header_args );
 
 		// Loop through the prepared data to output it to CSV file.
 		foreach( $results as $key => $value ) {
-			$modified_values = array( 
+			$modified_values = array(
 				$value['Id'],
 				$value['Title'],
 				$value['Date'],
