@@ -38,8 +38,9 @@ class Actions {
 		add_action( 'admin_menu', [ $this, 'add_admin_pages' ] );
 		add_action( 'manage_simplifiedwp_links_posts_custom_column', [ $this, 'simplifiedwp_links_custom_column_values' ], 10, 2 );
 		add_action ('post_submitbox_minor_actions', [ $this, 'before_preview_changes'] );
+		add_action( 'admin_post_export', [ $this, 'export_csv' ] );
 	}
-		
+	
 	/**
 	 * Add Essential Admin Pages.
 	 *
@@ -122,6 +123,7 @@ class Actions {
 			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
 
 			<div class="migrate-content white-bg rounded shadow">
+				<h2>Import</h2>
 				<h2>Migrate From Lasso Lite</h2>
 				
 				<div class="progress mt-3 mb-3 sl-hidden" id="progress" >
@@ -135,6 +137,18 @@ class Actions {
 					</button>
 				</p>
 				<div class="errormessage sl-hidden" id="errormessage"></div>
+			</div>
+
+			<hr class="differ">
+			
+			<div class="migrate-content white-bg rounded shadow section-2">
+				<h2>Export</h2>
+				
+				<form id="export-form" action="<?php echo admin_url( 'admin-post.php' ); ?>" method="post">
+					<?php wp_nonce_field( 'export_data', 'export_nonce' ); ?>
+					<input type="hidden" name="action" value="export"/>
+					<input type="submit" name="export-submit" id="export-submit" class="button button-primary" value="<?php esc_html_e( 'Export', 'simplified-links' ); ?>" />
+				</form>
 			</div>
 
 		</div>
@@ -282,7 +296,6 @@ class Actions {
 		global $wpdb;
 		$simplified_db = new Database();
 		$simplified_import = new Import();
-		// $lasso_post_type = 'surl';
 
 		$filter_plugin = 'simple-urls';
 
@@ -293,10 +306,6 @@ class Actions {
 		$all_imports = $wpdb->get_results( $sql );
 		
 		$count = count( $all_imports );
-		
-		// echo "<pre>";
-		// print_r($all_imports);
-		//exit("czcz");
 		
 		if( $count <= 0 ) {
 			update_option( self::OPTION, '0' );
@@ -310,9 +319,7 @@ class Actions {
 		} else {
 			foreach ( $all_imports as $import ) {
 				$import = Helpers::format_importable_data( $import );
-				///echo "<pre>";
-				//print_r($import);
-				//exit("import");
+				
 				if( $import->id && $import->post_type ) {
 					$simplified_import->process_single_link_data_import( $import->id, $import->post_type );
 				}
@@ -328,4 +335,52 @@ class Actions {
 		}
 		wp_die();
 	}
+
+	/**
+	 * Export csv functionality
+	 */
+	public function export_csv() {
+
+		// Start the output buffer.
+		ob_start();
+
+		global $wpdb;
+		$simplified_db = new Database();
+		// Set PHP headers for CSV output.
+		header('Content-Type: text/csv; charset=utf-8');
+		header('Content-Disposition: attachment; filename=export_simplified.csv');
+
+		// Create the headers.
+		$header_args = array( 'Id', 'Title', 'Date', 'Redirect From', 'Redirect To' );
+
+		$sql = $simplified_db->export_simplified_data();
+
+		$results = $wpdb->get_results( $sql, ARRAY_A );
+
+		// Clean up output buffer before writing anything to CSV file.
+		ob_end_clean();
+
+		// Create a file pointer with PHP.
+		$output = fopen( 'php://output', 'w' );
+		
+		// Write headers to CSV file.
+		fputcsv( $output, $header_args );
+
+		// Loop through the prepared data to output it to CSV file.
+		foreach( $results as $key => $value ) {
+			$modified_values = array( 
+				$value['Id'],
+				$value['Title'],
+				$value['Date'],
+				get_permalink( $value['Id'] ),
+				get_post_meta( $value['Id'], 'simplified_redirect_url', true )
+			);
+			fputcsv( $output, $modified_values );
+		}
+
+		// Close the file pointer with PHP with the updated output.
+		fclose( $output );
+		exit;
+	}
+
 }

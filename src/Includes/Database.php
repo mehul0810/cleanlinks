@@ -115,5 +115,24 @@ class Database {
 
 		return $result1;
 	}
+
+	public function export_simplified_data() {
+		global $wpdb;
+		
+		$simplified_post_type = 'simplifiedwp_links'; 
+		$sql = "
+			SELECT
+			po.ID as Id,
+			CONVERT(po.post_title USING utf8) as Title,
+			po.post_date as Date
+			FROM {$wpdb->posts} as po
+			WHERE po.post_type = %s
+			AND po.post_status = 'publish'
+		";	
+
+		$sql = $wpdb->prepare( $sql, $simplified_post_type );
+		
+		return $sql;		
+	}
 	
 }
