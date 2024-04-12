@@ -31,8 +31,8 @@
 			"@php -r \"exit( intval( is_null( json_decode( file_get_contents( './.wordpress-org/blueprints/blueprint.json' ) ) ) ) );\""
 		],
 		"test": [
-            "@php ./vendor/phpunit/phpunit/phpunit"
-        ]
+			"@php ./vendor/phpunit/phpunit/phpunit"
+		]
 	},
 	"autoload": {
 		"psr-4": {
@@ -40,10 +40,10 @@
 		}
 	},
 	"autoload-dev": {
-        "psr-4": {
-            "SimplifiedWP\\Links\\Tests\\": "tests/"
-        }
-    },
+		"psr-4": {
+			"SimplifiedWP\\Links\\Tests\\": "tests/"
+		}
+	},
 	"config": {
 		"allow-plugins": {
 			"composer/installers": true,
