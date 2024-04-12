@@ -51,3 +51,6 @@
 .simplified-links-rating-link {
     text-decoration:none;
 }
+hr.differ {
+    border-top: 1px solid;
+}

@@ -57,7 +57,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
                             progressmsg.textContent = "Import Successfully";
                         }
                     }, 200); // Update progress every 200 milliseconds
-                    setTimeout(() => {
+                setTimeout(() => {
                         hideProgressBar();
                     }, 5000);
                     console.log("success");    
