@@ -49,7 +49,7 @@ class Filters {
 			return sprintf(
 				/* translators: %s: Link to 5 star rating */
 				__( 'If you like <strong>Simplified Links</strong> please leave us a %s rating. It takes a minute and helps a lot. Thanks in advance!', 'simplified-links' ),
-				'<a href="https://wordpress.org/support/view/plugin-reviews/simplified-links?filter=5#postform" target="_blank" class="simplified-links-rating-link" style="text-decoration:none;" data-rated="' . esc_attr__( 'Thanks :)', 'simplified-links' ) . '">&#9733;&#9733;&#9733;&#9733;&#9733;</a>'
+				'<a href="https://wordpress.org/support/view/plugin-reviews/simplified-links?filter=5#postform" target="_blank" class="simplified-links-rating-link" data-rated="' . esc_attr__( 'Thanks :)', 'simplified-links' ) . '">&#9733;&#9733;&#9733;&#9733;&#9733;</a>'
 			);
 		}
 		

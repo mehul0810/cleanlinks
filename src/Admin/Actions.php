@@ -124,8 +124,8 @@ class Actions {
 			<div class="migrate-content white-bg rounded shadow">
 				<h2>Migrate From Lasso Lite</h2>
 				
-				<div class="progress mt-3 mb-3 d-none" id="progress" >
-					<div class="progress-bar progress-bar-striped progress-bar-animated green-bg" role="progressbar" id="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 10%;transition: width 1s ease !important; background-color:#22baa0;animation: progress-bar-stripes 1s linear infinite;background-image: linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);background-size: 1rem 1rem;display: flex;-webkit-box-orient: vertical;-webkit-box-direction: normal;flex-direction: column;-webkit-box-pack: center;justify-content: center;color: #fff;text-align: center;"></div>
+				<div class="progress mt-3 mb-3 sl-hidden" id="progress" >
+					<div class="progress-bar progress-bar-striped progress-bar-animated green-bg" role="progressbar" id="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
 				</div>
 				<p class="js-message"></p>
 
@@ -134,7 +134,7 @@ class Actions {
 						<?php esc_html_e( 'Migrate', 'simplified-links' ); ?>
 					</button>
 				</p>
-				<div class="errormessage d-none" id="errormessage"></div>
+				<div class="errormessage sl-hidden" id="errormessage"></div>
 			</div>
 
 		</div>
@@ -207,6 +207,7 @@ class Actions {
 	 * @return void
 	 */
 	public function register_assets() {
+		wp_enqueue_style( 'simplified-admin', SIMPLIFIED_LINKS_PLUGIN_URL . 'assets/src/css/admin/simplified-admin.css', '', SIMPLIFIED_LINKS_VERSION );
 		wp_enqueue_script( 'simplified-admin', SIMPLIFIED_LINKS_PLUGIN_URL . 'assets/src/js/admin/simplified-admin.js', '', SIMPLIFIED_LINKS_VERSION, true );
 	}
 
@@ -231,7 +232,7 @@ class Actions {
 							data-default-text="Copy URL"
 							data-copied-text="Copied!"
 							data-url="%2$s">
-						<span class="dashicons dashicons-admin-page" style="font-size: 16px; margin-right: 2px; vertical-align: middle; width: 16px;"></span> <span class="simplified-button-text"> %3$s </span> 
+						<span class="dashicons dashicons-admin-page"></span> <span class="simplified-button-text"> %3$s </span> 
 					</button>',
 					esc_attr( $link ),
 					esc_attr( $link ),
@@ -265,7 +266,7 @@ class Actions {
 			$count = isset( $post->ID ) ? get_post_meta( $post->ID, 'simplified_redirect_count', true ) : 0;
 			?>
 			
-			<div class="simplified-click-count" style="text-align:left;">
+			<div class="simplified-click-count">
 				<?php /* translators: %d is the counter of clicks. */
 				echo '<p>' . sprintf( esc_html__( 'This URL has been accessed %d times', 'simplified-links' ), esc_attr( $count ) ) . '</p>'; ?>
 			</div>
@@ -325,7 +326,6 @@ class Actions {
 				)
 			);
 		}
-
 		wp_die();
 	}
 }

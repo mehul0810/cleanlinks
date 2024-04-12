@@ -8,18 +8,9 @@ document.addEventListener( 'DOMContentLoaded', () => {
     const progressBar = document.getElementById('progressbar');
     const progressmsg = document.querySelector(".js-message");
 
-    const styles = {
-        display: 'flex',
-        height: '1rem',
-        overflow: 'hidden',
-        fontSize: '.75rem', 
-        backgroundColor: '#e2e2e2',
-        borderRadius: '0.5rem',
-    };
-
     const setProgressZero = () => {
         progressBar.style.width = '0%'; // Initialize progress bar width to 0%
-        progress.classList.remove('d-none'); // Show progress
+        progress.classList.remove('sl-hidden'); // Show progress
         progressmsg.textContent = "Importing and updating your links. For large bulk imports this may take some time with no progress bar movement.";
     }
 
@@ -29,9 +20,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 
     const hideProgressBar = () => {
         progressmsg.textContent = "";
-        errorMessage.textContent = "";
-        progress.classList.add('d-none'); // Hide progress bar
-        Object.assign(progress.style, {});
+        progress.classList.add('sl-hidden'); // Hide progress bar
     };
 
     if ( null !== migratebtn ) {
@@ -39,9 +28,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 			e.preventDefault();
 
             setProgressZero(); // Show progress bar before sending the request
-            
-            Object.assign(progress.style, styles);
-
+        
             const formData = new FormData();
 			formData.append( 'action', 'simplified_import' );
 
@@ -67,20 +54,23 @@ document.addEventListener( 'DOMContentLoaded', () => {
                 
                         if (width >= 100) {
                             clearInterval(interval); // Stop the interval when width reaches 100%
+                            progressmsg.textContent = "Import Successfully";
                         }
                     }, 200); // Update progress every 200 milliseconds
-                    progressmsg.textContent = "";
+                    setTimeout(() => {
+                        hideProgressBar();
+                    }, 5000);
                     console.log("success");    
                 } else {
-                    //var data = JSON.parse(data);
                     console.log("data = "+data.success);
                     console.log("error");
-                    errorMessage.classList.remove('d-none');
+                    errorMessage.classList.remove('sl-hidden');
                     errorMessage.textContent = "There was no any import lasso post data.";
                     setTimeout(() => {
-                        errorMessage.classList.add('d-none');
+                        errorMessage.classList.add('sl-hidden');
+                        errorMessage.textContent = "";
                         hideProgressBar();
-                    }, 3000);
+                    }, 5000);
                 }
             } )
             .catch(error => {
