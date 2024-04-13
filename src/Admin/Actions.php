@@ -235,23 +235,21 @@ class Actions {
 	public function simplifiedwp_links_custom_column_values( $column, $post_id ) {
 		switch ( $column ) {
 			case 'simplified_permalink':
-
-				$link = get_the_permalink();
-				printf(
-					'<button
-							type="button"
-							id="simplifedbutton"
-							class="button js-simplified-link-button"
-							aria-label="%1$s"
-							data-default-text="Copy URL"
-							data-copied-text="Copied!"
-							data-url="%2$s">
-						<span class="dashicons dashicons-admin-page"></span> <span class="simplified-button-text"> %3$s </span>
-					</button>',
-					esc_attr( $link ),
-					esc_attr( $link ),
-					esc_html__( 'Copy URL', 'simplified-links' )
-				);
+				$default_text = __( 'Copy URL', 'simplified-links' );
+				$permalink    = get_the_permalink( $post_id );
+				?>
+				<button
+					type="button"
+					class="button simplified-links--copy-button"
+					aria-label="<?php echo $permalink; ?>"
+					data-default-text="<?php echo esc_html( $default_text ); ?>"
+					data-copied-text="<?php echo esc_html__( 'Copied!', 'simplified-links' ); ?>"
+					data-url="<?php echo $permalink; ?>"
+				>
+					<span class="dashicons dashicons-admin-page"></span>
+					<span class="simplified-links--copy-button-text"><?php echo esc_html( $default_text ); ?></span>
+				</button>
+				<?php
 				break;
 
 			case 'redirect_url':
