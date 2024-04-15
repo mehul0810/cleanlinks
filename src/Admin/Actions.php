@@ -51,38 +51,16 @@ class Actions {
 	 */
 	public function add_admin_pages() {
 		
-		if ( is_plugin_active( 'simple-urls/plugin.php' ) ) {
-			add_submenu_page(
-				'edit.php?post_type=simplifiedwp_links',
-				esc_html__( 'Import & Export', 'simplified-links' ),
-				esc_html__( 'Import & Export', 'simplified-links' ),
-				'manage_options',
-				'simplified_links_import_export',
-				[ $this, 'import_export_page' ],
-				5
-			);
-		} 
-
 		add_submenu_page(
 			'edit.php?post_type=simplifiedwp_links',
-			esc_html__( 'Reports', 'simplified-links' ),
-			esc_html__( 'Reports', 'simplified-links' ),
+			esc_html__( 'Import/Export', 'simplified-links' ),
+			esc_html__( 'Import/Export', 'simplified-links' ),
 			'manage_options',
-			'simplified_links_reports',
-			[ $this, 'reports_page' ],
+			'simplified_links_import_export',
+			[ $this, 'import_export_page' ],
 			5
 		);
-
-		add_submenu_page(
-			'edit.php?post_type=simplifiedwp_links',
-			esc_html__( 'Support', 'simplified-links' ),
-			esc_html__( 'Support', 'simplified-links' ),
-			'manage_options',
-			'simplified_links_support',
-			[ $this, 'support_page' ],
-			5
-		);
-
+		 
 		add_submenu_page(
 			'edit.php?post_type=simplifiedwp_links',
 			esc_html__( 'More Plugins', 'simplified-links' ),
@@ -92,18 +70,6 @@ class Actions {
 			[ $this, 'more_plugins_page' ],
 			5
 		);
-	}
-
-	/**
-	 * Dashboard Page for Simplified Links.
-	 *
-	 * @since  1.0.0
-	 * @access public
-	 *
-	 * @return mixed
-	 */
-	public function dashboard_page() {
-		return 'Dashboard Page';
 	}
 
 	/**
@@ -151,44 +117,6 @@ class Actions {
 				</form>
 			</div>
 
-		</div>
-		<?php
-	}
-
-	/**
-	 * Reports Page for Simplified Links.
-	 *
-	 * @since  1.0.0
-	 * @access public
-	 *
-	 * @return mixed
-	 */
-	public function reports_page() {
-		// check user capabilities
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
-		} ?>
-		<div class="wrap">
-			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
-		</div>
-		<?php
-	}
-
-	/**
-	 * Support Page for Simplified Links.
-	 *
-	 * @since  1.0.0
-	 * @access public
-	 *
-	 * @return mixed
-	 */
-	public function support_page() {
-		// check user capabilities
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
-		} ?>
-		<div class="wrap">
-			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
 		</div>
 		<?php
 	}
