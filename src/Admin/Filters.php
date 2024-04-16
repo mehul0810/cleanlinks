@@ -91,8 +91,8 @@ class Filters {
 			'cb'     		=> '<input type="checkbox" />',
 			'title'     	=> esc_html__( 'Title', 'simplified-links' ),
 			'simplified_permalink' 	=> esc_html__( 'Permalink', 'simplified-links' ),
-			'redirect_url'	=> esc_html__( 'Redirect To', 'simplified-links' ),
-			'clicks_count'	=> esc_html__( 'Total Clicks', 'simplified-links' ),
+			'redirect_to'	=> esc_html__( 'Redirect To', 'simplified-links' ),
+			'total_clicks'	=> esc_html__( 'Total Clicks', 'simplified-links' ),
 			'date'			=> esc_html__( 'Date', 'simplified-links' ),
 		);
 
