@@ -63,7 +63,7 @@ class Database {
 			
 			$sql = new \WP_Query($args);
 
-			//$sql = $wpdb->prepare( $sql, $lasso_post_type );
+			/* $sql = $wpdb->prepare( $sql, $lasso_post_type ); */
 		}
 
 		return $sql;

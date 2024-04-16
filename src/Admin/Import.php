@@ -9,7 +9,6 @@
 
 namespace SimplifiedWP\Links\Admin;
 
-//use SimplifiedWP\Links\includes\Database;
 use SimplifiedWP\Links\includes\Helpers;
 
 // Bailout, if accessed directly.
