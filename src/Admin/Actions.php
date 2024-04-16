@@ -18,10 +18,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class Actions {
-	const LIMIT   = 100;
+	
 	const OPTION        = 'simplifiedwp_links_import_all_enable';
-	const FILTER_PLUGIN = 'simplifiedwp_links_import_all_filter_plugin';
-
+	
 	/**
 	 * Initialize the class.
 	 *
