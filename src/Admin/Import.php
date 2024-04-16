@@ -7,9 +7,9 @@
  * @since 1.0.0
  */
 
-namespace SimplifiedWP\Links\Includes;
+namespace SimplifiedWP\Links\Admin;
 
-use SimplifiedWP\Links\includes\Database;
+//use SimplifiedWP\Links\includes\Database;
 use SimplifiedWP\Links\includes\Helpers;
 
 // Bailout, if accessed directly.
@@ -123,10 +123,7 @@ class Import {
 	 */
 	private function import_into_simplified( $import_data, $post_type ) {
 		$simplified_db = new Database();
-		//$lasso_affiliate_link = new Lasso_Affiliate_Link();
-
-		//$lasso_settings = Setting::get_settings();
-
+		
 		// ? Make sure slug is correct
 		$post_id = $import_data['post']->ID ?? '';
 		$slug    = $import_data['post']->post_name ?? '';
@@ -143,9 +140,6 @@ class Import {
 		if( isset( $data['surl_redirect'] ) && !empty ( $data['surl_redirect'] ) ) {
 			update_post_meta( $post_id , 'simplified_redirect_url' , $data['surl_redirect'] );
 		}
-		// $post_id                 = $lasso_affiliate_link->save_lasso_url( $data );
-		
-		// $import_data['post']->ID = $post_id;
 
 		$post      = get_post( $post_id );
 		$post_name = $post->post_name ?? '';
@@ -167,7 +161,7 @@ class Import {
 	/**
 	 * Unset cache by key
 	 *
-	 * @param Cache key $key cache key.
+	 * @param $key cache key.
 	 */
 	public function un_set( $key ) {
 		if ( isset( $this->data[ $key ] ) ) {
