@@ -51,34 +51,14 @@ class Actions {
 		
 		add_submenu_page(
 			'edit.php?post_type=simplifiedwp_links',
-			esc_html__( 'Import & Export', 'simplified-links' ),
-			esc_html__( 'Import & Export', 'simplified-links' ),
+			esc_html__( 'Import/Export', 'simplified-links' ),
+			esc_html__( 'Import/Export', 'simplified-links' ),
 			'manage_options',
 			'simplified_links_import_export',
 			[ $this, 'import_export_page' ],
 			5
-		); 
-
-		add_submenu_page(
-			'edit.php?post_type=simplifiedwp_links',
-			esc_html__( 'Reports', 'simplified-links' ),
-			esc_html__( 'Reports', 'simplified-links' ),
-			'manage_options',
-			'simplified_links_reports',
-			[ $this, 'reports_page' ],
-			5
 		);
-
-		add_submenu_page(
-			'edit.php?post_type=simplifiedwp_links',
-			esc_html__( 'Support', 'simplified-links' ),
-			esc_html__( 'Support', 'simplified-links' ),
-			'manage_options',
-			'simplified_links_support',
-			[ $this, 'support_page' ],
-			5
-		);
-
+		 
 		add_submenu_page(
 			'edit.php?post_type=simplifiedwp_links',
 			esc_html__( 'More Plugins', 'simplified-links' ),
@@ -88,18 +68,6 @@ class Actions {
 			[ $this, 'more_plugins_page' ],
 			5
 		);
-	}
-
-	/**
-	 * Dashboard Page for Simplified Links.
-	 *
-	 * @since  1.0.0
-	 * @access public
-	 *
-	 * @return mixed
-	 */
-	public function dashboard_page() {
-		return 'Dashboard Page';
 	}
 
 	/**
@@ -170,44 +138,6 @@ class Actions {
 	}
 
 	/**
-	 * Reports Page for Simplified Links.
-	 *
-	 * @since  1.0.0
-	 * @access public
-	 *
-	 * @return mixed
-	 */
-	public function reports_page() {
-		// check user capabilities
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
-		} ?>
-		<div class="wrap">
-			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
-		</div>
-		<?php
-	}
-
-	/**
-	 * Support Page for Simplified Links.
-	 *
-	 * @since  1.0.0
-	 * @access public
-	 *
-	 * @return mixed
-	 */
-	public function support_page() {
-		// check user capabilities
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
-		} ?>
-		<div class="wrap">
-			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
-		</div>
-		<?php
-	}
-
-	/**
 	 * More Plugins Page for Simplified Links.
 	 *
 	 * @since  1.0.0
@@ -268,7 +198,7 @@ class Actions {
 				);
 				break;
 
-			case 'redirect_url':
+			case 'redirect_to':
 				
 				$redirect_url = get_post_meta( $post_id , 'simplified_redirect_url' , true );
 				$allowed_tags = array(
@@ -280,7 +210,7 @@ class Actions {
 				echo wp_kses( make_clickable( esc_url( $redirect_url ? $redirect_url : '' ) ), $allowed_tags );
 				break;
 			
-			case 'clicks_count':
+			case 'total_clicks':
 				$count_click = get_post_meta( $post_id , 'simplified_redirect_count' , true );
 				echo esc_html( $count_click ? $count_click : 0 );
 				break;
