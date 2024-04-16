@@ -254,7 +254,7 @@ class Actions {
 				);
 				break;
 
-			case 'redirect_url':
+			case 'redirect_to':
 				
 				$redirect_url = get_post_meta( $post_id , 'simplified_redirect_url' , true );
 				$allowed_tags = array(
@@ -266,7 +266,7 @@ class Actions {
 				echo wp_kses( make_clickable( esc_url( $redirect_url ? $redirect_url : '' ) ), $allowed_tags );
 				break;
 			
-			case 'clicks_count':
+			case 'total_clicks':
 				$count_click = get_post_meta( $post_id , 'simplified_redirect_count' , true );
 				echo esc_html( $count_click ? $count_click : 0 );
 				break;
