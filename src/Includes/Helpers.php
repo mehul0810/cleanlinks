@@ -15,6 +15,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class Helpers {
+	/**
+	 * Helps cleaning the input data. Prevents XSS.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 *
+	 * @param string|array $input Any type of input data.
+	 *
+	 * @return void
+	 */
+	public static function clean( $input ) {
+		if ( is_array( $input ) ) {
+			return array_map( 'wc_clean', $input );
+		} else {
+			return is_scalar( $input ) ? sanitize_text_field( $input ) : $input;
+		}
+	}
+
 
 	/**
 	 * Check whether slug exists or not
@@ -30,15 +48,15 @@ class Helpers {
 
 		$posts_tbl = $wpdb->posts;
 		$sql       = '
-			SELECT 
+			SELECT
 				ID,
 				post_name,
 				post_type
 			FROM '
-				. $posts_tbl . ' 
-			WHERE 
-				post_name = %s 
-				AND ID != %d 
+				. $posts_tbl . '
+			WHERE
+				post_name = %s
+				AND ID != %d
 				AND post_status <> "trash"
 				AND post_type = %s
 			LIMIT 1
