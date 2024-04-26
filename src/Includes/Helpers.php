@@ -46,7 +46,7 @@ class Helpers {
 	public static function get_total_access_count( $post_id ) {
 		$access_count = get_post_meta( $post_id, 'simplifiedwp_links_redirect_count', true );
 
-		return $access_count ?? 0;
+		return $access_count ?: 0;
 	}
 
 
