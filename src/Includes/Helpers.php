@@ -27,7 +27,7 @@ class Helpers {
 	 */
 	public static function clean( $input ) {
 		if ( is_array( $input ) ) {
-			return array_map( 'wc_clean', $input );
+			return array_map( [ 'self', 'clean' ], $input );
 		} else {
 			return is_scalar( $input ) ? sanitize_text_field( $input ) : $input;
 		}
