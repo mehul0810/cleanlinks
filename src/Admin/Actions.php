@@ -32,39 +32,40 @@ class Actions {
 	public function __construct() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'register_assets' ) );
 		add_action( 'wp_ajax_simplified_import', array( $this, 'simplified_import_all_links' ) );
-		add_action( 'admin_menu', array( $this, 'add_admin_pages' ) );
-		add_action( 'manage_simplifiedwp_links_posts_custom_column', array( $this, 'simplifiedwp_links_custom_column_values' ), 10, 2 );
+		add_action( 'admin_menu', array( $this, 'register_admin_pages' ) );
+		add_action( 'manage_simplifiedwp_links_posts_custom_column', array( $this, 'register_custom_columns' ), 10, 2 );
 		add_action( 'post_submitbox_misc_actions', array( $this, 'before_preview_changes' ) );
 		add_action( 'admin_post_export', array( $this, 'export_csv' ) );
 	}
 
 	/**
-	 * Add Essential Admin Pages.
+	 * Register Admin Pages
 	 *
 	 * @since  1.0.0
 	 * @access public
 	 *
 	 * @return void
 	 */
-	public function add_admin_pages() {
-
+	public function register_admin_pages() {
+		// Import/Export.
 		add_submenu_page(
 			'edit.php?post_type=simplifiedwp_links',
 			esc_html__( 'Import/Export', 'simplified-links' ),
 			esc_html__( 'Import/Export', 'simplified-links' ),
 			'manage_options',
 			'simplified_links_import_export',
-			array( $this, 'import_export_page' ),
+			array( $this, 'render_import_export_page' ),
 			5
 		);
 
+		// More Plugins.
 		add_submenu_page(
 			'edit.php?post_type=simplifiedwp_links',
 			esc_html__( 'More Plugins', 'simplified-links' ),
 			esc_html__( 'More Plugins', 'simplified-links' ),
 			'manage_options',
 			'simplified_links_more_plugins',
-			array( $this, 'more_plugins_page' ),
+			array( $this, 'render_more_plugins_page' ),
 			5
 		);
 	}
@@ -77,7 +78,7 @@ class Actions {
 	 *
 	 * @return mixed
 	 */
-	public function import_export_page() {
+	public function render_import_export_page() {
 		// check user capabilities
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
@@ -145,7 +146,7 @@ class Actions {
 	 *
 	 * @return mixed
 	 */
-	public function more_plugins_page() {
+	public function render_more_plugins_page() {
 		// check user capabilities
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
@@ -173,14 +174,18 @@ class Actions {
 	/**
 	 * Populate custom columns with data on the simplifiedwp_links admin listing page.
 	 *
+	 * @since  1.0.0
+	 * @access public
+	 *
 	 * @param string $column_name The name of the column to display.
 	 * @param int $post_id The ID of the current post.
-	 * @return void
+	 *
+	 * @return mixed
 	 */
-	public function simplifiedwp_links_custom_column_values( $column, $post_id ) {
+	public function register_custom_columns( $column, $post_id ) {
 		switch ( $column ) {
 			case 'simplified_permalink':
-				$default_text = __( 'Copy URL', 'simplified-links' );
+				$default_text = esc_html__( 'Copy URL', 'simplified-links' );
 				$permalink    = get_the_permalink( $post_id );
 				?>
 				<button
@@ -209,8 +214,7 @@ class Actions {
 				break;
 
 			case 'total_clicks':
-				$count_click = get_post_meta( $post_id, 'simplified_redirect_count', true );
-				echo esc_html( $count_click ? $count_click : 0 );
+				echo Helpers::get_total_access_count( $post_id );
 				break;
 		}
 	}
@@ -234,7 +238,7 @@ class Actions {
 			return;
 		}
 
-		$count = get_post_meta( $post->ID, 'simplifiedwp_links_redirect_count', true );
+		$count = Helpers::get_total_access_count( $post->ID );
 		?>
 		<div class="misc-pub-section simplified-links--access-count">
 			<span class="dashicons dashicons-external"></span>

@@ -33,6 +33,22 @@ class Helpers {
 		}
 	}
 
+	/**
+	 * Get total access count based on the post id.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 *
+	 * @param int $post_id Post ID.
+	 *
+	 * @return void
+	 */
+	public static function get_total_access_count( $post_id ) {
+		$access_count = get_post_meta( $post_id, 'simplifiedwp_links_redirect_count', true );
+
+		return $access_count ?? 0;
+	}
+
 
 	/**
 	 * Check whether slug exists or not
