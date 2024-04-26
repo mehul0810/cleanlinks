@@ -15,7 +15,8 @@
 		"phpcompatibility/phpcompatibility-wp": "*",
 		"wp-coding-standards/wpcs": "*",
 		"php-parallel-lint/php-parallel-lint": "^1.3",
-		"yoast/wp-test-utils": "^1.2"
+		"yoast/wp-test-utils": "^1.2",
+		"automattic/vipwpcs": "*"
 	},
 	"scripts": {
 		"check-cs": [
