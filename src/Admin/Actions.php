@@ -34,7 +34,7 @@ class Actions {
 		add_action( 'wp_ajax_simplified_import', array( $this, 'simplified_import_all_links' ) );
 		add_action( 'admin_menu', array( $this, 'add_admin_pages' ) );
 		add_action( 'manage_simplifiedwp_links_posts_custom_column', array( $this, 'simplifiedwp_links_custom_column_values' ), 10, 2 );
-		add_action( 'post_submitbox_minor_actions', array( $this, 'before_preview_changes' ) );
+		add_action( 'post_submitbox_misc_actions', array( $this, 'before_preview_changes' ) );
 		add_action( 'admin_post_export', array( $this, 'export_csv' ) );
 	}
 
@@ -107,7 +107,7 @@ class Actions {
 							<div class="progress-bar progress-bar-striped progress-bar-animated green-bg" role="progressbar" id="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
 						</div>
 						<p class="js-message"></p>
-	
+
 						<p class="submit">
 							<button name="migrate-button" id="migrate-btn" class="button button-primary">
 								<?php esc_html_e( 'Migrate', 'simplified-links' ); ?>
@@ -120,9 +120,9 @@ class Actions {
 				}
 				?>
 			</div>
-			
+
 			<span class="differ <?php echo $class; ?>">
-			
+
 			<div class="migrate-content white-bg rounded shadow section-2">
 				<h2> <?php esc_html_e( 'Export your links', 'simplified-links' ); ?> </h2>
 				<p> <?php esc_html_e( 'This tool lets you export a properly formatted CSV file containing a list of all the affiliate links of Simplified Links Plugin .', 'simplified-links' ); ?> </p>
@@ -166,8 +166,8 @@ class Actions {
 	 * @return void
 	 */
 	public function register_assets() {
-		wp_enqueue_style( 'simplified-admin', SIMPLIFIED_LINKS_PLUGIN_URL . 'assets/dist/css/admin.css', '', SIMPLIFIED_LINKS_VERSION );
-		wp_enqueue_script( 'simplified-admin', SIMPLIFIED_LINKS_PLUGIN_URL . 'assets/dist/js/admin.js', '', SIMPLIFIED_LINKS_VERSION, true );
+		wp_enqueue_style( 'simplified-admin', SIMPLIFIED_LINKS_PLUGIN_URL . 'assets/dist/admin.css', '', SIMPLIFIED_LINKS_VERSION );
+		wp_enqueue_script( 'simplified-admin', SIMPLIFIED_LINKS_PLUGIN_URL . 'assets/dist/admin.js', '', SIMPLIFIED_LINKS_VERSION, true );
 	}
 
 	/**
@@ -214,22 +214,42 @@ class Actions {
 				break;
 		}
 	}
+
 	/**
-	 * This function is used for display click count to post meta box
+	 * Display link access count in the post submit box.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 *
+	 * @return void
 	 */
 	public function before_preview_changes( $post ) {
-		if ( $post->post_type == 'simplifiedwp_links' ) {
-			$count = isset( $post->ID ) ? get_post_meta( $post->ID, 'simplified_redirect_count', true ) : 0;
-			?>
-
-			<div class="simplified-click-count">
-				<?php
-				/* translators: %d is the counter of clicks. */
-				echo '<p>' . sprintf( esc_html__( 'This URL has been accessed %d times', 'simplified-links' ), esc_attr( $count ) ) . '</p>';
-				?>
-			</div>
-			<?php
+		// Bailout, if the post type is not simplifiedwp_links.
+		if ( 'simplifiedwp_links' !== $post->post_type ) {
+			return;
 		}
+
+		// Bailout, if the post is in draft or auto-draft.
+		if ( in_array( $post->post_status, [ 'draft', 'auto-draft' ], true ) ) {
+			return;
+		}
+
+		$count = get_post_meta( $post->ID, 'simplifiedwp_links_redirect_count', true );
+		?>
+		<div class="misc-pub-section simplified-links--access-count">
+			<span class="dashicons dashicons-external"></span>
+			<?php esc_html_e( 'Viewed:', 'simplified-links' ); ?>
+			<span class="simplified-links--view-times">
+				<?php
+				/* translators: 1. Access Count */
+				echo sprintf(
+					'%1$s times',
+					absint( $count )
+				);
+				?>
+			</span>
+		</div>
+		<?php
 	}
 
 	/**
