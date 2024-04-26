@@ -9,9 +9,7 @@
 
 namespace SimplifiedWP\Links\Admin;
 
-use SimplifiedWP\Links\includes\Database;
 use SimplifiedWP\Links\includes\Helpers;
-use SimplifiedWP\Links\includes\Import;
 /** 
  *  Bailout, if accessed directly. 
  */ 
@@ -20,10 +18,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class Actions {
-	const LIMIT   = 100;
+	
 	const OPTION        = 'simplifiedwp_links_import_all_enable';
-	const FILTER_PLUGIN = 'simplifiedwp_links_import_all_filter_plugin';
-
+	
 	/**
 	 * Initialize the class.
 	 *
@@ -87,29 +84,47 @@ class Actions {
 		} ?>
 		<div class="wrap">
 			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
-
 			<div class="migrate-content white-bg rounded shadow">
-				<h2>Import</h2>
-				<h2>Migrate From Lasso Lite</h2>
-				
-				<div class="progress mt-3 mb-3 sl-hidden" id="progress" >
-					<div class="progress-bar progress-bar-striped progress-bar-animated green-bg" role="progressbar" id="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-				</div>
-				<p class="js-message"></p>
-
-				<p class="submit">
-					<button name="migrate-button" id="migrate-btn" class="button button-primary">
-						<?php esc_html_e( 'Migrate', 'simplified-links' ); ?>
-					</button>
-				</p>
-				<div class="errormessage sl-hidden" id="errormessage"></div>
+				<?php 
+				$migration_support_plugins = Helpers::add_plugin_migration_support();
+				$class = '';
+				$class_applied = false;
+				if( is_array( $migration_support_plugins ) && count( $migration_support_plugins ) > 0 )  {
+					foreach ( $migration_support_plugins as $active_plugin ) {
+						if ( is_plugin_active( $active_plugin['path'] ) ) {
+							if ( !$class_applied ) {
+								echo '<h2>' . esc_html__( 'Import', 'simplified-links' ) . '</h2>';
+								$class = "simplified-horizontal-line";
+								$class_applied = true; // Set the flag to true once the class is applied
+								$total_posts = Database::total_posts();
+							}
+							$plugin_name = esc_html($active_plugin['name']);
+						?>
+						<h2> <?php esc_html_e( 'Migrate From '. $plugin_name, 'simplified-links' ); ?> </h2>
+						<p><?php echo wp_kses_post( sprintf( __( 'This tool lets you migrate <strong>%s</strong> affiliate links of %s Plugin into Simplified Links Plugin.', 'simplified-links' ), $total_posts, $plugin_name ) ); ?></p>
+						<p><?php esc_html_e( 'This will transfer and remove the link from your ' . $plugin_name . ' plugin into Simplified Links Plugin.', 'simplified-links' ); ?> </p>
+						<div class="progress mt-3 mb-3 sl-hidden" id="progress" >
+							<div class="progress-bar progress-bar-striped progress-bar-animated green-bg" role="progressbar" id="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+						</div>
+						<p class="js-message"></p>
+	
+						<p class="submit">
+							<button name="migrate-button" id="migrate-btn" class="button button-primary">
+								<?php esc_html_e( 'Migrate', 'simplified-links' ); ?>
+							</button>
+						</p>
+						<div class="errormessage sl-hidden" id="errormessage"></div>
+						<?php
+						}
+					} 
+				} ?>
 			</div>
-
-			<hr class="differ">
+			
+			<span class="differ <?php echo $class;?>">
 			
 			<div class="migrate-content white-bg rounded shadow section-2">
-				<h2>Export</h2>
-				
+				<h2> <?php esc_html_e( 'Export your links', 'simplified-links' ); ?> </h2>
+				<p> <?php esc_html_e( 'This tool lets you export a properly formatted CSV file containing a list of all the affiliate links of Simplified Links Plugin .', 'simplified-links' ); ?> </p>
 				<form id="export-form" action="<?php echo admin_url( 'admin-post.php' ); ?>" method="post">
 					<?php wp_nonce_field( 'export_data', 'export_nonce' ); ?>
 					<input type="hidden" name="action" value="export"/>
@@ -229,9 +244,7 @@ class Actions {
 
 		$sql = $simplified_db->get_import_urls_query( $filter_plugin );
 		
-		$sql = $simplified_db->paginate( $sql, 1, self::LIMIT );
-		
-		$all_imports = $wpdb->get_results( $sql );
+		$all_imports = $sql->posts;
 		
 		$count = count( $all_imports );
 		
@@ -245,14 +258,13 @@ class Actions {
 			);
 
 		} else {
-			foreach ( $all_imports as $import ) {
-				$import = Helpers::format_importable_data( $import );
-				
-				if( $import->id && $import->post_type ) {
-					$simplified_import->process_single_link_data_import( $import->id, $import->post_type );
+			foreach ( $all_imports as $import_id ) {
+				$post = get_post( $import_id );
+				if( $post->ID && $post->post_type ) {
+					$simplified_import->process_single_link_data_import( $post->ID, $post->post_type );
 				}
 			}
-
+			
 			update_option( self::OPTION, '1' );
 
 			wp_send_json_success(
@@ -272,8 +284,6 @@ class Actions {
 		// Start the output buffer.
 		ob_start();
 
-		global $wpdb;
-		$simplified_db = new Database();
 		// Set PHP headers for CSV output.
 		header('Content-Type: text/csv; charset=utf-8');
 		header('Content-Disposition: attachment; filename=export_simplified.csv');
@@ -281,10 +291,20 @@ class Actions {
 		// Create the headers.
 		$header_args = array( 'Id', 'Title', 'Date', 'Redirect From', 'Redirect To' );
 
-		$sql = $simplified_db->export_simplified_data();
+		$args = array(
+			'post_type'      => 'simplifiedwp_links',
+			'post_status'    => 'publish',
+			'posts_per_page' =>  200,
+			'fields'         => 'ids',
+			'no_found_rows'  => true,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false
+		);
+		
+		$query = new \WP_Query($args);
 
-		$results = $wpdb->get_results( $sql, ARRAY_A );
-
+		$results = $query->posts;
+		
 		// Clean up output buffer before writing anything to CSV file.
 		ob_end_clean();
 
@@ -295,13 +315,14 @@ class Actions {
 		fputcsv( $output, $header_args );
 
 		// Loop through the prepared data to output it to CSV file.
-		foreach( $results as $key => $value ) {
+		foreach( $results as $post_id ) {
+			$post = get_post($post_id);
 			$modified_values = array( 
-				$value['Id'],
-				$value['Title'],
-				$value['Date'],
-				get_permalink( $value['Id'] ),
-				get_post_meta( $value['Id'], 'simplified_redirect_url', true )
+				$post_id,
+				$post->post_title,
+				$post->post_date,
+				get_permalink( $post_id ),
+				get_post_meta( $post_id, 'simplified_redirect_url', true )
 			);
 			fputcsv( $output, $modified_values );
 		}

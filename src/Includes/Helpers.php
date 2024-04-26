@@ -15,24 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class Helpers {
-	/**
-	 * Format importable data before showing/importing/reverting
-	 *
-	 * @param object $p Importable post.
-	 */
-	public static function format_importable_data( $p ) {
-		//$simpli_db         = new Database();
-		//$lasso_helper     = new Helper();
-		//$home_url            = home_url();
-		$p->import_permalink = get_permalink( $p->id );
-		
-		//$import_data = $this->get_simple_url_link_data( $p->id, $p->post_title, $p->import_permalink );
-
-		return $p;
-	}
-
 	
-
 	/**
 	 * Check whether slug exists or not
 	 *
@@ -82,4 +65,20 @@ class Helpers {
 
 		return $post_name;
 	}
+	
+	/**
+	 * Used for Checking Different Plugins supported for migration
+	 */
+	public static function add_plugin_migration_support() {
+		$plugin_supports_arr = [];
+
+		$plugin_supports_arr[] = [
+			'name' => 'Lasso Lite', 
+			'slug' => 'simple-urls',
+			'path' => 'simple-urls/plugin.php',
+		];
+
+		return $plugin_supports_arr;
+	}
+
 }

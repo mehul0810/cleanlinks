@@ -7,7 +7,7 @@
  * @since 1.0.0
  */
 
-namespace SimplifiedWP\Links\Includes;
+namespace SimplifiedWP\Links\Admin;
 
 // Bailout, if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -23,14 +23,6 @@ class Database {
 	 */
 	public function __construct() {
 		global $wpdb;
-
-		$this->dbname         = $wpdb->dbname;
-		$this->prefix         = $wpdb->prefix;
-		
-		// ? WP Tables
-		$this->posts          = $wpdb->posts;
-		$this->postmeta       = $wpdb->postmeta;
-		$this->options        = $wpdb->options;
 	}
 
 	/**
@@ -40,13 +32,13 @@ class Database {
 	 */
 	public function get_import_urls_query( $filter_plugin = null ) {
 		
-		global $wpdb;
+		//global $wpdb;
 
 		$sql = '';
 		$lasso_post_type = 'surl';
 		// ? Simple urls plugin 
 		if ( empty( $filter_plugin ) || 'simple-urls' === $filter_plugin ) {
-			$sql = "
+			/* $sql = "
 				SELECT
 					po.ID as id,
 					po.post_type,
@@ -55,26 +47,26 @@ class Database {
 					CONVERT(po.post_title USING utf8) as post_title,
 					'' as check_status,
 					'' as check_disabled
-				FROM " . $this->posts . ' as po
-				WHERE po.post_type = %s 
-			';
+				FROM {$wpdb->posts} as po
+				WHERE po.post_type = %s
+				AND po.post_status = 'publish' 
+			"; */
 
-			$sql = $wpdb->prepare( $sql, $lasso_post_type );
+			$args = array(
+				'post_type'      => $lasso_post_type,
+				'post_status'    => 'publish',
+				'posts_per_page' =>  100,
+				'fields'         => 'ids',
+				'no_found_rows'  => true,
+				'update_post_term_cache' => false
+			);
+			
+			$sql = new \WP_Query($args);
+
+			/* $sql = $wpdb->prepare( $sql, $lasso_post_type ); */
 		}
 
 		return $sql;
-	}
-
-	/**
-	 * Paginate items by a sql query
-	 *
-	 * @param string $sql   Sql query.
-	 * @param int    $page  Number of page.
-	 * @param int    $limit Number of results. Default to 10.
-	 */
-	public function paginate( $sql, $page, $limit = 10 ) {
-		$start_index = ( $page - 1 ) * $limit;
-		return $sql . ' LIMIT ' . $start_index . ', ' . $limit;
 	}
 
 	/**
@@ -97,17 +89,18 @@ class Database {
 		if ( 'surl' === $post_type ) {
 			// ? Flip post time and potentially the slug
 			
-			$update_sql = '
-				UPDATE ' . $this->posts . '
+			$update_sql = "
+				UPDATE {$wpdb->posts}
 				SET
 					post_name = %s,
 					post_type = %s,
 					post_modified = NOW(),
 					post_modified_gmt = NOW()
 				WHERE ID = %d;
-			';
+			";
+			
 			$update_sql = $wpdb->prepare( $update_sql, $slug, 'simplifiedwp_links', $id ); // phpcs:ignore
-
+			
 			$wpdb->query( $update_sql );
 			
 			$result1 = 'simplifiedwp_links' === get_post_type( $id );
@@ -116,23 +109,22 @@ class Database {
 		return $result1;
 	}
 
-	public function export_simplified_data() {
-		global $wpdb;
+	/**
+	 * Return count of post_type
+	 */
+	public static function total_posts () {
+		$args = array(
+			'post_type'      => 'surl', // Change 'surl' to your post type slug
+			'post_status'    => 'publish',
+			'fields'         => 'ids', // Retrieve only post IDs
+			'no_found_rows'  => true,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false
+		);
 		
-		$simplified_post_type = 'simplifiedwp_links'; 
-		$sql = "
-			SELECT
-			po.ID as Id,
-			CONVERT(po.post_title USING utf8) as Title,
-			po.post_date as Date
-			FROM {$wpdb->posts} as po
-			WHERE po.post_type = %s
-			AND po.post_status = 'publish'
-		";	
-
-		$sql = $wpdb->prepare( $sql, $simplified_post_type );
+		$query = new \WP_Query($args);
 		
-		return $sql;		
+		return $post_count = $query->post_count;
 	}
 	
 }
