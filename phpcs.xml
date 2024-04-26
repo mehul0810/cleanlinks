@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<ruleset name="WordPressVIPStandard">
+    <!-- Path to the PHP_CodeSniffer autoloader -->
+    <arg name="bootstrap" value="vendor/autoload.php"/>
+
+    <!-- The WordPress-VIP-Go standard -->
+    <rule ref="WordPress-VIP-Go"/>
+
+    <!-- Paths to check (all PHP files in your project) -->
+    <file>.</file>
+
+    <!-- Exclude patterns -->
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/node_modules/*</exclude-pattern>
+
+    <!-- Show progress -->
+    <arg value="p"/>
+
+    <!-- Include sniff codes in the report -->
+    <arg value="s"/>
+
+    <!-- Report warnings as well as errors -->
+    <arg name="warning-severity" value="0"/>
+
+    <!-- Set tab width to 4 spaces -->
+    <arg name="tab-width" value="4"/>
+
+    <!-- Exclude specific sniffs or rules if necessary -->
+    <exclude name="WordPress.Files.FileName.NotHyphenatedLowercase"/>
+	<exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
+</ruleset>
