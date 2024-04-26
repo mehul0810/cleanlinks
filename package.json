@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-    "start": "wp-scripts start",
+		"start": "wp-scripts start",
 		"build": "wp-scripts build",
 		"check-engines": "wp-scripts check-engines",
 		"check-licenses": "wp-scripts check-licenses",
@@ -31,6 +31,7 @@
 	"devDependencies": {
 		"@wordpress/scripts": "^27.6.0",
 		"clean-webpack-plugin": "^4.0.0",
+		"style-loader": "^4.0.0",
 		"wp-pot": "^1.10.2",
 		"wp-textdomain": "^1.0.1"
 	}

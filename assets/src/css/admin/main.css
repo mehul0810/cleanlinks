@@ -1,4 +1,5 @@
-@import url('./list.scss');
+@import url('./list.css');
+@import url('./post-actions.css');
 
 .sl-hidden {
 	display: none !important;

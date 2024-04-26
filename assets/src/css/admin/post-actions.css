@@ -1,0 +1,11 @@
+.simplified-links--access-count span.dashicons {
+	color: #8c8f94;
+}
+
+.simplified-links--access-count span::last-child {
+	font-weight: bold;
+}
+
+.simplified-links--access-count .simplified-links--view-times {
+	font-weight: bold;
+}
