@@ -10,6 +10,7 @@
 namespace SimplifiedWP\Links\Admin;
 
 use SimplifiedWP\Links\includes\Helpers;
+
 /**
  *  Bailout, if accessed directly.
  */
@@ -82,7 +83,8 @@ class Actions {
 		// check user capabilities
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
-		} ?>
+		}
+		?>
 		<div class="wrap">
 			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
 			<div class="migrate-content white-bg rounded shadow">
@@ -121,6 +123,11 @@ class Actions {
 				}
 				?>
 			</div>
+
+			<?php
+			// Render Export UI.
+			( new Export() )->render_ui();
+			?>
 
 			<span class="differ <?php echo $class; ?>">
 

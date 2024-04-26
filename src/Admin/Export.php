@@ -34,14 +34,26 @@ class Export {
 
 	public function render_ui() {
 		?>
-		<div class="wrap">
-			<h1><?php esc_html_e( 'Export Simplified Links', 'simplified-links' ); ?></h1>
-			<p><?php esc_html_e( 'Export your links data to a CSV file.', 'simplified-links' ); ?></p>
-			<form method="post">
-				<?php wp_nonce_field( 'simplifiedwp_links_export_nonce', 'simplifiedwp_links_export_nonce' ); ?>
-				<input type="hidden" name="action" value="simplifiedwp_links_export">
-				<button type="submit" class="button button-primary"><?php esc_html_e( 'Export', 'simplified-links' ); ?></button>
-			</form>
+		<div id="#poststuff">
+			<div class="metabox-holder">
+				<div class="meta-box-sortables ui-sortable">
+					<div class="postbox">
+						<div class="postbox-header">
+							<h2 class="hndle ui-sortable-handle">
+								<?php esc_html_e( 'Export', 'simplified-links' ); ?>
+							</h2>
+						</div>
+						<div class="inside">
+							<p><?php esc_html_e( 'Using this tool, you can have a seamless experience to export your links to a CSV (Comma Separated Values) file with just a single click.', 'simplified-links' ); ?></p>
+							<form method="post">
+								<?php wp_nonce_field( 'simplifiedwp_links_export_nonce', 'simplifiedwp_links_export_nonce' ); ?>
+								<input type="hidden" name="action" value="simplifiedwp_links_export">
+								<button type="submit" class="button button-primary"><?php esc_html_e( 'Export', 'simplified-links' ); ?></button>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 		<?php
 	}
