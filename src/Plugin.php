@@ -60,6 +60,7 @@ final class Plugin {
 		if ( is_admin() ) {
 			new Admin\Filters();
 			new Admin\Actions();
+			new Admin\Export();
 		}
 	}
 
