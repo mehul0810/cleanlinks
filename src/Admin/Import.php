@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Import {
 
 	protected $data = array();
-    
+
 	/**
 	 * Import a single post into SimplifiedWP
 	 *
@@ -31,12 +31,12 @@ class Import {
 	public function process_single_link_data_import( $import_id, $post_type ) {
 		if ( 'surl' === $post_type ) {
 			$import_data = $this->get_simple_url_link_data( $import_id );
-		} 
+		}
 		$import_data['post_type'] = $post_type;
-		
+
 		// ? Make a Lasso Link
 		list($status, $import_data) = $this->import_into_simplified( $import_data, $post_type );
-		
+
 		// ? Return if status is false
 		if ( ! $status ) {
 			return array( $status, $import_data );
@@ -45,7 +45,7 @@ class Import {
 		return array( $status, $import_data );
 	}
 
-    /**
+	/**
 	 * Get post data of Simple Urls plugin
 	 *
 	 * @param string $import_id  Post id.
@@ -58,9 +58,9 @@ class Import {
 		//$terms        = get_the_terms( $import_id, 'eafl_category' );
 		//$cat_ids      = $terms && ! is_wp_error( $terms ) ? wp_list_pluck( $terms, 'name' ) : null;
 
-		$target           = get_post_meta( $import_id, '_open_new_tab', true );
-		$description      = get_post_meta( $import_id, '_description', true );
-		
+		$target      = get_post_meta( $import_id, '_open_new_tab', true );
+		$description = get_post_meta( $import_id, '_description', true );
+
 		$data = array(
 			'post'             => $post,
 			'redirect_url'     => $redirect_url,
@@ -122,22 +122,22 @@ class Import {
 	 */
 	private function import_into_simplified( $import_data, $post_type ) {
 		$simplified_db = new Database();
-		
+
 		// ? Make sure slug is correct
 		$post_id = $import_data['post']->ID ?? '';
 		$slug    = $import_data['post']->post_name ?? '';
 		$slug    = Helpers::simplified_unique_post_name( $post_id, $slug );
 		$title   = $import_data['post']->post_title ?? '';
-		
-		$data['post_id']      = $post_id;
+
+		$data['post_id'] = $post_id;
 		//$data['settings']     = $affiliate_link;
-		$data['thumbnail_id'] = $import_data['thumbnail_id'][0] ?? '';
-		$data['old_uri']      = $import_data['old_uri'] ?? '';
-		$data['is_importing'] = true;
+		$data['thumbnail_id']  = $import_data['thumbnail_id'][0] ?? '';
+		$data['old_uri']       = $import_data['old_uri'] ?? '';
+		$data['is_importing']  = true;
 		$data['surl_redirect'] = $import_data['redirect_url'];
-		
-		if( isset( $data['surl_redirect'] ) && !empty ( $data['surl_redirect'] ) ) {
-			update_post_meta( $post_id , 'simplified_redirect_url' , $data['surl_redirect'] );
+
+		if ( isset( $data['surl_redirect'] ) && ! empty( $data['surl_redirect'] ) ) {
+			update_post_meta( $post_id, 'simplified_redirect_url', $data['surl_redirect'] );
 		}
 
 		$post      = get_post( $post_id );
@@ -145,9 +145,9 @@ class Import {
 		$slug      = ! empty( $post_name ) && empty( $slug ) ? $post_name : $slug;
 
 		$old_uri = $import_data['old_uri'] ?? '';
-		
+
 		$status = $simplified_db->process_import( $post_id, $slug, $old_uri, $post_type );
-		
+
 		// ? clear cache after importing
 		if ( $status ) {
 			$this->un_set( 'simplified_import_' . $post_id );
@@ -167,5 +167,4 @@ class Import {
 			unset( $this->data[ $key ] );
 		}
 	}
-
 }

@@ -24,6 +24,5 @@ class Filters {
 	 * @return void
 	 */
 	public function __construct() {
-
 	}
 }

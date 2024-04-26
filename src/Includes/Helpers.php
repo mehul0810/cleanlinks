@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class Helpers {
-	
+
 	/**
 	 * Check whether slug exists or not
 	 *
@@ -27,7 +27,7 @@ class Helpers {
 		if ( empty( $post_name ) ) {
 			return false;
 		}
-		
+
 		$posts_tbl = $wpdb->posts;
 		$sql       = '
 			SELECT 
@@ -65,20 +65,19 @@ class Helpers {
 
 		return $post_name;
 	}
-	
+
 	/**
 	 * Used for Checking Different Plugins supported for migration
 	 */
 	public static function add_plugin_migration_support() {
-		$plugin_supports_arr = [];
+		$plugin_supports_arr = array();
 
-		$plugin_supports_arr[] = [
-			'name' => 'Lasso Lite', 
+		$plugin_supports_arr[] = array(
+			'name' => 'Lasso Lite',
 			'slug' => 'simple-urls',
 			'path' => 'simple-urls/plugin.php',
-		];
+		);
 
 		return $plugin_supports_arr;
 	}
-
 }

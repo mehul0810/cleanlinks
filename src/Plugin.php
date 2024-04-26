@@ -33,14 +33,14 @@ final class Plugin {
 	 */
 	public function register() {
 		// Handle plugin activation and deactivation.
-		register_activation_hook( SIMPLIFIED_LINKS_PLUGIN_FILE, [ $this, 'activate' ] );
-		register_deactivation_hook( SIMPLIFIED_LINKS_PLUGIN_FILE, [ $this, 'deactivate' ] );
+		register_activation_hook( SIMPLIFIED_LINKS_PLUGIN_FILE, array( $this, 'activate' ) );
+		register_deactivation_hook( SIMPLIFIED_LINKS_PLUGIN_FILE, array( $this, 'deactivate' ) );
 
 		// Register services used throughout the plugin.
-		add_action( 'plugins_loaded', [ $this, 'register_services' ] );
+		add_action( 'plugins_loaded', array( $this, 'register_services' ) );
 
 		// Load text domain.
-		add_action( 'init', [ $this, 'load_plugin_textdomain' ] );
+		add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
 	}
 
 	/**

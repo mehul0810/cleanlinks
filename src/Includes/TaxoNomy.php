@@ -24,7 +24,7 @@ class TaxoNomy {
 	 * @return void
 	 */
 	public function __construct() {
-		add_action( 'init', [ $this, 'register_taxo_nomy' ] );
+		add_action( 'init', array( $this, 'register_taxo_nomy' ) );
 	}
 
 	/**
@@ -37,21 +37,21 @@ class TaxoNomy {
 	 */
 	public function get_labels() {
 		return array(
-            'name'                       => _x( 'Groups', 'taxonomy general name', 'simplified-links' ),
-            'singular_name'              => _x( 'Group', 'taxonomy singular name', 'simplified-links' ),
-            'search_items'               => __( 'Search Groups', 'simplified-links' ),
-            'popular_items'              => __( 'Popular Groups', 'simplified-links' ),
-            'all_items'                  => __( 'All Groups', 'simplified-links' ),
-            'edit_item'                  => __( 'Edit Group', 'simplified-links' ),
-            'update_item'                => __( 'Update Group', 'simplified-links' ),
-            'add_new_item'               => __( 'Add New Group', 'simplified-links' ),
-            'new_item_name'              => __( 'New Group Name', 'simplified-links' ),
-            'separate_items_with_commas' => __( 'Separate groups with commas', 'simplified-links' ),
-            'add_or_remove_items'        => __( 'Add or remove groups', 'simplified-links' ),
-            'choose_from_most_used'      => __( 'Choose from the most used groups', 'simplified-links' ),
-            'not_found'                  => __( 'No groups found', 'simplified-links' ),
-            'menu_name'                  => __( 'Groups', 'simplified-links' ),
-        );
+			'name'                       => _x( 'Groups', 'taxonomy general name', 'simplified-links' ),
+			'singular_name'              => _x( 'Group', 'taxonomy singular name', 'simplified-links' ),
+			'search_items'               => __( 'Search Groups', 'simplified-links' ),
+			'popular_items'              => __( 'Popular Groups', 'simplified-links' ),
+			'all_items'                  => __( 'All Groups', 'simplified-links' ),
+			'edit_item'                  => __( 'Edit Group', 'simplified-links' ),
+			'update_item'                => __( 'Update Group', 'simplified-links' ),
+			'add_new_item'               => __( 'Add New Group', 'simplified-links' ),
+			'new_item_name'              => __( 'New Group Name', 'simplified-links' ),
+			'separate_items_with_commas' => __( 'Separate groups with commas', 'simplified-links' ),
+			'add_or_remove_items'        => __( 'Add or remove groups', 'simplified-links' ),
+			'choose_from_most_used'      => __( 'Choose from the most used groups', 'simplified-links' ),
+			'not_found'                  => __( 'No groups found', 'simplified-links' ),
+			'menu_name'                  => __( 'Groups', 'simplified-links' ),
+		);
 	}
 
 	/**
@@ -64,17 +64,17 @@ class TaxoNomy {
 	 */
 	public function get_args() {
 		return array(
-			'hierarchical'          => false, // Set to true if you want hierarchical groups like categories
-            'labels'                => $this->get_labels(),
-            'public'                => true,
-            'show_ui'               => true,
-            'show_in_menu'          => true,
-            'show_in_nav_menus'     => true,
-            'show_tagcloud'         => true,
-            'show_in_quick_edit'    => true,
-            'show_admin_column'     => true,
-            'rewrite'               => array( 'slug' => 'simplifiedwp_groups' ),
-        );
+			'hierarchical'       => false, // Set to true if you want hierarchical groups like categories
+			'labels'             => $this->get_labels(),
+			'public'             => true,
+			'show_ui'            => true,
+			'show_in_menu'       => true,
+			'show_in_nav_menus'  => true,
+			'show_tagcloud'      => true,
+			'show_in_quick_edit' => true,
+			'show_admin_column'  => true,
+			'rewrite'            => array( 'slug' => 'simplifiedwp_groups' ),
+		);
 	}
 
 	/**

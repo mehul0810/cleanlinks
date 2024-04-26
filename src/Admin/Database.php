@@ -31,12 +31,12 @@ class Database {
 	 * @param string $filter_plugin    Plugin name.
 	 */
 	public function get_import_urls_query( $filter_plugin = null ) {
-		
+
 		//global $wpdb;
 
-		$sql = '';
+		$sql             = '';
 		$lasso_post_type = 'surl';
-		// ? Simple urls plugin 
+		// ? Simple urls plugin
 		if ( empty( $filter_plugin ) || 'simple-urls' === $filter_plugin ) {
 			/* $sql = "
 				SELECT
@@ -49,19 +49,19 @@ class Database {
 					'' as check_disabled
 				FROM {$wpdb->posts} as po
 				WHERE po.post_type = %s
-				AND po.post_status = 'publish' 
+				AND po.post_status = 'publish'
 			"; */
 
 			$args = array(
-				'post_type'      => $lasso_post_type,
-				'post_status'    => 'publish',
-				'posts_per_page' =>  100,
-				'fields'         => 'ids',
-				'no_found_rows'  => true,
-				'update_post_term_cache' => false
+				'post_type'              => $lasso_post_type,
+				'post_status'            => 'publish',
+				'posts_per_page'         => 100,
+				'fields'                 => 'ids',
+				'no_found_rows'          => true,
+				'update_post_term_cache' => false,
 			);
-			
-			$sql = new \WP_Query($args);
+
+			$sql = new \WP_Query( $args );
 
 			/* $sql = $wpdb->prepare( $sql, $lasso_post_type ); */
 		}
@@ -84,11 +84,11 @@ class Database {
 
 		global $wpdb;
 		clean_post_cache( $id );
-		
+
 		$result1 = true;
 		if ( 'surl' === $post_type ) {
 			// ? Flip post time and potentially the slug
-			
+
 			$update_sql = "
 				UPDATE {$wpdb->posts}
 				SET
@@ -98,11 +98,11 @@ class Database {
 					post_modified_gmt = NOW()
 				WHERE ID = %d;
 			";
-			
+
 			$update_sql = $wpdb->prepare( $update_sql, $slug, 'simplifiedwp_links', $id ); // phpcs:ignore
-			
+
 			$wpdb->query( $update_sql );
-			
+
 			$result1 = 'simplifiedwp_links' === get_post_type( $id );
 		}
 
@@ -112,19 +112,18 @@ class Database {
 	/**
 	 * Return count of post_type
 	 */
-	public static function total_posts () {
+	public static function total_posts() {
 		$args = array(
-			'post_type'      => 'surl', // Change 'surl' to your post type slug
-			'post_status'    => 'publish',
-			'fields'         => 'ids', // Retrieve only post IDs
-			'no_found_rows'  => true,
+			'post_type'              => 'surl', // Change 'surl' to your post type slug
+			'post_status'            => 'publish',
+			'fields'                 => 'ids', // Retrieve only post IDs
+			'no_found_rows'          => true,
 			'update_post_meta_cache' => false,
-			'update_post_term_cache' => false
+			'update_post_term_cache' => false,
 		);
-		
-		$query = new \WP_Query($args);
-		
+
+		$query = new \WP_Query( $args );
+
 		return $post_count = $query->post_count;
 	}
-	
 }

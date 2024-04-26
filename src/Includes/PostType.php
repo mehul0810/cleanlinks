@@ -24,8 +24,8 @@ class PostType {
 	 * @return void
 	 */
 	public function __construct() {
-		add_action( 'init', [ $this, 'register_post_type' ] );
-		add_action( 'save_post', [ $this, 'save_link_meta' ], 10, 2 );
+		add_action( 'init', array( $this, 'register_post_type' ) );
+		add_action( 'save_post', array( $this, 'save_link_meta' ), 10, 2 );
 	}
 
 	/**
@@ -76,28 +76,28 @@ class PostType {
 	public function get_args() {
 
 		$rewrite_slug_default = 'recommends';
-		
+
 		$rewrite_slug = apply_filters( 'simplified_urls_slug', $rewrite_slug_default );
 
 		$rewrite_slug = sanitize_title( $rewrite_slug, $rewrite_slug_default );
 
 		return array(
-			'labels'             => $this->get_labels(),
-			'public'             => true,
-			'publicly_queryable' => true,
-			'show_ui'            => true,
-			'show_in_menu'       => true,
-			'query_var'          => true,
-			'rewrite'            => array( 'slug' => $rewrite_slug ),
-			'capability_type'    => 'post',
-			'has_archive'        => false,
-			'hierarchical'       => false,
-			'menu_position'      => null,
-			'show_in_rest'       => true,
-			'menu_icon'          => 'dashicons-admin-links',
+			'labels'               => $this->get_labels(),
+			'public'               => true,
+			'publicly_queryable'   => true,
+			'show_ui'              => true,
+			'show_in_menu'         => true,
+			'query_var'            => true,
+			'rewrite'              => array( 'slug' => $rewrite_slug ),
+			'capability_type'      => 'post',
+			'has_archive'          => false,
+			'hierarchical'         => false,
+			'menu_position'        => null,
+			'show_in_rest'         => true,
+			'menu_icon'            => 'dashicons-admin-links',
 			'register_meta_box_cb' => array( $this, 'action_add_url_metabox' ),
-			'supports'           => array( 'title' ),
-			'can_export'      	 => true,
+			'supports'             => array( 'title' ),
+			'can_export'           => true,
 		);
 	}
 
@@ -129,22 +129,22 @@ class PostType {
 
 		if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
 			return;
-		};
+		}
 
 		if ( defined( 'DOING_CRON' ) && DOING_CRON ) {
 			return;
-		};
+		}
 
 		// Update post meta for simplifiedwp links
 		if ( ! empty( $_POST['simplified_redirect_nonce'] ) && wp_verify_nonce( $_POST['simplified_redirect_nonce'], 'simplified-save-redirect-meta' ) && current_user_can( 'edit_post', $post_id ) && 'simplifiedwp_links' === $post->post_type ) {
-			
+
 			if ( ! empty( $_POST['simplified_redirect_url'] ) ) {
 
 				// Remove all illegal characters from a url
 				$url = filter_var( $_POST['simplified_redirect_url'], FILTER_SANITIZE_URL );
 
 				// Validate url
-				if ( filter_var($url, FILTER_VALIDATE_URL ) ) {
+				if ( filter_var( $url, FILTER_VALIDATE_URL ) ) {
 					update_post_meta( $post_id, 'simplified_redirect_url', esc_url( $url ) );
 				}
 			} else {
@@ -171,9 +171,9 @@ class PostType {
 	 * @return void
 	 */
 	public function link_metabox( $post ) {
-		
+
 		wp_nonce_field( 'simplified-save-redirect-meta', 'simplified_redirect_nonce' );
-		
+
 		$url = get_post_meta( $post->ID, 'simplified_redirect_url', true );
 		?>
 		
