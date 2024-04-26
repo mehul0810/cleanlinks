@@ -1,0 +1,16 @@
+{
+	"landingPage": "/wp-admin/edit.php?post_type=simplifiedwp_links",
+	"steps": [
+		{
+			"step": "login",
+			"username": "admin",
+			"password": "password"
+		},
+		{
+			"step": "defineWpConfigConsts",
+			"consts": {
+				"IS_PLAYGROUND_PREVIEW": true
+			}
+		}
+	]
+}

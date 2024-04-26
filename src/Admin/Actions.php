@@ -37,7 +37,7 @@ class Actions {
 		add_action ('post_submitbox_minor_actions', [ $this, 'before_preview_changes'] );
 		add_action( 'admin_post_export', [ $this, 'export_csv' ] );
 	}
-	
+
 	/**
 	 * Add Essential Admin Pages.
 	 *
@@ -164,8 +164,8 @@ class Actions {
 	 * @return void
 	 */
 	public function register_assets() {
-		wp_enqueue_style( 'simplified-admin', SIMPLIFIED_LINKS_PLUGIN_URL . 'assets/src/css/admin/simplified-admin.css', '', SIMPLIFIED_LINKS_VERSION );
-		wp_enqueue_script( 'simplified-admin', SIMPLIFIED_LINKS_PLUGIN_URL . 'assets/src/js/admin/simplified-admin.js', '', SIMPLIFIED_LINKS_VERSION, true );
+		wp_enqueue_style( 'simplified-admin', SIMPLIFIED_LINKS_PLUGIN_URL . 'assets/dist/css/admin.css', '', SIMPLIFIED_LINKS_VERSION );
+		wp_enqueue_script( 'simplified-admin', SIMPLIFIED_LINKS_PLUGIN_URL . 'assets/dist/js/admin.js', '', SIMPLIFIED_LINKS_VERSION, true );
 	}
 
 	/**
@@ -178,23 +178,21 @@ class Actions {
 	public function simplifiedwp_links_custom_column_values( $column, $post_id ) {
 		switch ( $column ) {
 			case 'simplified_permalink':
-				
-				$link = get_the_permalink();
-				printf(
-					'<button
-							type="button"
-							id="simplifedbutton"
-							class="button js-simplified-link-button"
-							aria-label="%1$s"
-							data-default-text="Copy URL"
-							data-copied-text="Copied!"
-							data-url="%2$s">
-						<span class="dashicons dashicons-admin-page"></span> <span class="simplified-button-text"> %3$s </span> 
-					</button>',
-					esc_attr( $link ),
-					esc_attr( $link ),
-					esc_html__( 'Copy URL', 'simplified-links' )
-				);
+				$default_text = __( 'Copy URL', 'simplified-links' );
+				$permalink    = get_the_permalink( $post_id );
+				?>
+				<button
+					type="button"
+					class="button simplified-links--copy-button"
+					aria-label="<?php echo $permalink; ?>"
+					data-default-text="<?php echo esc_html( $default_text ); ?>"
+					data-copied-text="<?php echo esc_html__( 'Copied!', 'simplified-links' ); ?>"
+					data-url="<?php echo $permalink; ?>"
+				>
+					<span class="dashicons dashicons-admin-page"></span>
+					<span class="simplified-links--copy-button-text"><?php echo esc_html( $default_text ); ?></span>
+				</button>
+				<?php
 				break;
 
 			case 'redirect_to':
@@ -213,16 +211,16 @@ class Actions {
 				$count_click = get_post_meta( $post_id , 'simplified_redirect_count' , true );
 				echo esc_html( $count_click ? $count_click : 0 );
 				break;
-		}	
+		}
 	}
 	/**
 	 * This function is used for display click count to post meta box
 	 */
 	public function before_preview_changes($post) {
-		if ( $post->post_type == 'simplifiedwp_links') { 
+		if ( $post->post_type == 'simplifiedwp_links') {
 			$count = isset( $post->ID ) ? get_post_meta( $post->ID, 'simplified_redirect_count', true ) : 0;
 			?>
-			
+
 			<div class="simplified-click-count">
 				<?php /* translators: %d is the counter of clicks. */
 				echo '<p>' . sprintf( esc_html__( 'This URL has been accessed %d times', 'simplified-links' ), esc_attr( $count ) ) . '</p>'; ?>
@@ -235,7 +233,7 @@ class Actions {
 	 * Ajax callback function
 	 */
 	public function simplified_import_all_links() {
-		
+
 		global $wpdb;
 		$simplified_db = new Database();
 		$simplified_import = new Import();
@@ -247,10 +245,10 @@ class Actions {
 		$all_imports = $sql->posts;
 		
 		$count = count( $all_imports );
-		
+
 		if( $count <= 0 ) {
 			update_option( self::OPTION, '0' );
-			
+
 			wp_send_json_error(
 				array(
 					'status' => false,
@@ -310,7 +308,7 @@ class Actions {
 
 		// Create a file pointer with PHP.
 		$output = fopen( 'php://output', 'w' );
-		
+
 		// Write headers to CSV file.
 		fputcsv( $output, $header_args );
 
