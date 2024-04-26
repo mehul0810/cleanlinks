@@ -9,6 +9,8 @@
 
 namespace SimplifiedWP\Links\Includes;
 
+use SimplifiedWP\Links\Includes\Helpers;
+
 // Bailout, if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -135,13 +137,21 @@ class PostType {
 			return;
 		}
 
-		// Update post meta for simplifiedwp links
-		if ( ! empty( $_POST['simplified_redirect_nonce'] ) && wp_verify_nonce( $_POST['simplified_redirect_nonce'], 'simplified-save-redirect-meta' ) && current_user_can( 'edit_post', $post_id ) && 'simplifiedwp_links' === $post->post_type ) {
+		// Sanitize post data.
+		$_post = Helpers::clean( $_POST );
 
-			if ( ! empty( $_POST['simplified_redirect_url'] ) ) {
+		// Update post meta for simplifiedwp links
+		if (
+			! empty( $_post['simplified_redirect_nonce'] ) &&
+			wp_verify_nonce( $_post['simplified_redirect_nonce'], 'simplified-save-redirect-meta' ) &&
+			current_user_can( 'edit_post', $post_id ) &&
+			'simplifiedwp_links' === $post->post_type
+		) {
+
+			if ( ! empty( $_post['simplified_redirect_url'] ) ) {
 
 				// Remove all illegal characters from a url
-				$url = filter_var( $_POST['simplified_redirect_url'], FILTER_SANITIZE_URL );
+				$url = filter_var( $_post['simplified_redirect_url'], FILTER_SANITIZE_URL );
 
 				// Validate url
 				if ( filter_var( $url, FILTER_VALIDATE_URL ) ) {
@@ -176,12 +186,12 @@ class PostType {
 
 		$url = get_post_meta( $post->ID, 'simplified_redirect_url', true );
 		?>
-		
+
 		<p>
 			<label for="simplified_redirect_url"><strong><?php esc_html_e( 'Redirect to:', 'simplified-links' ); ?></strong></label><br />
 			<input class="widefat" type="url" name="simplified_redirect_url" id="simplified_redirect_url" value="<?php echo esc_attr( $url ); ?>" />
 		</p>
-		<p><span class="description"><?php esc_html_e( 'This is the URL that the Redirect Link you create on this page will redirect to when accessed in a web browser.', 'simplified-links' ); ?> </span></p> 
+		<p><span class="description"><?php esc_html_e( 'This is the URL that the Redirect Link you create on this page will redirect to when accessed in a web browser.', 'simplified-links' ); ?> </span></p>
 		<?php
 		$count = isset( $post->ID ) ? get_post_meta( $post->ID, 'simplified_redirect_count', true ) : 0;
 		/* translators: %d is the counter of clicks. */
