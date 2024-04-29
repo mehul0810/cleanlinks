@@ -48,6 +48,17 @@ class Actions {
 	 * @return void
 	 */
 	public function register_admin_pages() {
+		// Migrate.
+		add_submenu_page(
+			'edit.php?post_type=simplifiedwp_links',
+			esc_html__( 'Migrate', 'simplified-links' ),
+			esc_html__( 'Migrate', 'simplified-links' ),
+			'manage_options',
+			'simplified_links_migrate',
+			array( $this, 'render_migrate_page' ),
+			5
+		);
+
 		// Import/Export.
 		add_submenu_page(
 			'edit.php?post_type=simplifiedwp_links',
@@ -72,6 +83,29 @@ class Actions {
 	}
 
 	/**
+	 * Migrate Page for Simplified Links.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 *
+	 * @return mixed
+	 */
+	public function render_migrate_page() {
+		?>
+		<div class="wrap">
+			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
+			<p class="description">
+				<?php esc_html_e( 'Using this tool, you can have a seamless experience to import your links from all the supported existing WordPress plugins with similar functionality to our plugin with just a single click.', 'simplified-links' ); ?>
+			</p>
+			<?php
+			// Render Migrate UI.
+			( new Migrate() )->render_ui();
+			?>
+		</div>
+		<?php
+	}
+
+	/**
 	 * Import & Export Page for Simplified Links.
 	 *
 	 * @since  1.0.0
@@ -89,7 +123,7 @@ class Actions {
 			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
 			<div class="migrate-content white-bg rounded shadow">
 				<?php
-				$migration_support_plugins = Helpers::add_plugin_migration_support();
+				$migration_support_plugins = Helpers::get_migration_supported_plugins();
 				$class                     = '';
 				$class_applied             = false;
 				if ( is_array( $migration_support_plugins ) && count( $migration_support_plugins ) > 0 ) {
@@ -174,8 +208,8 @@ class Actions {
 	 * @return void
 	 */
 	public function register_assets() {
-		wp_enqueue_style( 'simplified-admin', SIMPLIFIED_LINKS_PLUGIN_URL . 'assets/dist/admin.css', '', SIMPLIFIED_LINKS_VERSION );
-		wp_enqueue_script( 'simplified-admin', SIMPLIFIED_LINKS_PLUGIN_URL . 'assets/dist/admin.js', '', SIMPLIFIED_LINKS_VERSION, true );
+		wp_enqueue_style( 'simplified-admin', SIMPLIFIED_LINKS_PLUGIN_URL . 'dist/admin.css', '', SIMPLIFIED_LINKS_VERSION );
+		wp_enqueue_script( 'simplified-admin', SIMPLIFIED_LINKS_PLUGIN_URL . 'dist/admin.js', '', SIMPLIFIED_LINKS_VERSION, true );
 	}
 
 	/**

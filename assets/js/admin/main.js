@@ -1,7 +1,9 @@
 import { setupCopyUrlButtons } from './copy-url-button.js';
+import { setupMigrateLinks } from './migrate-links.js';
 
 document.addEventListener( 'DOMContentLoaded', () => {
     setupCopyUrlButtons();
+	setupMigrateLinks();
 
 
 	const migratebtn = document.getElementById( 'migrate-btn' );

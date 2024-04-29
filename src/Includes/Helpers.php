@@ -49,7 +49,6 @@ class Helpers {
 		return $access_count ?: 0;
 	}
 
-
 	/**
 	 * Check whether slug exists or not
 	 *
@@ -101,17 +100,33 @@ class Helpers {
 	}
 
 	/**
-	 * Used for Checking Different Plugins supported for migration
+	 * Get list of plugins that supports migration to Simplified Links.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 *
+	 * @return array
 	 */
-	public static function add_plugin_migration_support() {
-		$plugin_supports_arr = array();
-
-		$plugin_supports_arr[] = array(
-			'name' => 'Lasso Lite',
-			'slug' => 'simple-urls',
-			'path' => 'simple-urls/plugin.php',
-		);
-
-		return $plugin_supports_arr;
+	public static function get_migration_supported_plugins() {
+		return [
+			[
+				'name'      => 'Lasso Lite',
+				'slug'      => 'simple-urls',
+				'path'      => 'simple-urls/plugin.php',
+				'post_type' => 'surl',
+			],
+			[
+				'name'      => 'Pretty Links',
+				'slug'      => 'pretty-link',
+				'path'      => 'pretty-link/pretty-link.php',
+				'post_type' => 'pretty-link',
+			],
+			[
+				'name'      => 'Affiliate Links',
+				'slug'      => 'affiliate-links',
+				'path'      => 'affiliate-links/affiliate-links.php',
+				'post_type' => 'affiliate-links',
+			],
+		];
 	}
 }
