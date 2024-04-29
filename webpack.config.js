@@ -1,49 +1,51 @@
-const path = require( 'path' );
-const { CleanWebpackPlugin } = require( 'clean-webpack-plugin' );
-// const MiniCssExtractPlugin = require( 'mini-css-extract-plugin' );
-const defaultConfig = require( '@wordpress/scripts/config/webpack.config.js' );
+// Import the original config from the @wordpress/scripts package.
+const defaultConfig = require('@wordpress/scripts/config/webpack.config');
 
-module.exports = {
+// Import path to update the output path.
+const path = require('path');
+
+// Import the wpPot function from the wp-pot package.
+const wpPot = require('wp-pot');
+
+// Set production mode.
+const isProduction = ('production' === process.env.NODE_ENV);
+const mode = isProduction ? 'production' : 'development';
+
+const config = {
 	...defaultConfig,
-	...{
-		output: {
-			path: path.resolve( __dirname, 'assets/dist/' ),
-			filename: 'js/[name].js',
-		},
-		entry: {
-			admin: [
-				'./assets/src/css/admin/main.css',
-				'./assets/src/js/admin/main.js',
-			],
-		},
-		module: {
-			rules: [
-				...defaultConfig.module.rules,
-				{
-					test: /\.s[ac]ss$/i,
-					use: [
-					  // Creates `style` nodes from JS strings
-					  "style-loader",
-					  // Translates CSS into CommonJS
-					  "css-loader",
-					  // Compiles Sass to CSS
-					  "postcss-loader",
-					],
-				},
-			]
-		},
-		plugins: [
-			...defaultConfig.plugins,
-
-			// Clean the directory before building.
-			new CleanWebpackPlugin( {
-				cleanOnceBeforeBuildPatterns: [ 'assets/dist/' ],
-			} ),
-
-			// Extract CSS into separate files under specific path.
-			// new MiniCssExtractPlugin( {
-			// 	filename: 'css/[name].css',
-			// } ),
+	mode,
+	output : {
+		path: path.resolve(__dirname, "dist"),
+		clean: true,
+	},
+	entry: {
+		admin: [
+			'./assets/scss/admin/main.scss',
+			'./assets/js/admin/main.js',
 		],
 	},
-};
+	module: {
+	  ...defaultConfig.module,
+	  rules: [
+		...defaultConfig.module.rules,
+	  ],
+	},
+	plugins: [
+		...defaultConfig.plugins,
+	],
+  };
+
+if (isProduction) {
+	// POT file.
+	wpPot({
+		package: 'Simplified Links',
+		domain: 'simplified-links',
+		destFile: 'languages/simplified-links.pot',
+		relativeTo: './',
+		src: ['./**/*.php', '!./includes/libraries/**/*', '!./vendor/**/*'],
+		bugReport: 'https://github.com/simplifiedwp/simplified-links/issues/new',
+		team: 'SimplifiedWP Team <hello@simplifiedwp.com>',
+	});
+}
+
+module.exports = config;
