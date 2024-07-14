@@ -1,57 +1,20 @@
+import { migrate } from "./migrate";
+
 export function setupMigrateLinks() {
     const migrateBtns = document.querySelectorAll('.simplified-links--migrate-btn-wrap button');
 
 	Array.from( migrateBtns ).forEach( ( button ) => {
 		button.addEventListener( 'click', ( event ) => {
-			console.log('triggered');
 			event.preventDefault();
 
-			const setProgressZero = () => {
-				progressBar.style.width = '0%'; // Initialize progress bar width to 0%
-				progress.classList.remove( 'sl-hidden' ); // Show progress
-				progressmsg.textContent =
-					'Importing and updating your links. For large bulk imports this may take some time with no progress bar movement.';
-			};
+			// Display Spinner.
+			button.parentElement.querySelector('.spinner').style.visibility = 'visible';
 
-			const setProgress = ( progessPercentage ) => {
-				progressBar.style.width = progessPercentage + '%';
-			};
+			// Migration Process.
+			migrate( 'simplified_links_migrate', 0, button.dataset.post_type, button.dataset.meta_key );
 
-			const hideProgressBar = () => {
-				progressmsg.textContent = '';
-				progress.classList.add( 'sl-hidden' ); // Hide progress bar
-			};
-
-			setProgressZero(); // Show progress bar before sending the request
-
-			const formData = new FormData();
-			formData.append( 'action', 'simplified_import' );
-
-			fetch( ajaxurl, {
-				method: 'POST',
-				body: formData,
-			} )
-				.then( ( response ) => {
-					setProgress( 10 );
-					if ( 200 === response.status ) {
-						return response.json();
-					}
-					return false;
-				} )
-				.then( ( data ) => {
-					console.log( 'data = ' + data.success );
-					if ( data.success === true ) {
-						let width = 0;
-						const interval = setInterval( () => {
-							width += 10; // Increase width by 10%
-							progressBar.style.width = `${ width }%`;
-
-							if ( width >= 100 ) {
-								clearInterval( interval ); // Stop the interval when width reaches 100%
-							}
-						}, 1000 );
-					}
-				} );
+			// Hide Spinner.
+			button.parentElement.querySelector('.spinner').style.visibility = 'none';
 		} );
 	});
 }

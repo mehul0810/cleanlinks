@@ -61,6 +61,7 @@ final class Plugin {
 			new Admin\Filters();
 			new Admin\Actions();
 			new Admin\Export();
+			new Admin\Migrate();
 		}
 	}
 

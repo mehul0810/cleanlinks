@@ -77,7 +77,13 @@ class Migrate {
 									?>
 								</p>
 								<div class="simplified-links--migrate-btn-wrap">
-									<button type="button" class="button button-primary" <?php echo $total_count > 0 ? '' : 'disabled'; ?>>
+									<button
+										data-post_type="<?php echo esc_html( $plugin['post_type'] ); ?>"
+										data-meta_key="<?php echo esc_html( $plugin['meta_key'] ); ?>"
+										type="button"
+										class="button button-primary"
+										<?php echo $total_count > 0 ? '' : 'disabled'; ?>
+									>
 										<?php esc_html_e( 'Migrate', 'simplified-links' ); ?>
 									</button>
 									<span class="spinner"></span>
@@ -100,6 +106,53 @@ class Migrate {
 	 * @return WP_Object
 	 */
 	public function migrate_links() {
+		// Sanitize and validate input.
+		$_post = Helpers::clean( $_POST );
+echo "<pre>"; print_r($_post); die();
+		// Setup necessary variables.
+		$offset    = isset( $_post['offset'] ) ? intval( $_post['offset'] ) : 0;
+		$limit     = apply_filters( 'simplifiedwp/links/migration_limit', 100 );
+		$post_type = ! empty( $_post['postType'] ) ? $_post['postType'] : '';
+		$meta_key  = ! empty( $_post['metaKey'] ) ? $_post['metaKey'] : '';
 
+		// Query old post type with offset and limit.
+		$args = array(
+			'post_type'      => $post_type,
+			'posts_per_page' => $limit,
+			'offset'         => $offset,
+		);
+		$old_posts = new \WP_Query( $args );
+
+		if ( $old_posts->have_posts() ) {
+			while ( $old_posts->have_posts() ) {
+				$old_posts->the_post();
+
+				$old_post_id = get_the_ID();
+
+				// Create new post.
+				$new_post = array(
+					'ID'        => $old_post_id,
+					'post_type' => 'simplifiedwp_links',
+				);
+
+				// Insert new post
+				$new_post_id = wp_update_post( $new_post );
+
+				if ($new_post_id) {
+					// Get meta value of old post type meta key.
+					$old_meta_value = get_post_meta( $old_post_id, $meta_key, true );
+
+					// Update the post meta of new post type with the meta key.
+					update_post_meta( $new_post_id, 'simplifiedwp_links_redirect_url', $old_meta_value );
+				}
+			}
+			wp_reset_postdata();
+
+			// Send response to client
+			wp_send_json_success( true );
+		} else {
+			// No more posts to migrate
+			wp_send_json_success( false );
+		}
 	}
 }
