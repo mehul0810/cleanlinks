@@ -116,20 +116,6 @@ class Helpers {
 				'post_type' => 'surl',
 				'meta_key'  => '_surl_redirect',
 			],
-			[
-				'name'      => 'Pretty Links',
-				'slug'      => 'pretty-link',
-				'path'      => 'pretty-link/pretty-link.php',
-				'post_type' => 'pretty-link',
-				'meta_key'  => '',
-			],
-			[
-				'name'      => 'Affiliate Links',
-				'slug'      => 'affiliate-links',
-				'path'      => 'affiliate-links/affiliate-links.php',
-				'post_type' => 'affiliate-links',
-				'meta_key'  => '',
-			],
 		];
 	}
 }
