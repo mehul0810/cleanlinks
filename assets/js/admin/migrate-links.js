@@ -11,7 +11,7 @@ export function setupMigrateLinks() {
 			button.parentElement.querySelector('.spinner').style.visibility = 'visible';
 
 			// Migration Process.
-			migrate( 'simplified_links_migrate', 0, button.dataset.post_type, button.dataset.meta_key );
+			migrate( 'simplified_links_migrate', 0, button.dataset.post_type, button.dataset.redirect_to, button.dataset.clicks );
 
 			// Hide Spinner.
 			button.parentElement.querySelector('.spinner').style.visibility = 'none';

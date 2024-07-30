@@ -48,6 +48,9 @@ class Migrate {
 				continue;
 			}
 
+			$redirect_to = ! empty( $plugin['meta_key']['redirect_to'] ) ? $plugin['meta_key']['redirect_to'] : '';
+			$clicks      = ! empty( $plugin['meta_key']['clicks'] ) ? $plugin['meta_key']['clicks'] : '';
+
 			$publish_count = wp_count_posts( $plugin['post_type'] )->publish;
 			$draft_count   = wp_count_posts( $plugin['post_type'] )->draft;
 			$total_count   = $publish_count + $draft_count;
@@ -79,7 +82,8 @@ class Migrate {
 								<div class="simplified-links--migrate-btn-wrap">
 									<button
 										data-post_type="<?php echo esc_html( $plugin['post_type'] ); ?>"
-										data-meta_key="<?php echo esc_html( $plugin['meta_key'] ); ?>"
+										data-redirect_to="<?php echo esc_attr( $redirect_to ); ?>"
+										data-clicks="<?php echo esc_attr( $clicks ); ?>"
 										type="button"
 										class="button button-primary"
 										<?php echo $total_count > 0 ? '' : 'disabled'; ?>
@@ -106,9 +110,10 @@ class Migrate {
 	 * @return WP_Object
 	 */
 	public function migrate_links() {
+		echo "<pre>"; print_r($_POST); die();
 		// Sanitize and validate input.
 		$_post = Helpers::clean( $_POST );
-echo "<pre>"; print_r($_post); die();
+
 		// Setup necessary variables.
 		$offset    = isset( $_post['offset'] ) ? intval( $_post['offset'] ) : 0;
 		$limit     = apply_filters( 'simplifiedwp/links/migration_limit', 100 );
@@ -154,5 +159,7 @@ echo "<pre>"; print_r($_post); die();
 			// No more posts to migrate
 			wp_send_json_success( false );
 		}
+
+		wp_die();
 	}
 }

@@ -114,7 +114,10 @@ class Helpers {
 				'slug'      => 'simple-urls',
 				'path'      => 'simple-urls/plugin.php',
 				'post_type' => 'surl',
-				'meta_key'  => '_surl_redirect',
+				'meta_key'  => [
+					'redirect_to' => '_surl_redirect',
+					'clicks'      => '_surl_count',
+				],
 			],
 		];
 	}

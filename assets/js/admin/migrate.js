@@ -1,4 +1,4 @@
-const migrate = (action, offset, postType, metaKey ) => {
+const migrate = (action, offset, postType, redirect_to, clicks ) => {
     const limit = 100; // Number of posts to migrate per AJAX call
 
     fetch(ajaxurl, {
@@ -10,7 +10,8 @@ const migrate = (action, offset, postType, metaKey ) => {
             action,
             offset,
 			postType,
-			metaKey,
+			redirect_to,
+			clicks,
         }),
     })
     .then(response => response.json())
