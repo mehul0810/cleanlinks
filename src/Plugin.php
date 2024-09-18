@@ -62,8 +62,6 @@ final class Plugin {
 			new Admin\Actions();
 			new Admin\Export();
 		}
-
-		new Admin\Migrate();
 	}
 
 	/**

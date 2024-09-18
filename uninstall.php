@@ -66,7 +66,4 @@ if($simplified_links_clean_up === true) {
     // Delete Taxonomies.
     $wpdb->delete($wpdb->term_taxonomy, ['taxonomy' => $simplified_taxonomy], ['%s']);
     
-    // Delete option
-    $import_all = 'simplifiedwp_links_import_all_enable';
-    delete_option( $import_all );
 }
