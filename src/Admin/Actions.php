@@ -208,8 +208,16 @@ class Actions {
 	 * @return void
 	 */
 	public function register_assets() {
-		wp_enqueue_style( 'simplified-admin', SIMPLIFIED_LINKS_PLUGIN_URL . 'dist/admin.css', '', SIMPLIFIED_LINKS_VERSION );
-		wp_enqueue_script( 'simplified-admin', SIMPLIFIED_LINKS_PLUGIN_URL . 'dist/admin.js', '', SIMPLIFIED_LINKS_VERSION, true );
+		wp_enqueue_style( 'simplified-admin', SIMPLIFIED_LINKS_PLUGIN_URL . 'assets/admin/admin.css', '', SIMPLIFIED_LINKS_VERSION );
+		wp_enqueue_script( 'simplified-admin', SIMPLIFIED_LINKS_PLUGIN_URL . 'assets/js/admin/main.js', '', SIMPLIFIED_LINKS_VERSION, true );
+		
+		// Add the type="module" attribute to the script
+		add_filter('script_loader_tag', function($tag, $handle, $src) {
+			if ('simplified-admin' === $handle) {
+				$tag = '<script type="module" src="' . esc_url( $src ) . '"></script>';
+			}
+			return $tag;
+		}, 10, 3);
 	}
 
 	/**

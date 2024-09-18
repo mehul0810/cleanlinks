@@ -5,7 +5,6 @@ document.addEventListener( 'DOMContentLoaded', () => {
     setupCopyUrlButtons();
 	setupMigrateLinks();
 
-
 	const migratebtn = document.getElementById( 'migrate-btn' );
 	const errorMessage = document.getElementById( 'errormessage' );
 	const progress = document.getElementById( 'progress' );
@@ -31,7 +30,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	if ( null !== migratebtn ) {
 		migratebtn.addEventListener( 'click', ( e ) => {
 			e.preventDefault();
-
+			console.log("clickfired");
 			setProgressZero(); // Show progress bar before sending the request
 
 			const formData = new FormData();

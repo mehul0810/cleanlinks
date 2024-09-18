@@ -1,4 +1,4 @@
-import { migrate } from "./migrate";
+import { migrate } from './migrate';
 
 export function setupMigrateLinks() {
     const migrateBtns = document.querySelectorAll('.simplified-links--migrate-btn-wrap button');
