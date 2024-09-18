@@ -177,7 +177,8 @@ class Actions {
 				break;
 
 			case 'total_clicks':
-				echo Helpers::get_total_access_count( $post_id );
+				$post_status = get_post_status ( $post_id );
+				echo ( $post_status != 'publish' ) ? '0' : Helpers::get_total_access_count( $post_id );
 				break;
 		}
 	}
