@@ -193,7 +193,7 @@ class PostType {
 		</p>
 		<p><span class="description"><?php esc_html_e( 'This is the URL that the Redirect Link you create on this page will redirect to when accessed in a web browser.', 'simplified-links' ); ?> </span></p>
 		<?php
-		$count = isset( $post->ID ) ? get_post_meta( $post->ID, 'simplified_redirect_count', true ) : 0;
+		$count = isset( $post->ID ) ? get_post_meta( $post->ID, 'simplifiedwp_links_redirect_count', true ) : 0;
 		/* translators: %d is the counter of clicks. */
 		echo '<p>' . sprintf( esc_html__( 'This URL has been accessed %d times', 'simplified-links' ), esc_attr( $count ) ) . '</p>';
 	}

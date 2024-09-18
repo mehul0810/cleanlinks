@@ -39,8 +39,8 @@ class Actions {
 		global $wp_query;
 
 		// Update the count.
-		$count = isset( $wp_query->post->simplified_redirect_count ) ? (int) $wp_query->post->simplified_redirect_count : 0;
-		update_post_meta( $wp_query->post->ID, 'simplified_redirect_count', $count + 1 );
+		$count = isset( $wp_query->post->simplifiedwp_links_redirect_count ) ? (int) $wp_query->post->simplifiedwp_links_redirect_count : 0;
+		update_post_meta( $wp_query->post->ID, 'simplifiedwp_links_redirect_count', $count + 1 );
 
 		// Handle the redirect.
 		$redirect = isset( $wp_query->post->ID ) ? get_post_meta( $wp_query->post->ID, 'simplified_redirect_url', true ) : '';
