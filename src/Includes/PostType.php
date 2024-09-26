@@ -125,41 +125,54 @@ class PostType {
 	 * @return void
 	 */
 	public function save_link_meta( $post_id, $post ) {
+		// Bailout, if doing autosave.
 		if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) ) {
 			return;
 		}
 
+		// Bailout, if doing ajax.
 		if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
 			return;
 		}
 
+		// Bailout, if doing cron.
 		if ( defined( 'DOING_CRON' ) && DOING_CRON ) {
 			return;
 		}
 
+		// Bailout, if the post type is not `simplifiedwp_links`.
+		if ( 'simplifiedwp_links' !== $post->post_type ) {
+			return;
+		}
+
+		// Bailout, if the user doesn't have permissions to edit post.
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return;
+		}
+
+		// Prepare nonce variable.
+		$nonce = filter_input( INPUT_POST, 'simplified_redirect_nonce', FILTER_UNSAFE_RAW );
+
+		// Bailout, if the nonce is not verified.
+		if ( ! wp_verify_nonce( $nonce, 'simplified-save-redirect-meta' ) ) {
+			return;
+		}
+
 		// Sanitize post data.
-		$_post = Helpers::clean( $_POST );
+		$post_data = Helpers::clean( $_POST );
 
 		// Update post meta for simplifiedwp links
-		if (
-			! empty( $_post['simplified_redirect_nonce'] ) &&
-			wp_verify_nonce( $_post['simplified_redirect_nonce'], 'simplified-save-redirect-meta' ) &&
-			current_user_can( 'edit_post', $post_id ) &&
-			'simplifiedwp_links' === $post->post_type
-		) {
+		if ( ! empty( $post_data['simplified_redirect_url'] ) ) {
 
-			if ( ! empty( $_post['simplified_redirect_url'] ) ) {
+			// Remove all illegal characters from a url
+			$url = filter_var( $post_data['simplified_redirect_url'], FILTER_SANITIZE_URL );
 
-				// Remove all illegal characters from a url
-				$url = filter_var( $_post['simplified_redirect_url'], FILTER_SANITIZE_URL );
-
-				// Validate url
-				if ( filter_var( $url, FILTER_VALIDATE_URL ) ) {
-					update_post_meta( $post_id, 'simplified_redirect_url', esc_url( $url ) );
-				}
-			} else {
-				delete_post_meta( $post_id, 'simplified_redirect_url' );
+			// Validate url
+			if ( filter_var( $url, FILTER_VALIDATE_URL ) ) {
+				update_post_meta( $post_id, 'simplified_redirect_url', esc_url( $url ) );
 			}
+		} else {
+			delete_post_meta( $post_id, 'simplified_redirect_url' );
 		}
 	}
 
