@@ -55,5 +55,5 @@ require_once __DIR__ . '/config/constants.php';
 require_once SIMPLIFIED_LINKS_PLUGIN_DIR . 'vendor/autoload.php';
 
 // Initialize the plugin.
-$plugin = new Plugin();
-$plugin->register();
+$init_plugin = new Plugin();
+$init_plugin->register();

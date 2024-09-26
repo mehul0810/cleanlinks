@@ -32,7 +32,7 @@ class Actions {
 		add_action( 'admin_enqueue_scripts', array( $this, 'register_assets' ) );
 		add_action( 'admin_menu', array( $this, 'register_admin_pages' ) );
 		add_action( 'manage_simplifiedwp_links_posts_custom_column', array( $this, 'register_custom_columns' ), 10, 2 );
-		add_action( 'post_submitbox_misc_actions', array( $this, 'before_preview_changes' ) );		
+		add_action( 'post_submitbox_misc_actions', array( $this, 'before_preview_changes' ) );
 	}
 
 	/**
@@ -44,7 +44,7 @@ class Actions {
 	 * @return void
 	 */
 	public function register_admin_pages() {
-		
+
 		// Export.
 		add_submenu_page(
 			'edit.php?post_type=simplifiedwp_links',
@@ -124,7 +124,7 @@ class Actions {
 	 */
 	public function register_assets() {
 		wp_enqueue_script( 'simplified-admin', SIMPLIFIED_LINKS_PLUGIN_URL . 'assets/js/admin/main.js', '', SIMPLIFIED_LINKS_VERSION, true );
-		
+
 		// Add the type="module" attribute to the script
 		add_filter('script_loader_tag', function($tag, $handle, $src) {
 			if ( 'simplified-admin' === $handle ) {
@@ -154,10 +154,10 @@ class Actions {
 				<button
 					type="button"
 					class="button simplified-links--copy-button"
-					aria-label="<?php echo $permalink; ?>"
-					data-default-text="<?php echo esc_html( $default_text ); ?>"
-					data-copied-text="<?php echo esc_html__( 'Copied!', 'simplified-links' ); ?>"
-					data-url="<?php echo $permalink; ?>"
+					aria-label="<?php echo esc_url( $permalink ); ?>"
+					data-default-text="<?php echo esc_attr( $default_text ); ?>"
+					data-copied-text="<?php echo esc_attr__( 'Copied!', 'simplified-links' ); ?>"
+					data-url="<?php echo esc_url( $permalink ); ?>"
 				>
 					<span class="dashicons dashicons-admin-page"></span>
 					<span class="simplified-links--copy-button-text"><?php echo esc_html( $default_text ); ?></span>
@@ -178,7 +178,10 @@ class Actions {
 
 			case 'total_clicks':
 				$post_status = get_post_status ( $post_id );
-				echo ( $post_status != 'publish' ) ? '0' : Helpers::get_total_access_count( $post_id );
+				$total_clicks = ( $post_status != 'publish' ) ? 0 : Helpers::get_total_access_count( $post_id );
+
+				// Display Total Clicks.
+				echo absint( $total_clicks );
 				break;
 		}
 	}

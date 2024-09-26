@@ -76,7 +76,7 @@ class Export {
 			$permalink 		= get_permalink( $post_id );
 			$parts 			= explode( '/', rtrim( $permalink, '/' ) );
        		$slug 			= $parts[count($parts)-2]; // Get the slug part
-				
+
 			$modified_values = array(
 				$post_id,
 				$post->post_title,
@@ -104,7 +104,7 @@ class Export {
 						</div>
 						<div class="inside">
 							<p><?php esc_html_e( 'Using this tool, you can have a seamless experience to export your links to a CSV (Comma Separated Values) file with just a single click.', 'simplified-links' ); ?></p>
-							<form method="post" id="export-form" action="<?php echo admin_url( 'admin-post.php' );?>">									
+							<form method="post" id="export-form" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 								<?php wp_nonce_field( 'simplifiedwp_links_export_nonce', 'simplifiedwp_links_export_nonce' ); ?>
 								<input type="hidden" name="action" value="simplifiedwp_links_export">
 								<button type="submit" class="button button-primary"><?php esc_html_e( 'Export', 'simplified-links' ); ?></button>

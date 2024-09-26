@@ -94,7 +94,6 @@ final class Plugin {
 	public function activate( $network_wide = false ) {
 		$post_type = new Includes\PostType();
 		$post_type->register_post_type();
-		flush_rewrite_rules();
 	}
 
 	/**
