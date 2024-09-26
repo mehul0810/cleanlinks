@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Simplified Links | Uninstall.
  *
@@ -17,7 +16,7 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
 global $wpdb;
 
 $simplified_links_clean_up_default = false;
-		
+
 $simplified_links_clean_up = apply_filters( 'simplified_links_clean_up', $simplified_links_clean_up_default );
 
 if($simplified_links_clean_up === true) {
@@ -65,5 +64,5 @@ if($simplified_links_clean_up === true) {
 
     // Delete Taxonomies.
     $wpdb->delete($wpdb->term_taxonomy, ['taxonomy' => $simplified_taxonomy], ['%s']);
-    
+
 }
