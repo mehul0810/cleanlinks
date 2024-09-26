@@ -2,8 +2,32 @@
 	"name": "simplified-links",
 	"version": "1.0.0",
 	"description": "",
-	"main": "index.js",
-	"scripts": {
+	"author": "SimplifiedWP",
+	"license": "GPL-2.0-or-later",
+  "keywords": [],
+  "homepage": "https://github.com/simplifiedwp/simplified-links#readme",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/simplifiedwp/simplified-links.git"
+	},
+	"bugs": {
+		"url": "https://github.com/simplifiedwp/simplified-links/issues"
+	},
+  "main": "index.js",
+	"devDependencies": {
+		"@wordpress/scripts": "^27.6.0",
+		"css-loader": "^7.1.1",
+		"file-loader": "^6.2.0",
+		"husky": "^9.1.6",
+		"mini-css-extract-plugin": "^2.9.0",
+		"postcss-import": "^16.1.0",
+		"postcss-loader": "^8.1.1",
+		"postcss-preset-env": "^9.5.9",
+		"sass": "^1.75.0",
+		"wp-pot": "^1.10.2",
+		"wp-textdomain": "^1.0.1"
+	},
+  "scripts": {
     "prepare": "husky",
 		"start": "wp-scripts start",
 		"build": "wp-scripts build",
@@ -18,28 +42,5 @@
 		"plugin-zip": "wp-scripts plugin-zip",
 		"test:e2e": "wp-scripts test-e2e",
 		"test:unit": "wp-scripts test-unit-js"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/simplifiedwp/simplified-links.git"
-	},
-	"author": "SimplifiedWP",
-	"license": "GPL-3.0-only",
-	"bugs": {
-		"url": "https://github.com/simplifiedwp/simplified-links/issues"
-	},
-	"homepage": "https://github.com/simplifiedwp/simplified-links#readme",
-	"devDependencies": {
-		"@wordpress/scripts": "^27.6.0",
-		"css-loader": "^7.1.1",
-		"file-loader": "^6.2.0",
-		"husky": "^9.1.6",
-		"mini-css-extract-plugin": "^2.9.0",
-		"postcss-import": "^16.1.0",
-		"postcss-loader": "^8.1.1",
-		"postcss-preset-env": "^9.5.9",
-		"sass": "^1.75.0",
-		"wp-pot": "^1.10.2",
-		"wp-textdomain": "^1.0.1"
 	}
 }
