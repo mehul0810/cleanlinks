@@ -4,6 +4,7 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
+    "prepare": "husky",
 		"start": "wp-scripts start",
 		"build": "wp-scripts build",
 		"check-engines": "wp-scripts check-engines",
@@ -32,6 +33,7 @@
 		"@wordpress/scripts": "^27.6.0",
 		"css-loader": "^7.1.1",
 		"file-loader": "^6.2.0",
+		"husky": "^9.1.6",
 		"mini-css-extract-plugin": "^2.9.0",
 		"postcss-import": "^16.1.0",
 		"postcss-loader": "^8.1.1",
