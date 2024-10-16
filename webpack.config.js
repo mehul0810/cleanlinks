@@ -8,44 +8,37 @@ const path = require('path');
 const wpPot = require('wp-pot');
 
 // Set production mode.
-const isProduction = ('production' === process.env.NODE_ENV);
+const isProduction = 'production' === process.env.NODE_ENV;
 const mode = isProduction ? 'production' : 'development';
 
 const config = {
 	...defaultConfig,
 	mode,
-	output : {
-		path: path.resolve(__dirname, "dist"),
+	output: {
+		path: path.resolve( __dirname, 'dist' ),
 		clean: true,
 	},
 	entry: {
-		admin: [
-			'./assets/scss/admin/main.scss',
-			'./assets/js/admin/main.js',
-		],
+		admin: [ './assets/scss/admin/main.scss', './assets/js/admin/main.js' ],
 	},
 	module: {
-	  ...defaultConfig.module,
-	  rules: [
-		...defaultConfig.module.rules,
-	  ],
+		...defaultConfig.module,
+		rules: [ ...defaultConfig.module.rules ],
 	},
-	plugins: [
-		...defaultConfig.plugins,
-	],
-  };
+	plugins: [ ...defaultConfig.plugins ],
+};
 
-if (isProduction) {
+if ( isProduction ) {
 	// POT file.
-	wpPot({
+	wpPot( {
 		package: 'Simplified Links',
 		domain: 'simplified-links',
 		destFile: 'languages/simplified-links.pot',
 		relativeTo: './',
-		src: ['./**/*.php', '!./includes/libraries/**/*', '!./vendor/**/*'],
+		src: [ './**/*.php', '!./includes/libraries/**/*', '!./vendor/**/*' ],
 		bugReport: 'https://github.com/simplifiedwp/simplified-links/issues/new',
 		team: 'SimplifiedWP Team <hello@simplifiedwp.com>',
-	});
+	} );
 }
 
 module.exports = config;

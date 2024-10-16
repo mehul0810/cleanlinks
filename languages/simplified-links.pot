@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: SimplifiedWP Team <hello@simplifiedwp.com>\n"
-"POT-Creation-Date: 2024-07-23 10:21+0000\n"
+"POT-Creation-Date: 2024-09-26 10:41+0000\n"
 "Report-Msgid-Bugs-To: https://github.com/simplifiedwp/simplified-links/issues/new\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -16,55 +16,27 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/Admin/Actions.php:54, src/Admin/Actions.php:55, src/Admin/Actions.php:150, src/Admin/Migrate.php:91
-msgid "Migrate"
-msgstr ""
-
-#: src/Admin/Actions.php:65, src/Admin/Actions.php:66
-msgid "Import/Export"
-msgstr ""
-
-#: src/Admin/Actions.php:76, src/Admin/Actions.php:77
-msgid "More Plugins"
-msgstr ""
-
-#: src/Admin/Actions.php:98
-msgid "Using this tool, you can have a seamless experience to import your links from all the supported existing WordPress plugins with similar functionality to our plugin with just a single click."
-msgstr ""
-
-#: src/Admin/Actions.php:133
-msgid "Import"
-msgstr ""
-
-#: src/Admin/Actions.php:141
-msgid "This tool lets you migrate <strong>%1$s</strong> affiliate links of %2$s Plugin into Simplified Links Plugin."
-msgstr ""
-
-#: src/Admin/Actions.php:169
-msgid "Export your links"
-msgstr ""
-
-#: src/Admin/Actions.php:170
-msgid "This tool lets you export a properly formatted CSV file containing a list of all the affiliate links of Simplified Links Plugin ."
-msgstr ""
-
-#: src/Admin/Actions.php:174, src/Admin/Export.php:43, src/Admin/Export.php:51
+#: src/Admin/Actions.php:51, src/Admin/Actions.php:52, src/Admin/Export.php:102, src/Admin/Export.php:110
 msgid "Export"
 msgstr ""
 
-#: src/Admin/Actions.php:229
+#: src/Admin/Actions.php:62, src/Admin/Actions.php:63
+msgid "More Plugins"
+msgstr ""
+
+#: src/Admin/Actions.php:151
 msgid "Copy URL"
 msgstr ""
 
-#: src/Admin/Actions.php:237
+#: src/Admin/Actions.php:159
 msgid "Copied!"
 msgstr ""
 
-#: src/Admin/Actions.php:286
+#: src/Admin/Actions.php:212
 msgid "Viewed:"
 msgstr ""
 
-#: src/Admin/Export.php:47
+#: src/Admin/Export.php:106
 msgid "Using this tool, you can have a seamless experience to export your links to a CSV (Comma Separated Values) file with just a single click."
 msgstr ""
 
@@ -207,20 +179,20 @@ msgctxt "Screen reader text for the items list heading on the post type listing 
 msgid "Simplified Links list"
 msgstr ""
 
-#: src/Includes/PostType.php:173
+#: src/Includes/PostType.php:186
 msgid "Redirection Settings"
 msgstr ""
 
-#: src/Includes/PostType.php:191
+#: src/Includes/PostType.php:204
 msgid "Redirect to:"
 msgstr ""
 
-#: src/Includes/PostType.php:194
+#: src/Includes/PostType.php:207
 msgid "This is the URL that the Redirect Link you create on this page will redirect to when accessed in a web browser."
 msgstr ""
 
 #. translators: %d is the counter of clicks.
-#: src/Includes/PostType.php:198
+#: src/Includes/PostType.php:211
 msgid "This URL has been accessed %d times"
 msgstr ""
 

@@ -1,6 +1,5 @@
 import { setupCopyUrlButtons } from './copy-url-button.js';
 
-document.addEventListener( 'DOMContentLoaded', () => {
-    setupCopyUrlButtons();
-
-} );
+document.addEventListener('DOMContentLoaded', () => {
+	setupCopyUrlButtons();
+});
