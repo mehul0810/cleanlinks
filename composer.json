@@ -1,5 +1,5 @@
 {
-	"name": "simplifiedwp/links",
+	"name": "simplifiedwp/cleanlinks",
 	"description": "The most robust, flexible, and intuitive way to build your brand using link building strategy.",
 	"authors": [
 		{
@@ -38,12 +38,12 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"SimplifiedWP\\Links\\": "src/"
+			"MG\\CleanLinks\\": "src/"
 		}
 	},
 	"autoload-dev": {
 		"psr-4": {
-			"SimplifiedWP\\Links\\Tests\\": "tests/"
+			"MG\\CleanLinks\\Tests\\": "tests/"
 		}
 	},
 	"config": {

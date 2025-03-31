@@ -1,13 +1,13 @@
 <?php
 /**
- * Simplified Links | Taxonomy.
+ * CleanLinks | Taxonomy.
  *
  * @package WordPress
- * @subpackage Simplified Links
+ * @subpackage CleanLinks
  * @since 1.0.0
  */
 
-namespace SimplifiedWP\Links\Includes;
+namespace MG\CleanLinks\Includes;
 
 // Bailout, if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -37,20 +37,20 @@ class TaxoNomy {
 	 */
 	public function get_labels() {
 		return array(
-			'name'                       => _x( 'Groups', 'taxonomy general name', 'simplified-links' ),
-			'singular_name'              => _x( 'Group', 'taxonomy singular name', 'simplified-links' ),
-			'search_items'               => __( 'Search Groups', 'simplified-links' ),
-			'popular_items'              => __( 'Popular Groups', 'simplified-links' ),
-			'all_items'                  => __( 'All Groups', 'simplified-links' ),
-			'edit_item'                  => __( 'Edit Group', 'simplified-links' ),
-			'update_item'                => __( 'Update Group', 'simplified-links' ),
-			'add_new_item'               => __( 'Add New Group', 'simplified-links' ),
-			'new_item_name'              => __( 'New Group Name', 'simplified-links' ),
-			'separate_items_with_commas' => __( 'Separate groups with commas', 'simplified-links' ),
-			'add_or_remove_items'        => __( 'Add or remove groups', 'simplified-links' ),
-			'choose_from_most_used'      => __( 'Choose from the most used groups', 'simplified-links' ),
-			'not_found'                  => __( 'No groups found', 'simplified-links' ),
-			'menu_name'                  => __( 'Groups', 'simplified-links' ),
+			'name'                       => _x( 'Groups', 'taxonomy general name', 'cleanlinks' ),
+			'singular_name'              => _x( 'Group', 'taxonomy singular name', 'cleanlinks' ),
+			'search_items'               => __( 'Search Groups', 'cleanlinks' ),
+			'popular_items'              => __( 'Popular Groups', 'cleanlinks' ),
+			'all_items'                  => __( 'All Groups', 'cleanlinks' ),
+			'edit_item'                  => __( 'Edit Group', 'cleanlinks' ),
+			'update_item'                => __( 'Update Group', 'cleanlinks' ),
+			'add_new_item'               => __( 'Add New Group', 'cleanlinks' ),
+			'new_item_name'              => __( 'New Group Name', 'cleanlinks' ),
+			'separate_items_with_commas' => __( 'Separate groups with commas', 'cleanlinks' ),
+			'add_or_remove_items'        => __( 'Add or remove groups', 'cleanlinks' ),
+			'choose_from_most_used'      => __( 'Choose from the most used groups', 'cleanlinks' ),
+			'not_found'                  => __( 'No groups found', 'cleanlinks' ),
+			'menu_name'                  => __( 'Groups', 'cleanlinks' ),
 		);
 	}
 
@@ -73,7 +73,7 @@ class TaxoNomy {
 			'show_tagcloud'      => true,
 			'show_in_quick_edit' => true,
 			'show_admin_column'  => true,
-			'rewrite'            => array( 'slug' => 'simplifiedwp_groups' ),
+			'rewrite'            => array( 'slug' => 'cleanlinks_groups' ),
 		);
 	}
 
@@ -86,6 +86,6 @@ class TaxoNomy {
 	 * @return void
 	 */
 	public function register_taxo_nomy() {
-		register_taxonomy( 'simplifiedwp_groups', 'simplifiedwp_links', $this->get_args() );
+		register_taxonomy( 'cleanlinks_groups', 'clean_links', $this->get_args() );
 	}
 }

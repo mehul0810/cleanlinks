@@ -1,5 +1,9 @@
 export function setupCopyUrlButtons() {
+<<<<<<< Updated upstream
 	const copyUrlButtons = document.querySelectorAll( '.simplified-links--copy-button' );
+=======
+    const copyUrlButtons = document.querySelectorAll('.cleanlinks--copy-button');
+>>>>>>> Stashed changes
 
 	const copyTextToClipboard = ( text ) => {
 		const textarea = document.createElement( 'textarea' );
@@ -20,8 +24,20 @@ export function setupCopyUrlButtons() {
 			const iconElement = event.currentTarget.querySelector( '.dashicons' );
 			const textElement = event.currentTarget.querySelector( '.simplified-links--copy-button-text' );
 
+<<<<<<< Updated upstream
 			iconElement.classList.add( 'dashicons-yes' );
 			iconElement.classList.remove( 'dashicons-admin-page' );
+=======
+    Array.from(copyUrlButtons).forEach((button) => {
+        button.addEventListener('click', ( event ) => {
+            const url         = event.currentTarget.getAttribute('data-url');
+			const copiedText  = event.currentTarget.getAttribute('data-copied-text');
+            const iconElement = event.currentTarget.querySelector('.dashicons');
+			const textElement = event.currentTarget.querySelector('.cleanlinks--copy-button-text');
+
+			iconElement.classList.add('dashicons-yes');
+			iconElement.classList.remove('dashicons-admin-page');
+>>>>>>> Stashed changes
 
 			textElement.textContent = iconElement.textContent + copiedText;
 
@@ -29,10 +45,17 @@ export function setupCopyUrlButtons() {
 			copyTextToClipboard( url );
 		});
 
+<<<<<<< Updated upstream
 		button.addEventListener( 'mouseleave', ( event ) => {
 			const defaultText = event.currentTarget.getAttribute( 'data-default-text' );
 			const iconElement = event.currentTarget.querySelector( 'span.dashicons' );
 			const textElement = event.currentTarget.querySelector( '.simplified-links--copy-button-text' );
+=======
+        button.addEventListener('mouseleave', (event) => {
+			const defaultText = event.currentTarget.getAttribute('data-default-text');
+            const iconElement = event.currentTarget.querySelector('span.dashicons');
+			const textElement = event.currentTarget.querySelector('.cleanlinks--copy-button-text');
+>>>>>>> Stashed changes
 
 			iconElement.classList.remove( 'dashicons-yes' );
 			iconElement.classList.add( 'dashicons-admin-page' );

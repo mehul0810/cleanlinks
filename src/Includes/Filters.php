@@ -1,13 +1,13 @@
 <?php
 /**
- * Simplified Links | Filters.
+ * CleanLinks | Filters.
  *
  * @package WordPress
- * @subpackage Simplified Links
+ * @subpackage CleanLinks
  * @since 1.0.0
  */
 
-namespace SimplifiedWP\Links\Includes;
+namespace MG\CleanLinks\Includes;
 
 // Bailout, if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {

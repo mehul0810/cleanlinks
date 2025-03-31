@@ -1,10 +1,10 @@
 <?php
 
-namespace SimplifiedWP\Links\Tests;
+namespace MG\CleanLinks\Tests;
 
-use SimplifiedWP\Links\Tests\Config\Config;
-use SimplifiedWP\Links\Tests\Config\Local;
-use SimplifiedWP\Links\Tests\Config\Workflow;
+use MG\CleanLinks\Tests\Config\Config;
+use MG\CleanLinks\Tests\Config\Local;
+use MG\CleanLinks\Tests\Config\Workflow;
 
 class TestEnvironment {
     /**

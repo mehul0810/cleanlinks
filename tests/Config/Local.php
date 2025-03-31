@@ -1,6 +1,6 @@
 <?php
 
-namespace SimplifiedWP\Links\Tests\Config;
+namespace MG\CleanLinks\Tests\Config;
 
 /**
  * Runs the test suite for local development, which

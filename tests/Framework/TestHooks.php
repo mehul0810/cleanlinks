@@ -1,6 +1,6 @@
 <?php
 
-namespace SimplifiedWP\Links\Tests\Framework;
+namespace MG\CleanLinks\Tests\Framework;
 
 use Closure;
 

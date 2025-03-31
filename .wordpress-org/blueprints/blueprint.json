@@ -1,5 +1,5 @@
 {
-	"landingPage": "/wp-admin/edit.php?post_type=simplifiedwp_links",
+	"landingPage": "/wp-admin/edit.php?post_type=clean_links",
 	"steps": [
 		{
 			"step": "login",

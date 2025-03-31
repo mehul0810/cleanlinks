@@ -1,9 +1,9 @@
 <?php
 
-namespace SimplifiedWP\Links;
+namespace MG\CleanLinks;
 
-use SimplifiedWP\Links\Tests\Framework\TestHooks;
-use SimplifiedWP\Links\Tests\TestEnvironment;
+use MG\CleanLinks\Tests\Framework\TestHooks;
+use MG\CleanLinks\Tests\TestEnvironment;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -26,7 +26,7 @@ define('WP_TESTS_CONFIG_FILE_PATH', $currentTestEnvironment->config());
  * Manually load the plugin being tested.
  */
 TestHooks::addFilter('muplugins_loaded', static function () {
-    require_once __DIR__ . '/../simplified-links.php';
+    require_once __DIR__ . '/../cleanlinks.php';
 });
 
 

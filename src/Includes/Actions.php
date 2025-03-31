@@ -1,13 +1,13 @@
 <?php
 /**
- * Simplified Links | Actions.
+ * CleanLinks | Actions.
  *
  * @package WordPress
- * @subpackage Simplified Links
+ * @subpackage CleanLinks
  * @since 1.0.0
  */
 
-namespace SimplifiedWP\Links\Includes;
+namespace MG\CleanLinks\Includes;
 
 // Bailout, if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -32,18 +32,18 @@ class Actions {
 	 */
 	public function simplified_redirect_and_count() {
 
-		if ( ! is_singular( 'simplifiedwp_links' ) ) {
+		if ( ! is_singular( 'clean_links' ) ) {
 			return;
 		}
 
 		global $wp_query;
 
 		// Update the count.
-		$count = isset( $wp_query->post->simplifiedwp_links_redirect_count ) ? (int) $wp_query->post->simplifiedwp_links_redirect_count : 0;
-		update_post_meta( $wp_query->post->ID, 'simplifiedwp_links_redirect_count', $count + 1 );
+		$count = isset( $wp_query->post->cleanlinks_redirect_count ) ? (int) $wp_query->post->cleanlinks_redirect_count : 0;
+		update_post_meta( $wp_query->post->ID, 'cleanlinks_redirect_count', $count + 1 );
 
 		// Handle the redirect.
-		$redirect = isset( $wp_query->post->ID ) ? get_post_meta( $wp_query->post->ID, 'simplified_redirect_url', true ) : '';
+		$redirect = isset( $wp_query->post->ID ) ? get_post_meta( $wp_query->post->ID, 'cleanlink_redirect_url', true ) : '';
 
 		/**
 		 * Filter the redirect URL.
@@ -53,7 +53,7 @@ class Actions {
 		 * @param string  $redirect The URL to redirect to.
 		 * @param int  $var The current click count.
 		 */
-		$redirect = apply_filters( 'simplified_urls_redirect_url', $redirect, $count );
+		$redirect = apply_filters( 'cleanlinks_urls_redirect_url', $redirect, $count );
 
 		/**
 		 * Action hook that fires before the redirect.
@@ -63,7 +63,7 @@ class Actions {
 		 * @param string  $redirect The URL to redirect to.
 		 * @param int  $var The current click count.
 		 */
-		do_action( 'simplified_urls_redirect', $redirect, $count );
+		do_action( 'cleanlinks_urls_redirect', $redirect, $count );
 
 		if ( ! empty( $redirect ) ) {
 			wp_redirect( esc_url_raw( $redirect ), 301 );

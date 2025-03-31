@@ -30,6 +30,7 @@ const config = {
 
 if ( isProduction ) {
 	// POT file.
+<<<<<<< Updated upstream
 	wpPot( {
 		package: 'Simplified Links',
 		domain: 'simplified-links',
@@ -37,6 +38,15 @@ if ( isProduction ) {
 		relativeTo: './',
 		src: [ './**/*.php', '!./includes/libraries/**/*', '!./vendor/**/*' ],
 		bugReport: 'https://github.com/simplifiedwp/simplified-links/issues/new',
+=======
+	wpPot({
+		package: 'CleanLinks',
+		domain: 'cleanlinks',
+		destFile: 'languages/cleanlinks.pot',
+		relativeTo: './',
+		src: ['./**/*.php', '!./includes/libraries/**/*', '!./vendor/**/*'],
+		bugReport: 'https://github.com/simplifiedwp/cleanlinks/issues/new',
+>>>>>>> Stashed changes
 		team: 'SimplifiedWP Team <hello@simplifiedwp.com>',
 	} );
 }

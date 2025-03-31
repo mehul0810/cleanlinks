@@ -1,15 +1,15 @@
 <?php
 /**
- * Simplified Links | Main Plugin File.
+ * CleanLinks | Main Plugin File.
  *
  * @package WordPress
- * @subpackage Simplified Links
+ * @subpackage CleanLinks
  * @since 1.0.0
  */
 
-namespace SimplifiedWP\Links;
+namespace MG\CleanLinks;
 
-use SimplifiedWP\Links\Includes\PostType;
+use MG\CleanLinks\Includes\PostType;
 
 // Bailout, if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -33,8 +33,8 @@ final class Plugin {
 	 */
 	public function register() {
 		// Handle plugin activation and deactivation.
-		register_activation_hook( SIMPLIFIED_LINKS_PLUGIN_FILE, array( $this, 'activate' ) );
-		register_deactivation_hook( SIMPLIFIED_LINKS_PLUGIN_FILE, array( $this, 'deactivate' ) );
+		register_activation_hook( CLEAN_LINKS_PLUGIN_FILE, array( $this, 'activate' ) );
+		register_deactivation_hook( CLEAN_LINKS_PLUGIN_FILE, array( $this, 'deactivate' ) );
 
 		// Register services used throughout the plugin.
 		add_action( 'plugins_loaded', array( $this, 'register_services' ) );
@@ -74,9 +74,9 @@ final class Plugin {
 	 */
 	public function load_plugin_textdomain() {
 		load_plugin_textdomain(
-			'simplified-links',
+			'cleanlinks',
 			false,
-			dirname( plugin_basename( SIMPLIFIED_LINKS_PLUGIN_FILE ) ) . '/languages/'
+			dirname( plugin_basename( CLEAN_LINKS_PLUGIN_FILE ) ) . '/languages/'
 		);
 	}
 

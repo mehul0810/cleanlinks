@@ -1,6 +1,6 @@
 <?php
 
-namespace SimplifiedWP\Links\Tests\Config;
+namespace MG\CleanLinks\Tests\Config;
 
 interface Config {
     /**

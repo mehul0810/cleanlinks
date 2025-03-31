@@ -1,13 +1,13 @@
 <?php
 /**
- * Simplified Links | Helpers
+ * CleanLinks | Helpers
  *
  * @package WordPress
- * @subpackage Simplified Links
+ * @subpackage CleanLinks
  * @since 1.0.0
  */
 
-namespace SimplifiedWP\Links\Includes;
+namespace MG\CleanLinks\Includes;
 
 // Bailout, if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -44,7 +44,7 @@ class Helpers {
 	 * @return void
 	 */
 	public static function get_total_access_count( $post_id ) {
-		$access_count = get_post_meta( $post_id, 'simplifiedwp_links_redirect_count', true );
+		$access_count = get_post_meta( $post_id, 'cleanlinks_redirect_count', true );
 
 		return $access_count ?: 0;
 	}

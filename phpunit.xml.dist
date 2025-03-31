@@ -16,7 +16,7 @@
 	<coverage>
 		<include>
 			<directory suffix=".php">src</directory>
-			<file>simplified-links.php</file>
+			<file>cleanlinks.php</file>
 		</include>
 	</coverage>
 </phpunit>

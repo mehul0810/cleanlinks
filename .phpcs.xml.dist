@@ -40,7 +40,7 @@
 		<properties>
 			<!-- Value: replace the text domain used. -->
 			<property name="text_domain" type="array">
-				<element value="simplified-links"/>
+				<element value="cleanlinks"/>
 			</property>
 		</properties>
 	</rule>

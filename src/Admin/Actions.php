@@ -1,15 +1,15 @@
 <?php
 /**
- * Simplified Links | Admin Actions.
+ * CleanLinks | Admin Actions.
  *
  * @package WordPress
- * @subpackage Simplified Links
+ * @subpackage CleanLinks
  * @since 1.0.0
  */
 
-namespace SimplifiedWP\Links\Admin;
+namespace MG\CleanLinks\Admin;
 
-use SimplifiedWP\Links\includes\Helpers;
+use MG\CleanLinks\includes\Helpers;
 
 /**
  *  Bailout, if accessed directly.
@@ -31,8 +31,13 @@ class Actions {
 	public function __construct() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'register_assets' ) );
 		add_action( 'admin_menu', array( $this, 'register_admin_pages' ) );
+<<<<<<< Updated upstream
 		add_action( 'manage_simplifiedwp_links_posts_custom_column', array( $this, 'register_custom_columns' ), 10, 2 );
 		add_action( 'post_submitbox_misc_actions', array( $this, 'before_preview_changes' ) );
+=======
+		add_action( 'manage_clean_links_posts_custom_column', array( $this, 'register_custom_columns' ), 10, 2 );
+		add_action( 'post_submitbox_misc_actions', array( $this, 'before_preview_changes' ) );		
+>>>>>>> Stashed changes
 	}
 
 	/**
@@ -47,22 +52,22 @@ class Actions {
 
 		// Export.
 		add_submenu_page(
-			'edit.php?post_type=simplifiedwp_links',
-			esc_html__( 'Export', 'simplified-links' ),
-			esc_html__( 'Export', 'simplified-links' ),
+			'edit.php?post_type=clean_links',
+			esc_html__( 'Export', 'cleanlinks' ),
+			esc_html__( 'Export', 'cleanlinks' ),
 			'manage_options',
-			'simplified_links_export',
+			'cleanlinks_export',
 			array( $this, 'render_export_page' ),
 			5
 		);
 
 		// More Plugins.
 		add_submenu_page(
-			'edit.php?post_type=simplifiedwp_links',
-			esc_html__( 'More Plugins', 'simplified-links' ),
-			esc_html__( 'More Plugins', 'simplified-links' ),
+			'edit.php?post_type=clean_links',
+			esc_html__( 'More Plugins', 'cleanlinks' ),
+			esc_html__( 'More Plugins', 'cleanlinks' ),
 			'manage_options',
-			'simplified_links_more_plugins',
+			'cleanlinks_more_plugins',
 			array( $this, 'render_more_plugins_page' ),
 			5
 		);
@@ -123,8 +128,13 @@ class Actions {
 	 * @return void
 	 */
 	public function register_assets() {
+<<<<<<< Updated upstream
 		wp_enqueue_script( 'simplified-admin', SIMPLIFIED_LINKS_PLUGIN_URL . 'assets/js/admin/main.js', '', SIMPLIFIED_LINKS_VERSION, true );
 
+=======
+		wp_enqueue_script( 'simplified-admin', CLEAN_LINKS_PLUGIN_URL . 'assets/js/admin/main.js', '', CLEAN_LINKS_VERSION, true );
+		
+>>>>>>> Stashed changes
 		// Add the type="module" attribute to the script
 		add_filter('script_loader_tag', function($tag, $handle, $src) {
 			if ( 'simplified-admin' === $handle ) {
@@ -135,7 +145,7 @@ class Actions {
 	}
 
 	/**
-	 * Populate custom columns with data on the simplifiedwp_links admin listing page.
+	 * Populate custom columns with data on the clean_links admin listing page.
 	 *
 	 * @since  1.0.0
 	 * @access public
@@ -148,25 +158,33 @@ class Actions {
 	public function register_custom_columns( $column, $post_id ) {
 		switch ( $column ) {
 			case 'simplified_permalink':
-				$default_text = esc_html__( 'Copy URL', 'simplified-links' );
+				$default_text = esc_html__( 'Copy URL', 'cleanlinks' );
 				$permalink    = get_the_permalink( $post_id );
 				?>
 				<button
 					type="button"
+<<<<<<< Updated upstream
 					class="button simplified-links--copy-button"
 					aria-label="<?php echo esc_url( $permalink ); ?>"
 					data-default-text="<?php echo esc_attr( $default_text ); ?>"
 					data-copied-text="<?php echo esc_attr__( 'Copied!', 'simplified-links' ); ?>"
 					data-url="<?php echo esc_url( $permalink ); ?>"
+=======
+					class="button cleanlinks--copy-button"
+					aria-label="<?php echo $permalink; ?>"
+					data-default-text="<?php echo esc_html( $default_text ); ?>"
+					data-copied-text="<?php echo esc_html__( 'Copied!', 'cleanlinks' ); ?>"
+					data-url="<?php echo $permalink; ?>"
+>>>>>>> Stashed changes
 				>
 					<span class="dashicons dashicons-admin-page"></span>
-					<span class="simplified-links--copy-button-text"><?php echo esc_html( $default_text ); ?></span>
+					<span class="cleanlinks--copy-button-text"><?php echo esc_html( $default_text ); ?></span>
 				</button>
 				<?php
 				break;
 
 			case 'redirect_to':
-				$redirect_url = get_post_meta( $post_id, 'simplified_redirect_url', true );
+				$redirect_url = get_post_meta( $post_id, 'cleanlink_redirect_url', true );
 				$allowed_tags = array(
 					'a' => array(
 						'href' => array(),
@@ -195,8 +213,8 @@ class Actions {
 	 * @return void
 	 */
 	public function before_preview_changes( $post ) {
-		// Bailout, if the post type is not simplifiedwp_links.
-		if ( 'simplifiedwp_links' !== $post->post_type ) {
+		// Bailout, if the post type is not clean_links.
+		if ( 'clean_links' !== $post->post_type ) {
 			return;
 		}
 
@@ -207,10 +225,10 @@ class Actions {
 
 		$count = Helpers::get_total_access_count( $post->ID );
 		?>
-		<div class="misc-pub-section simplified-links--access-count">
+		<div class="misc-pub-section cleanlinks--access-count">
 			<span class="dashicons dashicons-external"></span>
-			<?php esc_html_e( 'Viewed:', 'simplified-links' ); ?>
-			<span class="simplified-links--view-times">
+			<?php esc_html_e( 'Viewed:', 'cleanlinks' ); ?>
+			<span class="cleanlinks--view-times">
 				<?php
 				/* translators: 1. Access Count */
 				echo sprintf(

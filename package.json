@@ -1,5 +1,5 @@
 {
-	"name": "simplified-links",
+	"name": "cleanlinks",
 	"version": "1.0.0",
 	"description": "The most robust, flexible, and intuitive way to build your brand using link building strategy.",
 	"author": "SimplifiedWP",
@@ -46,10 +46,34 @@
 		"test:e2e": "wp-scripts test-e2e",
 		"test:unit": "wp-scripts test-unit-js"
 	},
+<<<<<<< Updated upstream
 	"lint-staged": {
 		"*.js": [
 			"wp-scripts lint-js --fix",
 			"git add"
 		]
+=======
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/simplifiedwp/cleanlinks.git"
+	},
+	"author": "SimplifiedWP",
+	"license": "GPL-3.0-only",
+	"bugs": {
+		"url": "https://github.com/simplifiedwp/cleanlinks/issues"
+	},
+	"homepage": "https://github.com/simplifiedwp/cleanlinks#readme",
+	"devDependencies": {
+		"@wordpress/scripts": "^27.6.0",
+		"css-loader": "^7.1.1",
+		"file-loader": "^6.2.0",
+		"mini-css-extract-plugin": "^2.9.0",
+		"postcss-import": "^16.1.0",
+		"postcss-loader": "^8.1.1",
+		"postcss-preset-env": "^9.5.9",
+		"sass": "^1.75.0",
+		"wp-pot": "^1.10.2",
+		"wp-textdomain": "^1.0.1"
+>>>>>>> Stashed changes
 	}
 }
