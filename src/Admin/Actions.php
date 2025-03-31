@@ -31,13 +31,8 @@ class Actions {
 	public function __construct() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'register_assets' ) );
 		add_action( 'admin_menu', array( $this, 'register_admin_pages' ) );
-<<<<<<< Updated upstream
-		add_action( 'manage_simplifiedwp_links_posts_custom_column', array( $this, 'register_custom_columns' ), 10, 2 );
-		add_action( 'post_submitbox_misc_actions', array( $this, 'before_preview_changes' ) );
-=======
 		add_action( 'manage_clean_links_posts_custom_column', array( $this, 'register_custom_columns' ), 10, 2 );
 		add_action( 'post_submitbox_misc_actions', array( $this, 'before_preview_changes' ) );		
->>>>>>> Stashed changes
 	}
 
 	/**
@@ -128,13 +123,8 @@ class Actions {
 	 * @return void
 	 */
 	public function register_assets() {
-<<<<<<< Updated upstream
-		wp_enqueue_script( 'simplified-admin', SIMPLIFIED_LINKS_PLUGIN_URL . 'assets/js/admin/main.js', '', SIMPLIFIED_LINKS_VERSION, true );
-
-=======
 		wp_enqueue_script( 'simplified-admin', CLEAN_LINKS_PLUGIN_URL . 'assets/js/admin/main.js', '', CLEAN_LINKS_VERSION, true );
 		
->>>>>>> Stashed changes
 		// Add the type="module" attribute to the script
 		add_filter('script_loader_tag', function($tag, $handle, $src) {
 			if ( 'simplified-admin' === $handle ) {
@@ -163,19 +153,11 @@ class Actions {
 				?>
 				<button
 					type="button"
-<<<<<<< Updated upstream
-					class="button simplified-links--copy-button"
-					aria-label="<?php echo esc_url( $permalink ); ?>"
-					data-default-text="<?php echo esc_attr( $default_text ); ?>"
-					data-copied-text="<?php echo esc_attr__( 'Copied!', 'simplified-links' ); ?>"
-					data-url="<?php echo esc_url( $permalink ); ?>"
-=======
 					class="button cleanlinks--copy-button"
 					aria-label="<?php echo $permalink; ?>"
 					data-default-text="<?php echo esc_html( $default_text ); ?>"
 					data-copied-text="<?php echo esc_html__( 'Copied!', 'cleanlinks' ); ?>"
 					data-url="<?php echo $permalink; ?>"
->>>>>>> Stashed changes
 				>
 					<span class="dashicons dashicons-admin-page"></span>
 					<span class="cleanlinks--copy-button-text"><?php echo esc_html( $default_text ); ?></span>

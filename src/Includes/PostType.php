@@ -162,16 +162,6 @@ class PostType {
 		$post_data = Helpers::clean( $_POST );
 
 		// Update post meta for simplifiedwp links
-<<<<<<< Updated upstream
-		if ( ! empty( $post_data['simplified_redirect_url'] ) ) {
-
-			// Remove all illegal characters from a url
-			$url = filter_var( $post_data['simplified_redirect_url'], FILTER_SANITIZE_URL );
-
-			// Validate url
-			if ( filter_var( $url, FILTER_VALIDATE_URL ) ) {
-				update_post_meta( $post_id, 'simplified_redirect_url', esc_url( $url ) );
-=======
 		if (
 			! empty( $_post['cleanlink_redirect_nonce'] ) &&
 			wp_verify_nonce( $_post['cleanlink_redirect_nonce'], 'cleanlink-save-redirect-meta' ) &&
@@ -190,7 +180,6 @@ class PostType {
 				}
 			} else {
 				delete_post_meta( $post_id, 'cleanlink_redirect_url' );
->>>>>>> Stashed changes
 			}
 		} else {
 			delete_post_meta( $post_id, 'simplified_redirect_url' );
