@@ -44,7 +44,7 @@ class Helpers {
 	 * @return void
 	 */
 	public static function get_total_access_count( $post_id ) {
-		$access_count = get_post_meta( $post_id, 'cleanlinks_redirect_count', true );
+		$access_count = get_post_meta( $post_id, 'cleanlink_redirect_count', true );
 
 		return $access_count ?: 0;
 	}

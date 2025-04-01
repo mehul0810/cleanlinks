@@ -24,13 +24,13 @@ class Actions {
 	 * @return void
 	 */
 	public function __construct() {
-		add_action( 'template_redirect', array( $this, 'simplified_redirect_and_count' ) );
+		add_action( 'template_redirect', array( $this, 'cleanlink_redirect_and_count' ) );
 	}
 
 	/**
 	 * Count and redirect function.
 	 */
-	public function simplified_redirect_and_count() {
+	public function cleanlink_redirect_and_count() {
 
 		if ( ! is_singular( 'clean_links' ) ) {
 			return;
@@ -39,8 +39,8 @@ class Actions {
 		global $wp_query;
 
 		// Update the count.
-		$count = isset( $wp_query->post->cleanlinks_redirect_count ) ? (int) $wp_query->post->cleanlinks_redirect_count : 0;
-		update_post_meta( $wp_query->post->ID, 'cleanlinks_redirect_count', $count + 1 );
+		$count = isset( $wp_query->post->cleanlink_redirect_count ) ? (int) $wp_query->post->cleanlink_redirect_count : 0;
+		update_post_meta( $wp_query->post->ID, 'cleanlink_redirect_count', $count + 1 );
 
 		// Handle the redirect.
 		$redirect = isset( $wp_query->post->ID ) ? get_post_meta( $wp_query->post->ID, 'cleanlink_redirect_url', true ) : '';

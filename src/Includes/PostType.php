@@ -140,8 +140,8 @@ class PostType {
 			return;
 		}
 
-		// Bailout, if the post type is not `simplifiedwp_links`.
-		if ( 'simplifiedwp_links' !== $post->post_type ) {
+		// Bailout, if the post type is not `clean_links`.
+		if ( 'clean_links' !== $post->post_type ) {
 			return;
 		}
 
@@ -151,28 +151,28 @@ class PostType {
 		}
 
 		// Prepare nonce variable.
-		$nonce = filter_input( INPUT_POST, 'simplified_redirect_nonce', FILTER_UNSAFE_RAW );
+		$nonce = filter_input( INPUT_POST, 'cleanlink_redirect_nonce', FILTER_UNSAFE_RAW );
 
 		// Bailout, if the nonce is not verified.
-		if ( ! wp_verify_nonce( $nonce, 'simplified-save-redirect-meta' ) ) {
+		if ( ! wp_verify_nonce( $nonce, 'cleanlink-save-redirect-meta' ) ) {
 			return;
 		}
 
 		// Sanitize post data.
 		$post_data = Helpers::clean( $_POST );
 
-		// Update post meta for simplifiedwp links
+		// Update post meta for cleanlinks
 		if (
-			! empty( $_post['cleanlink_redirect_nonce'] ) &&
-			wp_verify_nonce( $_post['cleanlink_redirect_nonce'], 'cleanlink-save-redirect-meta' ) &&
+			! empty( $post_data['cleanlink_redirect_nonce'] ) &&
+			wp_verify_nonce( $post_data['cleanlink_redirect_nonce'], 'cleanlink-save-redirect-meta' ) &&
 			current_user_can( 'edit_post', $post_id ) &&
 			'clean_links' === $post->post_type
 		) {
-
-			if ( ! empty( $_post['cleanlink_redirect_url'] ) ) {
+			
+			if ( ! empty( $post_data['cleanlink_redirect_url'] ) ) {
 
 				// Remove all illegal characters from a url
-				$url = filter_var( $_post['cleanlink_redirect_url'], FILTER_SANITIZE_URL );
+				$url = filter_var( $post_data['cleanlink_redirect_url'], FILTER_SANITIZE_URL );
 
 				// Validate url
 				if ( filter_var( $url, FILTER_VALIDATE_URL ) ) {
@@ -182,7 +182,7 @@ class PostType {
 				delete_post_meta( $post_id, 'cleanlink_redirect_url' );
 			}
 		} else {
-			delete_post_meta( $post_id, 'simplified_redirect_url' );
+			delete_post_meta( $post_id, 'cleanlink_redirect_url' );
 		}
 	}
 
@@ -216,7 +216,7 @@ class PostType {
 		</p>
 		<p><span class="description"><?php esc_html_e( 'This is the URL that the Redirect Link you create on this page will redirect to when accessed in a web browser.', 'cleanlinks' ); ?> </span></p>
 		<?php
-		$count = isset( $post->ID ) ? get_post_meta( $post->ID, 'cleanlinks_redirect_count', true ) : 0;
+		$count = isset( $post->ID ) ? get_post_meta( $post->ID, 'cleanlink_redirect_count', true ) : 0;
 		/* translators: %d is the counter of clicks. */
 		echo '<p>' . sprintf( esc_html__( 'This URL has been accessed %d times', 'cleanlinks' ), esc_attr( $count ) ) . '</p>';
 	}

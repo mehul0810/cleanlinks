@@ -69,7 +69,7 @@ class Actions {
 	}
 
 	/**
-	 * Export Page for Simplified Links.
+	 * Export Page for CleanLinks.
 	 *
 	 * @since  1.0.0
 	 * @access public
@@ -95,7 +95,7 @@ class Actions {
 	}
 
 	/**
-	 * More Plugins Page for Simplified Links.
+	 * More Plugins Page for CleanLinks.
 	 *
 	 * @since  1.0.0
 	 * @access public
@@ -123,11 +123,11 @@ class Actions {
 	 * @return void
 	 */
 	public function register_assets() {
-		wp_enqueue_script( 'simplified-admin', CLEAN_LINKS_PLUGIN_URL . 'assets/js/admin/main.js', '', CLEAN_LINKS_VERSION, true );
+		wp_enqueue_script( 'cleanlink-admin', CLEAN_LINKS_PLUGIN_URL . 'assets/js/admin/main.js', '', CLEAN_LINKS_VERSION, true );
 		
 		// Add the type="module" attribute to the script
 		add_filter('script_loader_tag', function($tag, $handle, $src) {
-			if ( 'simplified-admin' === $handle ) {
+			if ( 'cleanlink-admin' === $handle ) {
 				$tag = '<script type="module" src="' . esc_url( $src ) . '"></script>';
 			}
 			return $tag;
@@ -147,7 +147,7 @@ class Actions {
 	 */
 	public function register_custom_columns( $column, $post_id ) {
 		switch ( $column ) {
-			case 'simplified_permalink':
+			case 'cleanlink_permalink':
 				$default_text = esc_html__( 'Copy URL', 'cleanlinks' );
 				$permalink    = get_the_permalink( $post_id );
 				?>

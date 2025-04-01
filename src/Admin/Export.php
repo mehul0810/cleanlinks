@@ -1,9 +1,9 @@
 <?php
 /**
- * Simplified Links | Export.
+ * CleanLinks | Export.
  *
  * @package WordPress
- * @subpackage Simplified Links
+ * @subpackage CleanLinks
  * @since 1.0.0
  */
 
@@ -42,7 +42,7 @@ class Export {
 
 		// Set PHP headers for CSV output.
 		header( 'Content-Type: text/csv; charset=utf-8' );
-		header( 'Content-Disposition: attachment; filename=export_simplified.csv' );
+		header( 'Content-Disposition: attachment; filename=export_cleanlink.csv' );
 
 		// Create the headers.
 		$header_args = array( 'Id', 'Title', 'Slug', 'Redirect To' );
@@ -103,19 +103,11 @@ class Export {
 							</h2>
 						</div>
 						<div class="inside">
-<<<<<<< Updated upstream
-							<p><?php esc_html_e( 'Using this tool, you can have a seamless experience to export your links to a CSV (Comma Separated Values) file with just a single click.', 'simplified-links' ); ?></p>
-							<form method="post" id="export-form" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-								<?php wp_nonce_field( 'simplifiedwp_links_export_nonce', 'simplifiedwp_links_export_nonce' ); ?>
-								<input type="hidden" name="action" value="simplifiedwp_links_export">
-								<button type="submit" class="button button-primary"><?php esc_html_e( 'Export', 'simplified-links' ); ?></button>
-=======
 							<p><?php esc_html_e( 'Using this tool, you can have a seamless experience to export your links to a CSV (Comma Separated Values) file with just a single click.', 'cleanlinks' ); ?></p>
 							<form method="post" id="export-form" action="<?php echo admin_url( 'admin-post.php' );?>">									
-								<?php wp_nonce_field( 'clean_links_export_nonce', 'clean_links_export_nonce' ); ?>
+								<?php wp_nonce_field( 'cleanlinks_export', 'clean_links_export_nonce' ); ?>
 								<input type="hidden" name="action" value="clean_links_export">
 								<button type="submit" class="button button-primary"><?php esc_html_e( 'Export', 'cleanlinks' ); ?></button>
->>>>>>> Stashed changes
 							</form>
 						</div>
 					</div>

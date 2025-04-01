@@ -1,9 +1,9 @@
 <?php
 /**
- * Simplified Links | Uninstall.
+ * CleanLinks | Uninstall.
  *
  * @package WordPress
- * @subpackage Simplified Links
+ * @subpackage CleanLinks
  * @since 1.0.0
  *
  */

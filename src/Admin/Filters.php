@@ -90,7 +90,7 @@ class Filters {
 		$columns = array(
 			'cb'                   => '<input type="checkbox" />',
 			'title'                => esc_html__( 'Title', 'cleanlinks' ),
-			'simplified_permalink' => esc_html__( 'Permalink', 'cleanlinks' ),
+			'cleanlink_permalink' => esc_html__( 'Permalink', 'cleanlinks' ),
 			'redirect_to'          => esc_html__( 'Redirect To', 'cleanlinks' ),
 			'total_clicks'         => esc_html__( 'Total Clicks', 'cleanlinks' ),
 			'date'                 => esc_html__( 'Date', 'cleanlinks' ),
