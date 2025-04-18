@@ -104,7 +104,7 @@ class Export {
 						</div>
 						<div class="inside">
 							<p><?php esc_html_e( 'Using this tool, you can have a seamless experience to export your links to a CSV (Comma Separated Values) file with just a single click.', 'cleanlinks' ); ?></p>
-							<form method="post" id="export-form" action="<?php echo admin_url( 'admin-post.php' );?>">									
+							<form method="post" id="export-form" action="<?php echo esc_url( admin_url( 'admin-post.php' ) );?>">									
 								<?php wp_nonce_field( 'cleanlinks_export', 'clean_links_export_nonce' ); ?>
 								<input type="hidden" name="action" value="clean_links_export">
 								<button type="submit" class="button button-primary"><?php esc_html_e( 'Export', 'cleanlinks' ); ?></button>

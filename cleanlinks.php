@@ -55,5 +55,5 @@ require_once __DIR__ . '/config/constants.php';
 require_once CLEAN_LINKS_PLUGIN_DIR . 'vendor/autoload.php';
 
 // Initialize the plugin.
-$plugin = new Plugin();
-$plugin->register();
+$cleanlinks_plugin = new Plugin();
+$cleanlinks_plugin->register();

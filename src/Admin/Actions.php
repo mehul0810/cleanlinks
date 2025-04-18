@@ -154,10 +154,10 @@ class Actions {
 				<button
 					type="button"
 					class="button cleanlinks--copy-button"
-					aria-label="<?php echo $permalink; ?>"
-					data-default-text="<?php echo esc_html( $default_text ); ?>"
-					data-copied-text="<?php echo esc_html__( 'Copied!', 'cleanlinks' ); ?>"
-					data-url="<?php echo $permalink; ?>"
+					aria-label="<?php echo esc_attr($permalink); ?>"
+					data-default-text="<?php echo esc_attr( $default_text ); ?>"
+					data-copied-text="<?php echo esc_attr__( 'Copied!', 'cleanlinks' ); ?>"
+					data-url="<?php echo esc_url($permalink); ?>"
 				>
 					<span class="dashicons dashicons-admin-page"></span>
 					<span class="cleanlinks--copy-button-text"><?php echo esc_html( $default_text ); ?></span>
