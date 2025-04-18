@@ -27,21 +27,9 @@ jobs:
           sudo npm run build
       - name: Generate plugin artifact
         run: |
-          echo "Contents before rsync:"
-          ls -al "$GITHUB_WORKSPACE"
-
           rsync -rc --exclude-from="$GITHUB_WORKSPACE/.distignore" "$GITHUB_WORKSPACE/" release/ --delete --delete-excluded
-
-          echo "Contents of release folder:"
-          ls -al "${GITHUB_WORKSPACE}/release"
-
           cd "${GITHUB_WORKSPACE}/release" || exit
-
           zip -r "${GITHUB_WORKSPACE}/cleanlinks.zip" .
-
-          echo "Checking zip file:"
-          ls -al "${GITHUB_WORKSPACE}/cleanlinks.zip" .
-      
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
         env:
