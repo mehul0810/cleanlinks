@@ -172,11 +172,12 @@ class PostType {
 			if ( ! empty( $post_data['cleanlink_redirect_url'] ) ) {
 
 				// Remove all illegal characters from a url
-				$url = filter_var( $post_data['cleanlink_redirect_url'], FILTER_SANITIZE_URL );
+				$url = esc_url_raw( trim( $post_data['cleanlink_redirect_url'] ) );
 
 				// Validate url
 				if ( filter_var( $url, FILTER_VALIDATE_URL ) ) {
-					update_post_meta( $post_id, 'cleanlink_redirect_url', esc_url( $url ) );
+					// Store the sanitized URL in post meta
+					update_post_meta( $post_id, 'cleanlink_redirect_url', $url );
 				}
 			} else {
 				delete_post_meta( $post_id, 'cleanlink_redirect_url' );
