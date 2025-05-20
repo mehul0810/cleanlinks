@@ -185,9 +185,11 @@ class PostType {
 				update_post_meta( $post_id, 'cleanlink_redirect_nofollow', $nofollow );
 			} else {
 				delete_post_meta( $post_id, 'cleanlink_redirect_url' );
+				delete_post_meta( $post_id, 'cleanlink_redirect_nofollow' );
 			}
 		} else {
 			delete_post_meta( $post_id, 'cleanlink_redirect_url' );
+			delete_post_meta( $post_id, 'cleanlink_redirect_nofollow' );
 		}
 	}
 
