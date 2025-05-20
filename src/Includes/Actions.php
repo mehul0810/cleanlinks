@@ -29,29 +29,71 @@ class Actions {
 
 	/**
 	 * Count and redirect function.
+	 * 
+	 * @since 1.0.0
+	 * @return void
 	 */
 	public function cleanlink_redirect_and_count() {
-
+		// Bailout if not a clean_links post type
 		if ( ! is_singular( 'clean_links' ) ) {
 			return;
 		}
 
 		global $wp_query;
+		$post_id = isset( $wp_query->post->ID ) ? $wp_query->post->ID : 0;
+		
+		if ( ! $post_id ) {
+			return;
+		}
 
-		// Update the count.
-		$count = isset( $wp_query->post->cleanlink_redirect_count ) ? (int) $wp_query->post->cleanlink_redirect_count : 0;
-		update_post_meta( $wp_query->post->ID, 'cleanlink_redirect_count', $count + 1 );
+		// Update the access count
+		$this->update_access_count( $post_id );
 
-		// Handle the redirect.
-		$redirect = isset( $wp_query->post->ID ) ? get_post_meta( $wp_query->post->ID, 'cleanlink_redirect_url', true ) : '';
+		// Get the redirect URL
+		$redirect = $this->get_redirect_url( $post_id );
+
+		// Perform the redirect
+		$this->perform_redirect( $redirect );
+	}
+
+	/**
+	 * Update the access count for a clean link
+	 * 
+	 * @since 1.0.0
+	 * @access private
+	 * 
+	 * @param int $post_id The post ID
+	 * @return int The new count value
+	 */
+	private function update_access_count( $post_id ) {
+		$count = (int) get_post_meta( $post_id, 'cleanlink_redirect_count', true );
+		$new_count = $count + 1;
+		
+		update_post_meta( $post_id, 'cleanlink_redirect_count', $new_count );
+		
+		return $new_count;
+	}
+
+	/**
+	 * Get the redirect URL for a clean link
+	 * 
+	 * @since 1.0.0
+	 * @access private
+	 * 
+	 * @param int $post_id The post ID
+	 * @return string The redirect URL
+	 */
+	private function get_redirect_url( $post_id ) {
+		$redirect = get_post_meta( $post_id, 'cleanlink_redirect_url', true );
+		$count = (int) get_post_meta( $post_id, 'cleanlink_redirect_count', true );
 
 		/**
 		 * Filter the redirect URL.
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param string  $redirect The URL to redirect to.
-		 * @param int  $var The current click count.
+		 * @param string $redirect The URL to redirect to.
+		 * @param int    $count    The current click count.
 		 */
 		$redirect = apply_filters( 'cleanlinks_urls_redirect_url', $redirect, $count );
 
@@ -60,11 +102,24 @@ class Actions {
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param string  $redirect The URL to redirect to.
-		 * @param int  $var The current click count.
+		 * @param string $redirect The URL to redirect to.
+		 * @param int    $count    The current click count.
 		 */
 		do_action( 'cleanlinks_urls_redirect', $redirect, $count );
 
+		return $redirect;
+	}
+
+	/**
+	 * Perform the redirect to the specified URL
+	 * 
+	 * @since 1.0.0
+	 * @access private
+	 * 
+	 * @param string $redirect The URL to redirect to
+	 * @return void
+	 */
+	private function perform_redirect( $redirect ) {
 		if ( ! empty( $redirect ) ) {
 			wp_redirect( esc_url_raw( $redirect ), 301 );
 			exit;
