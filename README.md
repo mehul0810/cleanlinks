@@ -1,7 +1,3 @@
-Absolutely! Below is a professional and user-friendly `README.md` for your CleanLinks MVP WordPress plugin (without redirection, Gutenberg block, or shortcode for now).
-
----
-
 # CleanLinks
 
 **CleanLinks** is a lightweight WordPress link manager plugin designed to help you organize, cloak, and track your affiliate or outbound links with ease. Built with performance and simplicity in mind, CleanLinks is the perfect tool for bloggers, marketers, and site owners who want a no-fuss way to manage their external links from the WordPress dashboard.
