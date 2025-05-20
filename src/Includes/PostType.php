@@ -192,12 +192,11 @@ class PostType {
 		
 		// Process the redirect URL
 		if ( ! empty( $post_data['cleanlink_redirect_url'] ) ) {
-			// Remove all illegal characters from a url
-			$url = filter_var( $post_data['cleanlink_redirect_url'], FILTER_SANITIZE_URL );
-
-			// Validate url
-			if ( filter_var( $url, FILTER_VALIDATE_URL ) ) {
-				update_post_meta( $post_id, 'cleanlink_redirect_url', esc_url( $url ) );
+			// Validate and sanitize URL
+			$valid_url = Helpers::validate_url( $post_data['cleanlink_redirect_url'] );
+			
+			if ( $valid_url ) {
+				update_post_meta( $post_id, 'cleanlink_redirect_url', $valid_url );
 			}
 		} else {
 			delete_post_meta( $post_id, 'cleanlink_redirect_url' );
@@ -264,8 +263,7 @@ class PostType {
 	 * @return void
 	 */
 	private function render_access_count( $post_id ) {
-		$count = get_post_meta( $post_id, 'cleanlink_redirect_count', true );
-		$count = $count ? absint( $count ) : 0;
+		$count = Helpers::get_total_access_count( $post_id );
 		
 		/* translators: %d is the counter of clicks. */
 		echo '<p>' . sprintf( esc_html__( 'This URL has been accessed %d times', 'cleanlinks' ), esc_attr( $count ) ) . '</p>';

@@ -23,7 +23,7 @@ class Helpers {
 	 *
 	 * @param string|array $input Any type of input data.
 	 *
-	 * @return void
+	 * @return string|array Sanitized input data.
 	 */
 	public static function clean( $input ) {
 		if ( is_array( $input ) ) {
@@ -41,11 +41,33 @@ class Helpers {
 	 *
 	 * @param int $post_id Post ID.
 	 *
-	 * @return void
+	 * @return int The number of times the link has been accessed.
 	 */
 	public static function get_total_access_count( $post_id ) {
 		$access_count = get_post_meta( $post_id, 'cleanlink_redirect_count', true );
 
 		return $access_count ?: 0;
+	}
+
+	/**
+	 * Sanitize and validate a URL
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 *
+	 * @param string $url The URL to sanitize and validate.
+	 *
+	 * @return string|bool The sanitized URL if valid, false otherwise.
+	 */
+	public static function validate_url( $url ) {
+		// Remove all illegal characters from a url
+		$url = filter_var( $url, FILTER_SANITIZE_URL );
+
+		// Validate url
+		if ( filter_var( $url, FILTER_VALIDATE_URL ) ) {
+			return esc_url( $url );
+		}
+
+		return false;
 	}
 }
