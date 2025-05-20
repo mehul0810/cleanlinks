@@ -120,9 +120,16 @@ class Actions {
 	 * @since  1.0.0
 	 * @access public
 	 *
+	 * @param string $hook The current admin page.
+	 * 
 	 * @return void
 	 */
-	public function register_assets() {
+	public function register_assets( $hook ) {
+		// Only load on CleanLinks admin pages
+		if ( strpos( $hook, 'clean_links' ) === false ) {
+			return;
+		}
+		
 		wp_enqueue_script( 'cleanlink-admin', CLEAN_LINKS_PLUGIN_URL . 'assets/js/admin/main.js', '', CLEAN_LINKS_VERSION, true );
 		
 		// Add the type="module" attribute to the script

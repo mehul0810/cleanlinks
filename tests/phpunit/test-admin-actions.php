@@ -59,9 +59,13 @@ class Test_Admin_Actions extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_register_assets() {
-		self::$class_instance->register_assets();
-
-		$this->assertTrue( wp_script_is( 'simplified-admin', 'enqueued' ) );
+		// Test with a non-CleanLinks page
+		self::$class_instance->register_assets( 'edit.php' );
+		$this->assertFalse( wp_script_is( 'cleanlink-admin', 'enqueued' ) );
+		
+		// Test with a CleanLinks page
+		self::$class_instance->register_assets( 'edit.php?post_type=clean_links' );
+		$this->assertTrue( wp_script_is( 'cleanlink-admin', 'enqueued' ) );
 	}
 	
 	 /**
