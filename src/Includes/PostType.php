@@ -118,6 +118,21 @@ class PostType {
 	}
 
 	/**
+	 * Verify nonce for post update
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 * 
+	 * @param string $nonce_value The nonce value from the form.
+	 * @param string $nonce_action The nonce action to verify against.
+	 * 
+	 * @return bool True if nonce is valid, false otherwise.
+	 */
+	private function verify_nonce( $nonce_value, $nonce_action ) {
+		return ! empty( $nonce_value ) && wp_verify_nonce( $nonce_value, $nonce_action );
+	}
+
+	/**
 	 * Saves meta info for clean links
 	 *
 	 * @since 1.0
@@ -154,32 +169,35 @@ class PostType {
 		$nonce = filter_input( INPUT_POST, 'cleanlink_redirect_nonce', FILTER_UNSAFE_RAW );
 
 		// Bailout, if the nonce is not verified.
-		if ( ! wp_verify_nonce( $nonce, 'cleanlink-save-redirect-meta' ) ) {
+		if ( ! $this->verify_nonce( $nonce, 'cleanlink-save-redirect-meta' ) ) {
 			return;
 		}
 
+		// Sanitize post data and save redirect URL
+		$this->save_redirect_url( $post_id );
+	}
+
+	/**
+	 * Save the redirect URL for a clean link
+	 * 
+	 * @since 1.0.0
+	 * @access private
+	 * 
+	 * @param int $post_id Post ID
+	 * @return void
+	 */
+	private function save_redirect_url( $post_id ) {
 		// Sanitize post data.
 		$post_data = Helpers::clean( $_POST );
+		
+		// Process the redirect URL
+		if ( ! empty( $post_data['cleanlink_redirect_url'] ) ) {
+			// Remove all illegal characters from a url
+			$url = filter_var( $post_data['cleanlink_redirect_url'], FILTER_SANITIZE_URL );
 
-		// Update post meta for cleanlinks
-		if (
-			! empty( $post_data['cleanlink_redirect_nonce'] ) &&
-			wp_verify_nonce( $post_data['cleanlink_redirect_nonce'], 'cleanlink-save-redirect-meta' ) &&
-			current_user_can( 'edit_post', $post_id ) &&
-			'clean_links' === $post->post_type
-		) {
-			
-			if ( ! empty( $post_data['cleanlink_redirect_url'] ) ) {
-
-				// Remove all illegal characters from a url
-				$url = filter_var( $post_data['cleanlink_redirect_url'], FILTER_SANITIZE_URL );
-
-				// Validate url
-				if ( filter_var( $url, FILTER_VALIDATE_URL ) ) {
-					update_post_meta( $post_id, 'cleanlink_redirect_url', esc_url( $url ) );
-				}
-			} else {
-				delete_post_meta( $post_id, 'cleanlink_redirect_url' );
+			// Validate url
+			if ( filter_var( $url, FILTER_VALIDATE_URL ) ) {
+				update_post_meta( $post_id, 'cleanlink_redirect_url', esc_url( $url ) );
 			}
 		} else {
 			delete_post_meta( $post_id, 'cleanlink_redirect_url' );
@@ -204,19 +222,51 @@ class PostType {
 	 * @return void
 	 */
 	public function link_metabox( $post ) {
-
+		// Add nonce field
 		wp_nonce_field( 'cleanlink-save-redirect-meta', 'cleanlink_redirect_nonce' );
 
+		// Get the redirect URL
 		$url = get_post_meta( $post->ID, 'cleanlink_redirect_url', true );
-		?>
+		
+		// Display the redirect URL field
+		$this->render_redirect_url_field( $url );
+		
+		// Display access count
+		$this->render_access_count( $post->ID );
+	}
 
+	/**
+	 * Render the redirect URL field
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 * 
+	 * @param string $url The current redirect URL
+	 * @return void
+	 */
+	private function render_redirect_url_field( $url ) {
+		?>
 		<p>
 			<label for="cleanlink_redirect_url"><strong><?php esc_html_e( 'Redirect to:', 'cleanlinks' ); ?></strong></label><br />
 			<input class="widefat" type="url" name="cleanlink_redirect_url" id="cleanlink_redirect_url" value="<?php echo esc_attr( $url ); ?>" />
 		</p>
 		<p><span class="description"><?php esc_html_e( 'This is the URL that the Redirect Link you create on this page will redirect to when accessed in a web browser.', 'cleanlinks' ); ?> </span></p>
 		<?php
-		$count = isset( $post->ID ) ? get_post_meta( $post->ID, 'cleanlink_redirect_count', true ) : 0;
+	}
+
+	/**
+	 * Render the access count information
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 * 
+	 * @param int $post_id The post ID
+	 * @return void
+	 */
+	private function render_access_count( $post_id ) {
+		$count = get_post_meta( $post_id, 'cleanlink_redirect_count', true );
+		$count = $count ? absint( $count ) : 0;
+		
 		/* translators: %d is the counter of clicks. */
 		echo '<p>' . sprintf( esc_html__( 'This URL has been accessed %d times', 'cleanlinks' ), esc_attr( $count ) ) . '</p>';
 	}
