@@ -31,7 +31,7 @@ class Actions {
 	public function __construct() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'register_assets' ) );
 		add_action( 'admin_menu', array( $this, 'register_admin_pages' ) );
-		add_action( 'manage_clean_links_posts_custom_column', array( $this, 'register_custom_columns' ), 10, 2 );
+		add_action( 'manage_clean_links_posts_custom_column', array( $this, 'populate_custom_columns' ), 10, 2 );
 		add_action( 'post_submitbox_misc_actions', array( $this, 'before_preview_changes' ) );		
 	}
 
@@ -145,7 +145,7 @@ class Actions {
 	 *
 	 * @return mixed
 	 */
-	public function register_custom_columns( $column, $post_id ) {
+	public function populate_custom_columns( $column, $post_id ) {
 		switch ( $column ) {
 			case 'cleanlink_permalink':
 				$default_text = esc_html__( 'Copy URL', 'cleanlinks' );

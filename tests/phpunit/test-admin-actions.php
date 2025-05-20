@@ -1,9 +1,9 @@
 <?php
 /**
- * Simplified Links | Admin Actions.
+ * CleanLinks | Admin Actions.
  *
  * @package WordPress
- * @subpackage Simplified Links
+ * @subpackage CleanLinks
  * @since 1.0.0
  */
 
@@ -25,7 +25,7 @@ class Test_Admin_Actions extends WP_UnitTestCase {
 	/**
 	 * Instance of the class being tested.
 	 *
-	 * @var SimplifiedWP\Admin
+	 * @var MG\CleanLinks\Admin
 	 */
 	private static $class_instance;
 
@@ -61,7 +61,7 @@ class Test_Admin_Actions extends WP_UnitTestCase {
 	public function test_register_assets() {
 		self::$class_instance->register_assets();
 
-		$this->assertTrue( wp_script_is( 'simplified-admin', 'enqueued' ) );
+		$this->assertTrue( wp_script_is( 'cleanlink-admin', 'enqueued' ) );
 	}
 	
 	 /**

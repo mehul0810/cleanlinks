@@ -97,7 +97,7 @@ class PostType {
 			'menu_position'        => null,
 			'show_in_rest'         => true,
 			'menu_icon'            => 'dashicons-admin-links',
-			'register_meta_box_cb' => array( $this, 'action_add_url_metabox' ),
+			'register_meta_box_cb' => array( $this, 'register_url_metabox' ),
 			'supports'             => array( 'title' ),
 			'can_export'           => true,
 		);
@@ -192,7 +192,7 @@ class PostType {
 	 * @since 1.0
 	 * @return void
 	 */
-	public function action_add_url_metabox() {
+	public function register_url_metabox() {
 		add_meta_box( 'cleanlink_redirection_settings', esc_html__( 'Redirection Settings', 'cleanlinks' ), array( $this, 'link_metabox' ), 'clean_links', 'normal', 'core' );
 	}
 
