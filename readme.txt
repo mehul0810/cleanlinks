@@ -29,7 +29,7 @@ Designed to be lightweight yet powerful, CleanLinks lets you create 301 and 302 
 = Minimum Requirements =
 
 - WordPress 5.5 or higher
-- PHP 7.2 or higher
+- PHP 8.0 or higher
 - MySQL 5.5 or higher
 
 = Automatic Installation =
@@ -80,7 +80,3 @@ Yes, CleanLinks is fully compatible with popular caching and SEO plugins.
 
 = 1.0.0 =
 Initial version of CleanLinks with CSV export, link tracking, and redirect features.
-
-== Credits ==
-
-CleanLinks is developed and maintained by [Your Name or Company Name](https://yourwebsite.com).
