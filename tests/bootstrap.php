@@ -32,7 +32,7 @@ TestHooks::addFilter('muplugins_loaded', static function () {
 
 // install GiveWP
 TestHooks::addFilter('setup_theme', static function () {
-    echo 'Installing SimplifiedWP.....' . PHP_EOL;
+    echo 'Installing CleanLinks.....' . PHP_EOL;
     // Initialize the plugin.
     $plugin = new Plugin();
     $plugin->register();

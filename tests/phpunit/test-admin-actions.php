@@ -1,9 +1,9 @@
 <?php
 /**
- * Simplified Links | Admin Actions.
+ * CleanLinks | Admin Actions.
  *
  * @package WordPress
- * @subpackage Simplified Links
+ * @subpackage CleanLinks
  * @since 1.0.0
  */
 
@@ -25,7 +25,7 @@ class Test_Admin_Actions extends WP_UnitTestCase {
 	/**
 	 * Instance of the class being tested.
 	 *
-	 * @var SimplifiedWP\Admin
+	 * @var CleanLinks\Admin
 	 */
 	private static $class_instance;
 

@@ -125,9 +125,15 @@ class Actions {
 	 * 
 	 * @return void
 	 */
-	public function register_assets() {
-    //Only load on CleanLinks admin pages
-		if ( strpos( $hook, 'clean_links' ) === false ) {
+	public function register_assets($hook) {
+
+    	//load only on custom post type 'clean_links' edit screens
+		if ( 'edit.php' !== $hook ) {
+			return;
+		}
+		
+		$screen = get_current_screen();
+		if ( ! isset( $screen->post_type ) || 'clean_links' !== $screen->post_type ) {
 			return;
 		}
 		// Properly register the script first
