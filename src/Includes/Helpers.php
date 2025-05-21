@@ -23,13 +23,13 @@ class Helpers {
 	 *
 	 * @param string|array $input Any type of input data.
 	 *
-	 * @return void
+	 * @return string|array Sanitized input data.
 	 */
 	public static function clean( $input ) {
 		if ( is_array( $input ) ) {
-			return array_map( [ 'self', 'clean' ], $input );
+			return array_map( [ __CLASS__, 'clean' ], $input );
 		} else {
-			return is_scalar( $input ) ? sanitize_text_field( $input ) : $input;
+			return is_scalar( $input ) ? sanitize_text_field( $input ) : '';
 		}
 	}
 
@@ -41,7 +41,7 @@ class Helpers {
 	 *
 	 * @param int $post_id Post ID.
 	 *
-	 * @return int Access count
+	 * @return int Access count.
 	 */
 	public static function get_total_access_count( $post_id ) {
 		// Check for cached value first

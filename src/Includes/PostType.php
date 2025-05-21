@@ -172,17 +172,24 @@ class PostType {
 			if ( ! empty( $post_data['cleanlink_redirect_url'] ) ) {
 
 				// Remove all illegal characters from a url
-				$url = filter_var( $post_data['cleanlink_redirect_url'], FILTER_SANITIZE_URL );
+				$url = esc_url_raw( trim( $post_data['cleanlink_redirect_url'] ) );
 
 				// Validate url
 				if ( filter_var( $url, FILTER_VALIDATE_URL ) ) {
-					update_post_meta( $post_id, 'cleanlink_redirect_url', esc_url( $url ) );
+					// Store the sanitized URL in post meta
+					update_post_meta( $post_id, 'cleanlink_redirect_url', $url );
 				}
+				
+				// Save nofollow setting
+				$nofollow = isset( $post_data['cleanlink_redirect_nofollow'] ) ? '1' : '0';
+				update_post_meta( $post_id, 'cleanlink_redirect_nofollow', $nofollow );
 			} else {
 				delete_post_meta( $post_id, 'cleanlink_redirect_url' );
+				delete_post_meta( $post_id, 'cleanlink_redirect_nofollow' );
 			}
 		} else {
 			delete_post_meta( $post_id, 'cleanlink_redirect_url' );
+			delete_post_meta( $post_id, 'cleanlink_redirect_nofollow' );
 		}
 	}
 
@@ -208,6 +215,7 @@ class PostType {
 		wp_nonce_field( 'cleanlink-save-redirect-meta', 'cleanlink_redirect_nonce' );
 
 		$url = get_post_meta( $post->ID, 'cleanlink_redirect_url', true );
+		$nofollow = get_post_meta( $post->ID, 'cleanlink_redirect_nofollow', true );
 		?>
 
 		<p>
@@ -215,6 +223,15 @@ class PostType {
 			<input class="widefat" type="url" name="cleanlink_redirect_url" id="cleanlink_redirect_url" value="<?php echo esc_attr( $url ); ?>" />
 		</p>
 		<p><span class="description"><?php esc_html_e( 'This is the URL that the Redirect Link you create on this page will redirect to when accessed in a web browser.', 'cleanlinks' ); ?> </span></p>
+		
+		<p>
+			<label for="cleanlink_redirect_nofollow">
+				<input type="checkbox" name="cleanlink_redirect_nofollow" id="cleanlink_redirect_nofollow" value="1" <?php checked( $nofollow, '1' ); ?> />
+				<?php esc_html_e( 'Add nofollow attribute to redirect', 'cleanlinks' ); ?>
+			</label>
+		</p>
+		<p><span class="description"><?php esc_html_e( 'If checked, the nofollow attribute will be added to the redirect to prevent search engines from following the link.', 'cleanlinks' ); ?> </span></p>
+		
 		<?php
 		$count = isset( $post->ID ) ? get_post_meta( $post->ID, 'cleanlink_redirect_count', true ) : 0;
 		/* translators: %d is the counter of clicks. */
