@@ -30,6 +30,7 @@ class Actions {
 	 */
 	public function __construct() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'register_assets' ) );
+		add_filter( 'script_loader_tag', array( $this, 'add_module_type_to_script' ), 10, 3 );
 		add_action( 'admin_menu', array( $this, 'register_admin_pages' ) );
 		add_action( 'manage_clean_links_posts_custom_column', array( $this, 'register_custom_columns' ), 10, 2 );
 		add_action( 'post_submitbox_misc_actions', array( $this, 'before_preview_changes' ) );		
@@ -120,18 +121,43 @@ class Actions {
 	 * @since  1.0.0
 	 * @access public
 	 *
+	 * @param string $hook The current admin page.
+	 * 
 	 * @return void
 	 */
-	public function register_assets() {
-		wp_enqueue_script( 'cleanlink-admin', CLEAN_LINKS_PLUGIN_URL . 'assets/js/admin/main.js', '', CLEAN_LINKS_VERSION, true );
+	public function register_assets($hook) {
+
+    	//load only on custom post type 'clean_links' edit screens
+		if ( 'edit.php' !== $hook ) {
+			return;
+		}
 		
-		// Add the type="module" attribute to the script
-		add_filter('script_loader_tag', function($tag, $handle, $src) {
-			if ( 'cleanlink-admin' === $handle ) {
-				$tag = '<script type="module" src="' . esc_url( $src ) . '"></script>';
-			}
-			return $tag;
-		}, 10, 3);
+		$screen = get_current_screen();
+		if ( ! isset( $screen->post_type ) || 'clean_links' !== $screen->post_type ) {
+			return;
+		}
+		// Properly register the script first
+		wp_register_script(
+			'cleanlink-admin',
+			CLEAN_LINKS_PLUGIN_URL . 'assets/js/admin/main.js',
+			array(), // dependencies
+			CLEAN_LINKS_VERSION,
+			true // in footer
+		);
+
+		// Enqueue it
+		wp_enqueue_script( 'cleanlink-admin' );
+	}
+
+	/**
+	 * Register this filter globally
+	 * Add the type="module" attribute to the script
+	 */
+	 public function add_module_type_to_script( $tag, $handle, $src ) {
+		if ( 'cleanlink-admin' === $handle ) {
+			return '<script type="module" src="' . esc_url( $src ) . '"></script>';
+		}
+		return $tag;
 	}
 
 	/**

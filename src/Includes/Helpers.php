@@ -44,8 +44,20 @@ class Helpers {
 	 * @return int Access count.
 	 */
 	public static function get_total_access_count( $post_id ) {
-		$access_count = get_post_meta( $post_id, 'cleanlink_redirect_count', true );
+		// Check for cached value first
+		$cache_key = 'cleanlink_count_' . $post_id;
+		$cached = wp_cache_get( $cache_key );
 
-		return $access_count ?: 0;
+		if ( false !== $cached ) {
+			return (int) $cached;
+		}
+
+		$access_count = get_post_meta( $post_id, 'cleanlink_redirect_count', true );
+		$count = $access_count ?: 0;
+
+		// Cache the result for 1 hour
+		wp_cache_set( $cache_key, $count, '', HOUR_IN_SECONDS );
+
+		return $count;
 	}
 }
