@@ -121,6 +121,16 @@ class Actions {
 	 */
 	private function perform_redirect( $redirect ) {
 		if ( ! empty( $redirect ) ) {
+			// Check if nofollow is enabled
+			$nofollow = get_post_meta( $wp_query->post->ID, 'cleanlink_redirect_nofollow', true );
+			
+			if ( '1' === $nofollow ) {
+				// Add nofollow meta tag before redirect
+				echo '<meta name="robots" content="nofollow">';
+				// Ensure the output is sent before the redirect
+				flush();
+			}
+			
 			wp_redirect( esc_url_raw( $redirect ), 301 );
 			exit;
 		} else {

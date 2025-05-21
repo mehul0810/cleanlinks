@@ -4,12 +4,14 @@
  * Plugin URI: https://simplifiedwp.com/plugins/cleanlinks
  * Description: The most Powerful Link Branding Plugin for WordPress.
  * Author: SimplifiedWP
- * Author URI: https://simplifiedwp.com/
+ * Author URI: https://mehulgohil.com/
  * Version: 1.0.0
- * Requires at least: 5.0
+ * Requires at least: 5.5
  * Requires PHP: 8.0
  * Text Domain: cleanlinks
  * Domain Path: /languages
+ * License: GPLv3
+ * License URI: http://www.gnu.org/licenses/gpl-3.0.html
  *
  * CleanLinks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

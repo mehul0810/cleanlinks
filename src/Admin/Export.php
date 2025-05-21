@@ -36,6 +36,18 @@ class Export {
 	 * Export csv functionality
 	 */
 	public function export_csv() {
+		// Verify nonce
+		if ( 
+			! isset( $_POST['clean_links_export_nonce'] ) || 
+			! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['clean_links_export_nonce'] ) ), 'cleanlinks_export' ) 
+		) {
+			wp_die( esc_html__( 'Security check failed.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 403 ) );
+		}
+
+		// Check user capabilities
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You do not have sufficient permissions to perform this action.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 403 ) );
+		}
 
 		// Start the output buffer.
 		ob_start();

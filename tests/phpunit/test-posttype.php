@@ -1,9 +1,9 @@
 <?php
 /**
- * Simplified Links | Admin Actions.
+ * CleanLinks | Post Type.
  *
  * @package WordPress
- * @subpackage Simplified Links
+ * @subpackage CleanLinks
  * @since 1.0.0
  */
 
@@ -49,7 +49,7 @@ class Test_PostType extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test Simplifiedwp CPT Exists
+	 * Test CleanLinks CPT Exists
 	 */
     public function test_register_post_type() {
         global $wp_post_types;
@@ -59,7 +59,7 @@ class Test_PostType extends WP_UnitTestCase {
     }
 
     /**
-	 * Test Simplifiedwp CPT Labels
+	 * Test CleanLinks CPT Labels
 	 */
 	public function test_payment_post_type_labels() {
 		$wp_post_types = get_post_types( array(), 'objects' );
