@@ -53,7 +53,7 @@ class Actions {
 		$redirect = $this->get_redirect_url( $post_id );
 
 		// Perform the redirect
-		$this->perform_redirect( $redirect );
+		$this->perform_redirect( $redirect, $post_id );
 	}
 
 	/**
@@ -117,12 +117,13 @@ class Actions {
 	 * @access private
 	 * 
 	 * @param string $redirect The URL to redirect to
+	 * @param int    $post_id  The post ID
 	 * @return void
 	 */
-	private function perform_redirect( $redirect ) {
+	private function perform_redirect( $redirect, $post_id ) {
 		if ( ! empty( $redirect ) ) {
 			// Check if nofollow is enabled
-			$nofollow = get_post_meta( $wp_query->post->ID, 'cleanlink_redirect_nofollow', true );
+			$nofollow = get_post_meta( $post_id, 'cleanlink_redirect_nofollow', true );
 			
 			if ( '1' === $nofollow ) {
 				// Add nofollow meta tag before redirect

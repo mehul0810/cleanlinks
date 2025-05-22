@@ -197,14 +197,8 @@ class PostType {
 			
 			if ( $valid_url ) {
 
-				// Remove all illegal characters from a url
-				$url = esc_url_raw( trim( $post_data['cleanlink_redirect_url'] ) );
-
-				// Validate url
-				if ( filter_var( $url, FILTER_VALIDATE_URL ) ) {
-					// Store the sanitized URL in post meta
-					update_post_meta( $post_id, 'cleanlink_redirect_url', $url );
-				}
+				// Store the sanitized URL in post meta
+				update_post_meta( $post_id, 'cleanlink_redirect_url', $valid_url );
 				
 				// Save nofollow setting
 				$nofollow = isset( $post_data['cleanlink_redirect_nofollow'] ) ? '1' : '0';
@@ -212,7 +206,8 @@ class PostType {
 			} else {
 				delete_post_meta( $post_id, 'cleanlink_redirect_url' );
 				delete_post_meta( $post_id, 'cleanlink_redirect_nofollow' );
-		 }
+			}
+		}
 	}
 
 	/**
@@ -224,7 +219,7 @@ class PostType {
 	public function action_add_url_metabox() {
 		add_meta_box( 'cleanlink_redirection_settings', esc_html__( 'Redirection Settings', 'cleanlinks' ), array( $this, 'link_metabox' ), 'clean_links', 'normal', 'core' );
 	}
-
+	
 	/**
 	 * Echoes HTML for link meta box
 	 *
@@ -238,9 +233,10 @@ class PostType {
 
 		// Get the redirect URL
 		$url = get_post_meta( $post->ID, 'cleanlink_redirect_url', true );
-		
+		// Get the nofollow value
+		$nofollow = get_post_meta( $post->ID, 'cleanlink_redirect_nofollow', true );
 		// Display the redirect URL field
-		$this->render_redirect_url_field( $url );
+		$this->render_redirect_url_field( $url, $nofollow );
 		
 		// Display access count
 		$this->render_access_count( $post->ID );
@@ -253,9 +249,10 @@ class PostType {
 	 * @access private
 	 * 
 	 * @param string $url The current redirect URL
+	 * @param string $nofollow The current nofollow value
 	 * @return void
 	 */
-	private function render_redirect_url_field( $url ) {
+	private function render_redirect_url_field( $url, $nofollow = '0' ) {
 		?>
 		<p>
 			<label for="cleanlink_redirect_url"><strong><?php esc_html_e( 'Redirect to:', 'cleanlinks' ); ?></strong></label><br />

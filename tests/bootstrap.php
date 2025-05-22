@@ -30,7 +30,7 @@ TestHooks::addFilter('muplugins_loaded', static function () {
 });
 
 
-// install GiveWP
+// install the plugin
 TestHooks::addFilter('setup_theme', static function () {
     echo 'Installing CleanLinks.....' . PHP_EOL;
     // Initialize the plugin.
