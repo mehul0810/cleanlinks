@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Mehul Gohil <hello@mehulgohil.com>\n"
-"POT-Creation-Date: 2025-05-23 08:41+0000\n"
+"POT-Creation-Date: 2025-05-23 08:45+0000\n"
 "Report-Msgid-Bugs-To: https://github.com/mehul0810/cleanlinks/issues/new\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -20,19 +20,15 @@ msgstr ""
 msgid "Export"
 msgstr ""
 
-#: src/Admin/Actions.php:63, src/Admin/Actions.php:64
-msgid "More Plugins"
-msgstr ""
-
-#: src/Admin/Actions.php:177
+#: src/Admin/Actions.php:147
 msgid "Copy URL"
 msgstr ""
 
-#: src/Admin/Actions.php:185
+#: src/Admin/Actions.php:155
 msgid "Copied!"
 msgstr ""
 
-#: src/Admin/Actions.php:238
+#: src/Admin/Actions.php:208
 msgid "Viewed:"
 msgstr ""
 
