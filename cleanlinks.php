@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: CleanLinks - Powerful Link Branding Plugin for WordPress
+ * Plugin Name: CleanLinks - Link Cloaking Plugin for WordPress
  * Plugin URI: https://github.com/mehul0810/cleanlinks
- * Description: The most Powerful Link Branding Plugin for WordPress.
+ * Description: The most robust, flexible, and intuitive way to build your brand using link building strategy.
  * Author: Mehul Gohil
  * Author URI: https://mehulgohil.com/
  * Version: 1.0.0
