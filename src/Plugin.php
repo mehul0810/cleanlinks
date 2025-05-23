@@ -94,6 +94,11 @@ final class Plugin {
 	public function activate( $network_wide = false ) {
 		$post_type = new Includes\PostType();
 		$post_type->register_post_type();
+
+		// Flush rewrite rules to ensure the new post type is recognized.
+		// This is necessary to avoid 404 errors on the first load.
+		// This should be done only on activation, not on every page load.
+		flush_rewrite_rules();
 	}
 
 	/**

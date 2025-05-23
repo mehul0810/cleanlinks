@@ -109,8 +109,6 @@ class PostType {
 	 */
 	public function register_post_type() {
 		register_post_type( 'cleanlinks', $this->get_args() );
-
-		// https://developer.wordpress.org/reference/functions/register_post_type/#flushing-rewrite-on-activation
 	}
 
 	/**
