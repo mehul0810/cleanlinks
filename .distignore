@@ -21,6 +21,7 @@
 .jshintrc
 .eslintignore
 .eslintrc
+.eslintrc.js
 .eslintrc.json
 .prettierrc.json
 .prettierignore
@@ -29,7 +30,13 @@
 .lintstagedrc.json
 .distignore
 .stylelintignore
-
+.huskyrc
+.husky
+.prettierignore
+.wordpress-org
+.nvmrc
+.npmrc
+.phpcs.xml.dist
 composer.json
 composer.lock
 package.json
