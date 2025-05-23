@@ -1,13 +1,13 @@
-# Copyright (C) 2024 Simplified Links
-# This file is distributed under the same license as the Simplified Links package.
+# Copyright (C) 2025 CleanLinks
+# This file is distributed under the same license as the CleanLinks package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Simplified Links\n"
+"Project-Id-Version: CleanLinks\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Mehul Gohil <hello@mehulgohil.com>\n"
-"POT-Creation-Date: 2024-07-23 10:21+0000\n"
+"POT-Creation-Date: 2025-05-23 08:41+0000\n"
 "Report-Msgid-Bugs-To: https://github.com/mehul0810/cleanlinks/issues/new\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -16,33 +16,45 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/Admin/Actions.php:51, src/Admin/Actions.php:52, src/Admin/Export.php:102, src/Admin/Export.php:110
+#: src/Admin/Actions.php:52, src/Admin/Actions.php:53, src/Admin/Export.php:114, src/Admin/Export.php:122
 msgid "Export"
 msgstr ""
 
-#: src/Admin/Actions.php:62, src/Admin/Actions.php:63
+#: src/Admin/Actions.php:63, src/Admin/Actions.php:64
 msgid "More Plugins"
 msgstr ""
 
-#: src/Admin/Actions.php:151
+#: src/Admin/Actions.php:177
 msgid "Copy URL"
 msgstr ""
 
-#: src/Admin/Actions.php:159
+#: src/Admin/Actions.php:185
 msgid "Copied!"
 msgstr ""
 
-#: src/Admin/Actions.php:212
+#: src/Admin/Actions.php:238
 msgid "Viewed:"
 msgstr ""
 
-#: src/Admin/Export.php:106
+#: src/Admin/Export.php:44
+msgid "Security check failed."
+msgstr ""
+
+#: src/Admin/Export.php:44, src/Admin/Export.php:49
+msgid "Error"
+msgstr ""
+
+#: src/Admin/Export.php:49
+msgid "You do not have sufficient permissions to perform this action."
+msgstr ""
+
+#: src/Admin/Export.php:118
 msgid "Using this tool, you can have a seamless experience to export your links to a CSV (Comma Separated Values) file with just a single click."
 msgstr ""
 
 #. translators: %s: Link to 5 star rating
 #: src/Admin/Filters.php:51
-msgid "If you like <strong>Simplified Links</strong> please leave us a %s rating. It takes a minute and helps a lot. Thanks in advance!"
+msgid "If you like <strong>CleanLinks</strong> please leave us a %s rating. It takes a minute and helps a lot. Thanks in advance!"
 msgstr ""
 
 #: src/Admin/Filters.php:52
@@ -75,22 +87,22 @@ msgstr ""
 
 #: src/Includes/PostType.php:43
 msgctxt "Post type general name"
-msgid "Simplified Links"
+msgid "CleanLinks"
 msgstr ""
 
 #: src/Includes/PostType.php:44
 msgctxt "Post type singular name"
-msgid "Simplified Link"
+msgid "CleanLink"
 msgstr ""
 
 #: src/Includes/PostType.php:45
 msgctxt "Admin Menu text"
-msgid "Simplified Links"
+msgid "CleanLinks"
 msgstr ""
 
 #: src/Includes/PostType.php:46
 msgctxt "Add New on Toolbar"
-msgid "Simplified Link"
+msgid "CleanLink"
 msgstr ""
 
 #: src/Includes/PostType.php:47, src/Includes/PostType.php:48
@@ -98,15 +110,15 @@ msgid "Add New Link"
 msgstr ""
 
 #: src/Includes/PostType.php:49
-msgid "New Simplified Link"
+msgid "New CleanLink"
 msgstr ""
 
 #: src/Includes/PostType.php:50
-msgid "Edit Simplified Link"
+msgid "Edit CleanLink"
 msgstr ""
 
 #: src/Includes/PostType.php:51
-msgid "View Simplified Link"
+msgid "View CleanLink"
 msgstr ""
 
 #: src/Includes/PostType.php:52
@@ -114,24 +126,24 @@ msgid "All Links"
 msgstr ""
 
 #: src/Includes/PostType.php:53
-msgid "Search Simplified Links"
+msgid "Search CleanLinks"
 msgstr ""
 
 #: src/Includes/PostType.php:54
-msgid "Parent Simplified Links:"
+msgid "Parent CleanLinks:"
 msgstr ""
 
 #: src/Includes/PostType.php:55
-msgid "No Simplified Links found."
+msgid "No CleanLinks found."
 msgstr ""
 
 #: src/Includes/PostType.php:56
-msgid "No Simplified Links found in Trash."
+msgid "No CleanLinks found in Trash."
 msgstr ""
 
 #: src/Includes/PostType.php:57
 msgctxt "Overrides the “Featured Image” phrase for this post type. Added in 4.3"
-msgid "Simplified Link Cover Image"
+msgid "CleanLink Cover Image"
 msgstr ""
 
 #: src/Includes/PostType.php:58
@@ -151,48 +163,56 @@ msgstr ""
 
 #: src/Includes/PostType.php:61
 msgctxt "The post type archive label used in nav menus. Default “Post Archives”. Added in 4.4"
-msgid "Simplified Link archives"
+msgid "CleanLink archives"
 msgstr ""
 
 #: src/Includes/PostType.php:62
 msgctxt "Overrides the “Insert into post”/”Insert into page” phrase (used when inserting media into a post). Added in 4.4"
-msgid "Insert into Simplified Link"
+msgid "Insert into CleanLink"
 msgstr ""
 
 #: src/Includes/PostType.php:63
 msgctxt "Overrides the “Uploaded to this post”/”Uploaded to this page” phrase (used when viewing media attached to a post). Added in 4.4"
-msgid "Uploaded to this Simplified Link"
+msgid "Uploaded to this CleanLink"
 msgstr ""
 
 #: src/Includes/PostType.php:64
 msgctxt "Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4"
-msgid "Filter Simplified Links list"
+msgid "Filter CleanLinks list"
 msgstr ""
 
 #: src/Includes/PostType.php:65
 msgctxt "Screen reader text for the pagination heading on the post type listing screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
-msgid "Simplified Links list navigation"
+msgid "CleanLinks list navigation"
 msgstr ""
 
 #: src/Includes/PostType.php:66
 msgctxt "Screen reader text for the items list heading on the post type listing screen. Default “Posts list”/”Pages list”. Added in 4.4"
-msgid "Simplified Links list"
+msgid "CleanLinks list"
 msgstr ""
 
-#: src/Includes/PostType.php:186
+#: src/Includes/PostType.php:220
 msgid "Redirection Settings"
 msgstr ""
 
-#: src/Includes/PostType.php:204
+#: src/Includes/PostType.php:258
 msgid "Redirect to:"
 msgstr ""
 
-#: src/Includes/PostType.php:207
+#: src/Includes/PostType.php:261
 msgid "This is the URL that the Redirect Link you create on this page will redirect to when accessed in a web browser."
 msgstr ""
 
+#: src/Includes/PostType.php:266
+msgid "Add nofollow attribute to redirect"
+msgstr ""
+
+#: src/Includes/PostType.php:269
+msgid "If checked, the nofollow attribute will be added to the redirect to prevent search engines from following the link."
+msgstr ""
+
 #. translators: %d is the counter of clicks.
-#: src/Includes/PostType.php:211
+#: src/Includes/PostType.php:287
 msgid "This URL has been accessed %d times"
 msgstr ""
 
