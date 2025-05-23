@@ -1,11 +1,6 @@
-.cleanlinks--access-count span.dashicons {
-	color: #8c8f94;
-}
-
-.cleanlinks--access-count span::last-child {
-	font-weight: bold;
-}
-
-.cleanlinks--access-count .cleanlinks--view-times {
-	font-weight: bold;
+.cleanlinks--access-count {
+    background: #e5e5e5;
+    margin: -12px;
+    margin-top: 0px;
+    padding: 10px;
 }

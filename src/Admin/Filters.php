@@ -28,7 +28,7 @@ class Filters {
 	public function __construct() {
 		add_filter( 'admin_footer_text', array( $this, 'add_admin_footer_text' ), 100, 1 );
 		add_filter( 'plugin_action_links', array( $this, 'add_plugin_action_links' ), 10, 2 );
-		add_filter( 'manage_edit-clean_links_columns', array( $this, 'add_custom_columns_to_clean_links' ) );
+		add_filter( 'manage_edit-cleanlinks_columns', array( $this, 'add_custom_columns_to_cleanlinks' ) );
 	}
 
 	/**
@@ -44,7 +44,7 @@ class Filters {
 	public function add_admin_footer_text( $footer_text ) {
 		$current_screen = get_current_screen();
 
-		if ( isset( $current_screen->post_type ) && $current_screen->post_type === 'clean_links' ) {
+		if ( isset( $current_screen->post_type ) && $current_screen->post_type === 'cleanlinks' ) {
 
 			return sprintf(
 				/* translators: %s: Link to 5 star rating */
@@ -68,10 +68,10 @@ class Filters {
 	 * @return array List of modified plugin action links.
 	 */
 	public function add_plugin_action_links( $links, $file ) {
-		if ( $file === CLEAN_LINKS_PLUGIN_BASENAME ) {
+		if ( $file === CLEANLINKS_PLUGIN_BASENAME ) {
 			$links[] = sprintf(
 				'<a href="%s">%s</a>',
-				esc_url( admin_url( 'edit.php?post_type=clean_links' ) ),
+				esc_url( admin_url( 'edit.php?post_type=cleanlinks' ) ),
 				esc_html__( 'Manage Links', 'cleanlinks' )
 			);
 		}
@@ -80,12 +80,12 @@ class Filters {
 	}
 
 	/**
-	 * Add custom columns to the clean_links admin listing page.
+	 * Add custom columns to the cleanlinks admin listing page.
 	 *
 	 * @param array $columns An array of column names.
 	 * @return array Modified array of column names.
 	 */
-	public function add_custom_columns_to_clean_links( $columns ) {
+	public function add_custom_columns_to_cleanlinks( $columns ) {
 
 		$columns = array(
 			'cb'                   => '<input type="checkbox" />',

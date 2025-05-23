@@ -14,11 +14,11 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 }
 
 // Delete all posts of custom post type
-$clean_links = get_posts([
-    'post_type' => 'clean_links',
+$cleanlinks = get_posts([
+    'post_type' => 'cleanlinks',
     'numberposts' => -1,
 ]);
-foreach ($clean_links as $link) {
+foreach ($cleanlinks as $link) {
     wp_delete_post($link->ID, true);
 }
 

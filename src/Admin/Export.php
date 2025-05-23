@@ -29,7 +29,7 @@ class Export {
 	 * @return void
 	 */
 	public function __construct() {
-		add_action( 'admin_post_clean_links_export', array( $this, 'export_csv' ) );
+		add_action( 'admin_post_cleanlinks_export', array( $this, 'export_csv' ) );
 	}
 
 	/**
@@ -37,9 +37,9 @@ class Export {
 	 */
 	public function export_csv() {
 		// Verify nonce
-		if ( 
-			! isset( $_POST['clean_links_export_nonce'] ) || 
-			! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['clean_links_export_nonce'] ) ), 'cleanlinks_export' ) 
+		if (
+			! isset( $_POST['cleanlinks_export_nonce'] ) ||
+			! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['cleanlinks_export_nonce'] ) ), 'cleanlinks_export' )
 		) {
 			wp_die( esc_html__( 'Security check failed.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 403 ) );
 		}
@@ -60,7 +60,7 @@ class Export {
 		$header_args = array( 'Id', 'Title', 'Slug', 'Redirect To' );
 
 		$args = array(
-			'post_type'              => 'clean_links',
+			'post_type'              => 'cleanlinks',
 			'post_status'            => 'publish',
 			'posts_per_page'         => 200,
 			'fields'                 => 'ids',
@@ -116,9 +116,9 @@ class Export {
 						</div>
 						<div class="inside">
 							<p><?php esc_html_e( 'Using this tool, you can have a seamless experience to export your links to a CSV (Comma Separated Values) file with just a single click.', 'cleanlinks' ); ?></p>
-							<form method="post" id="export-form" action="<?php echo esc_url( admin_url( 'admin-post.php' ) );?>">									
-								<?php wp_nonce_field( 'cleanlinks_export', 'clean_links_export_nonce' ); ?>
-								<input type="hidden" name="action" value="clean_links_export">
+							<form method="post" id="export-form" action="<?php echo esc_url( admin_url( 'admin-post.php' ) );?>">
+								<?php wp_nonce_field( 'cleanlinks_export', 'cleanlinks_export_nonce' ); ?>
+								<input type="hidden" name="action" value="cleanlinks_export">
 								<button type="submit" class="button button-primary"><?php esc_html_e( 'Export', 'cleanlinks' ); ?></button>
 							</form>
 						</div>

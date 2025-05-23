@@ -53,7 +53,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 require_once __DIR__ . '/config/constants.php';
 
 // Automatically loads files used throughout the plugin.
-require_once CLEAN_LINKS_PLUGIN_DIR . 'vendor/autoload.php';
+require_once CLEANLINKS_PLUGIN_DIR . 'vendor/autoload.php';
 
 // Initialize the plugin.
 $cleanlinks_plugin = new Plugin();

@@ -108,7 +108,7 @@ class PostType {
 	 * @return void
 	 */
 	public function register_post_type() {
-		register_post_type( 'clean_links', $this->get_args() );
+		register_post_type( 'cleanlinks', $this->get_args() );
 
 		// https://developer.wordpress.org/reference/functions/register_post_type/#flushing-rewrite-on-activation
 	}
@@ -151,8 +151,8 @@ class PostType {
 			return;
 		}
 
-		// Bailout, if the post type is not `clean_links`.
-		if ( 'clean_links' !== $post->post_type ) {
+		// Bailout, if the post type is not `cleanlinks`.
+		if ( 'cleanlinks' !== $post->post_type ) {
 			return;
 		}
 
@@ -213,7 +213,7 @@ class PostType {
 	 * @return void
 	 */
 	public function action_add_url_metabox() {
-		add_meta_box( 'cleanlink_redirection_settings', esc_html__( 'Redirection Settings', 'cleanlinks' ), array( $this, 'link_metabox' ), 'clean_links', 'normal', 'core' );
+		add_meta_box( 'cleanlink_redirection_settings', esc_html__( 'Redirect Link Settings', 'cleanlinks' ), array( $this, 'link_metabox' ), 'cleanlinks', 'normal', 'core' );
 	}
 
 	/**
@@ -251,19 +251,21 @@ class PostType {
 	private function render_redirect_url_field( $url, $nofollow = '0' ) {
 		?>
 		<p>
-			<label for="cleanlink_redirect_url"><strong><?php esc_html_e( 'Redirect to:', 'cleanlinks' ); ?></strong></label><br />
-			<input class="widefat" type="url" name="cleanlink_redirect_url" id="cleanlink_redirect_url" value="<?php echo esc_attr( $url ); ?>" />
+			<label for="cleanlink_redirect_url"><strong><?php esc_html_e( 'Destination URL:', 'cleanlinks' ); ?></strong>
+			<input placeholder="<?php esc_attr_e( 'Enter the full destination URL (e.g., https://example.com)', 'cleanlinks' ); ?>" class="widefat" type="url" name="cleanlink_redirect_url" id="cleanlink_redirect_url" value="<?php echo esc_attr( $url ); ?>" />
+			</label>
+			<span class="description">
+				<?php esc_html_e( 'Visitors will be redirected to this URL when they access your link.', 'cleanlinks' ); ?>
+			</span>
 		</p>
-		<p><span class="description"><?php esc_html_e( 'This is the URL that the Redirect Link you create on this page will redirect to when accessed in a web browser.', 'cleanlinks' ); ?> </span></p>
 
 		<p>
 			<label for="cleanlink_redirect_nofollow">
 				<input type="checkbox" name="cleanlink_redirect_nofollow" id="cleanlink_redirect_nofollow" value="1" <?php checked( $nofollow, '1' ); ?> />
-				<?php esc_html_e( 'Add nofollow attribute to redirect', 'cleanlinks' ); ?>
+				<?php esc_html_e( 'Add nofollow to this redirect', 'cleanlinks' ); ?>
 			</label>
+			<span class="description"><?php esc_html_e( 'Check this option to prevent search engines from following this redirect.', 'cleanlinks' ); ?> </span>
 		</p>
-		<p><span class="description"><?php esc_html_e( 'If checked, the nofollow attribute will be added to the redirect to prevent search engines from following the link.', 'cleanlinks' ); ?> </span></p>
-
 		<?php
 	}
 
@@ -278,8 +280,11 @@ class PostType {
 	 */
 	private function render_access_count( $post_id ) {
 		$count = Helpers::get_total_access_count( $post_id );
-
-		/* translators: %d is the counter of clicks. */
-		echo '<p>' . sprintf( esc_html__( 'This URL has been accessed %d times', 'cleanlinks' ), esc_attr( $count ) ) . '</p>';
+		?>
+		<div class="cleanlinks--access-count">
+			<span class="dashicons dashicons-chart-bar"></span>
+			<?php echo sprintf( esc_html__( 'This link has been visited %d times', 'cleanlinks' ), esc_attr( $count ) ); ?>
+		</div>
+		<?php
 	}
 }

@@ -29,19 +29,19 @@ class Actions {
 
 	/**
 	 * Count and redirect function.
-	 * 
+	 *
 	 * @since 1.0.0
 	 * @return void
 	 */
 	public function cleanlink_redirect_and_count() {
-		// Bailout if not a clean_links post type
-		if ( ! is_singular( 'clean_links' ) ) {
+		// Bailout if not a cleanlinks post type
+		if ( ! is_singular( 'cleanlinks' ) ) {
 			return;
 		}
 
 		global $wp_query;
 		$post_id = isset( $wp_query->post->ID ) ? $wp_query->post->ID : 0;
-		
+
 		if ( ! $post_id ) {
 			return;
 		}
@@ -58,28 +58,28 @@ class Actions {
 
 	/**
 	 * Update the access count for a clean link
-	 * 
+	 *
 	 * @since 1.0.0
 	 * @access private
-	 * 
+	 *
 	 * @param int $post_id The post ID
 	 * @return int The new count value
 	 */
 	private function update_access_count( $post_id ) {
 		$count = (int) get_post_meta( $post_id, 'cleanlink_redirect_count', true );
 		$new_count = $count + 1;
-		
+
 		update_post_meta( $post_id, 'cleanlink_redirect_count', $new_count );
-		
+
 		return $new_count;
 	}
 
 	/**
 	 * Get the redirect URL for a clean link
-	 * 
+	 *
 	 * @since 1.0.0
 	 * @access private
-	 * 
+	 *
 	 * @param int $post_id The post ID
 	 * @return string The redirect URL
 	 */
@@ -112,10 +112,10 @@ class Actions {
 
 	/**
 	 * Perform the redirect to the specified URL
-	 * 
+	 *
 	 * @since 1.0.0
 	 * @access private
-	 * 
+	 *
 	 * @param string $redirect The URL to redirect to
 	 * @param int    $post_id  The post ID
 	 * @return void
@@ -124,14 +124,14 @@ class Actions {
 		if ( ! empty( $redirect ) ) {
 			// Check if nofollow is enabled
 			$nofollow = get_post_meta( $post_id, 'cleanlink_redirect_nofollow', true );
-			
+
 			if ( '1' === $nofollow ) {
 				// Add nofollow meta tag before redirect
 				echo '<meta name="robots" content="nofollow">';
 				// Ensure the output is sent before the redirect
 				flush();
 			}
-			
+
 			wp_redirect( esc_url_raw( $redirect ), 301 );
 			exit;
 		} else {

@@ -32,7 +32,7 @@ class Actions {
 		add_action( 'admin_enqueue_scripts', array( $this, 'register_assets' ) );
 		add_filter( 'script_loader_tag', array( $this, 'add_module_type_to_script' ), 10, 3 );
 		add_action( 'admin_menu', array( $this, 'register_admin_pages' ) );
-		add_action( 'manage_clean_links_posts_custom_column', array( $this, 'register_custom_columns' ), 10, 2 );
+		add_action( 'manage_cleanlinks_posts_custom_column', array( $this, 'register_custom_columns' ), 10, 2 );
 		add_action( 'post_submitbox_misc_actions', array( $this, 'before_preview_changes' ) );
 	}
 
@@ -48,7 +48,7 @@ class Actions {
 
 		// Export.
 		add_submenu_page(
-			'edit.php?post_type=clean_links',
+			'edit.php?post_type=cleanlinks',
 			esc_html__( 'Export', 'cleanlinks' ),
 			esc_html__( 'Export', 'cleanlinks' ),
 			'manage_options',
@@ -96,22 +96,24 @@ class Actions {
 	 * @return void
 	 */
 	public function register_assets($hook) {
-
-    	//load only on custom post type 'clean_links' edit screens
-		if ( 'edit.php' !== $hook ) {
-			return;
-		}
-
 		$screen = get_current_screen();
-		if ( ! isset( $screen->post_type ) || 'clean_links' !== $screen->post_type ) {
+		if ( ! isset( $screen->post_type ) || 'cleanlinks' !== $screen->post_type ) {
 			return;
 		}
+
+		wp_enqueue_style(
+			'cleanlink-admin',
+			CLEANLINKS_PLUGIN_URL . 'dist/admin.css',
+			array(),
+			CLEANLINKS_VERSION
+		);
+
 		// Properly register the script first
 		wp_register_script(
 			'cleanlink-admin',
-			CLEAN_LINKS_PLUGIN_URL . 'assets/js/admin/main.js',
+			CLEANLINKS_PLUGIN_URL . 'dist/admin.js',
 			array(), // dependencies
-			CLEAN_LINKS_VERSION,
+			CLEANLINKS_VERSION,
 			true // in footer
 		);
 
@@ -131,7 +133,7 @@ class Actions {
 	}
 
 	/**
-	 * Populate custom columns with data on the clean_links admin listing page.
+	 * Populate custom columns with data on the cleanlinks admin listing page.
 	 *
 	 * @since  1.0.0
 	 * @access public
@@ -191,8 +193,8 @@ class Actions {
 	 * @return void
 	 */
 	public function before_preview_changes( $post ) {
-		// Bailout, if the post type is not clean_links.
-		if ( 'clean_links' !== $post->post_type ) {
+		// Bailout, if the post type is not cleanlinks.
+		if ( 'cleanlinks' !== $post->post_type ) {
 			return;
 		}
 

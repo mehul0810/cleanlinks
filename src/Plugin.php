@@ -33,8 +33,8 @@ final class Plugin {
 	 */
 	public function register() {
 		// Handle plugin activation and deactivation.
-		register_activation_hook( CLEAN_LINKS_PLUGIN_FILE, array( $this, 'activate' ) );
-		register_deactivation_hook( CLEAN_LINKS_PLUGIN_FILE, array( $this, 'deactivate' ) );
+		register_activation_hook( CLEANLINKS_PLUGIN_FILE, array( $this, 'activate' ) );
+		register_deactivation_hook( CLEANLINKS_PLUGIN_FILE, array( $this, 'deactivate' ) );
 
 		// Register services used throughout the plugin.
 		add_action( 'plugins_loaded', array( $this, 'register_services' ) );
@@ -76,7 +76,7 @@ final class Plugin {
 		load_plugin_textdomain(
 			'cleanlinks',
 			false,
-			dirname( plugin_basename( CLEAN_LINKS_PLUGIN_FILE ) ) . '/languages/'
+			dirname( plugin_basename( CLEANLINKS_PLUGIN_FILE ) ) . '/languages/'
 		);
 	}
 

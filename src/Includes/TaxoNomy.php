@@ -86,6 +86,6 @@ class TaxoNomy {
 	 * @return void
 	 */
 	public function register_taxo_nomy() {
-		register_taxonomy( 'cleanlinks_groups', 'clean_links', $this->get_args() );
+		register_taxonomy( 'cleanlinks_groups', 'cleanlinks', $this->get_args() );
 	}
 }
