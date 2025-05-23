@@ -12,7 +12,7 @@ namespace MG\CleanLinks\Tests;
 use MG\CleanLinks\Admin;
 use WP_UnitTestCase;
 
-class Test_Admin_Actions extends WP_UnitTestCase {
+class TestAdminActions extends WP_UnitTestCase {
 	/**
 	 * Initialize the class.
 	 *

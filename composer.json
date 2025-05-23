@@ -1,10 +1,10 @@
 {
-	"name": "simplifiedwp/cleanlinks",
+	"name": "mehulgohil/cleanlinks",
 	"description": "The most robust, flexible, and intuitive way to build your brand using link building strategy.",
 	"authors": [
 		{
-			"name": "SimplifiedWP",
-			"email": "hello@simplifiedwp.com"
+			"name": "mehulgohil",
+			"email": "hello@mehulgohil.com"
 		}
 	],
 	"require": {

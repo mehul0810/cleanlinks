@@ -36,8 +36,8 @@ if ( isProduction ) {
 		destFile: 'languages/cleanlinks.pot',
 		relativeTo: './',
 		src: ['./**/*.php', '!./includes/libraries/**/*', '!./vendor/**/*'],
-		bugReport: 'https://github.com/simplifiedwp/cleanlinks/issues/new',
-		team: 'SimplifiedWP Team <hello@simplifiedwp.com>',
+		bugReport: 'https://github.com/mehul0810/cleanlinks/issues/new',
+		team: 'Mehul Gohil <hello@mehulgohil.com>',
 	} );
 }
 

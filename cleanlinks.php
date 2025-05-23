@@ -3,7 +3,7 @@
  * Plugin Name: CleanLinks - Powerful Link Branding Plugin for WordPress
  * Plugin URI: https://github.com/mehul0810/cleanlinks
  * Description: The most Powerful Link Branding Plugin for WordPress.
- * Author: mehul0810, ankur0812
+ * Author: mehulgohil
  * Author URI: https://mehulgohil.com/
  * Version: 1.0.0
  * Requires at least: 5.5
@@ -34,13 +34,12 @@
  *
  * -- The Open Source Initiative
  *
- * CleanLinks is a tribute to the spirit and philosophy of Open Source. We at SimplifiedWP gladly embrace the Open Source
+ * CleanLinks is a tribute to the spirit and philosophy of Open Source. We gladly embrace the Open Source
  * philosophy both in how Give itself was developed, and how we hope to see others build more from our code base.
  *
  * CleanLinks would not have been possible without the tireless efforts of WordPress and the surrounding Open Source projects
  * and their talented developers. Thank you all for your contribution to WordPress.
  *
- * - The SimplifiedWP Team
  */
 
 namespace MG\CleanLinks;

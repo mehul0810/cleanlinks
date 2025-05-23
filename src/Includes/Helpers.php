@@ -41,7 +41,7 @@ class Helpers {
 	 *
 	 * @param int $post_id Post ID.
 	 *
-	 * @return int Access count.
+	 * @return int The number of times the link has been accessed.
 	 */
 	public static function get_total_access_count( $post_id ) {
 		// Check for cached value first
@@ -59,5 +59,27 @@ class Helpers {
 		wp_cache_set( $cache_key, $count, '', HOUR_IN_SECONDS );
 
 		return $count;
+	}
+
+	/**
+	 * Sanitize and validate a URL
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 *
+	 * @param string $url The URL to sanitize and validate.
+	 *
+	 * @return string|bool The sanitized URL if valid, false otherwise.
+	 */
+	public static function validate_url( $url ) {
+		// Remove all illegal characters from a url
+		$url = esc_url_raw( trim( $url ));
+
+		// Validate url
+		if ( filter_var( $url, FILTER_VALIDATE_URL ) ) {
+			return esc_url( $url );
+		}
+
+		return false;
 	}
 }

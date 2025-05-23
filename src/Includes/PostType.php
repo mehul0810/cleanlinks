@@ -118,6 +118,21 @@ class PostType {
 	}
 
 	/**
+	 * Verify nonce for post update
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 * 
+	 * @param string $nonce_value The nonce value from the form.
+	 * @param string $nonce_action The nonce action to verify against.
+	 * 
+	 * @return bool True if nonce is valid, false otherwise.
+	 */
+	private function verify_nonce( $nonce_value, $nonce_action ) {
+		return ! empty( $nonce_value ) && wp_verify_nonce( $nonce_value, $nonce_action );
+	}
+
+	/**
 	 * Saves meta info for clean links
 	 *
 	 * @since 1.0
@@ -154,31 +169,36 @@ class PostType {
 		$nonce = filter_input( INPUT_POST, 'cleanlink_redirect_nonce', FILTER_UNSAFE_RAW );
 
 		// Bailout, if the nonce is not verified.
-		if ( ! wp_verify_nonce( $nonce, 'cleanlink-save-redirect-meta' ) ) {
+		if ( ! $this->verify_nonce( $nonce, 'cleanlink-save-redirect-meta' ) ) {
 			return;
 		}
 
+		// Sanitize post data and save redirect URL
+		$this->save_redirect_url( $post_id );
+	}
+
+	/**
+	 * Save the redirect URL for a clean link
+	 * 
+	 * @since 1.0.0
+	 * @access private
+	 * 
+	 * @param int $post_id Post ID
+	 * @return void
+	 */
+	private function save_redirect_url( $post_id ) {
 		// Sanitize post data.
 		$post_data = Helpers::clean( $_POST );
-
-		// Update post meta for cleanlinks
-		if (
-			! empty( $post_data['cleanlink_redirect_nonce'] ) &&
-			wp_verify_nonce( $post_data['cleanlink_redirect_nonce'], 'cleanlink-save-redirect-meta' ) &&
-			current_user_can( 'edit_post', $post_id ) &&
-			'clean_links' === $post->post_type
-		) {
+		
+		// Process the redirect URL
+		if ( ! empty( $post_data['cleanlink_redirect_url'] ) ) {
+			// Validate and sanitize URL
+			$valid_url = Helpers::validate_url( $post_data['cleanlink_redirect_url'] );
 			
-			if ( ! empty( $post_data['cleanlink_redirect_url'] ) ) {
+			if ( $valid_url ) {
 
-				// Remove all illegal characters from a url
-				$url = esc_url_raw( trim( $post_data['cleanlink_redirect_url'] ) );
-
-				// Validate url
-				if ( filter_var( $url, FILTER_VALIDATE_URL ) ) {
-					// Store the sanitized URL in post meta
-					update_post_meta( $post_id, 'cleanlink_redirect_url', $url );
-				}
+				// Store the sanitized URL in post meta
+				update_post_meta( $post_id, 'cleanlink_redirect_url', $valid_url );
 				
 				// Save nofollow setting
 				$nofollow = isset( $post_data['cleanlink_redirect_nofollow'] ) ? '1' : '0';
@@ -187,9 +207,6 @@ class PostType {
 				delete_post_meta( $post_id, 'cleanlink_redirect_url' );
 				delete_post_meta( $post_id, 'cleanlink_redirect_nofollow' );
 			}
-		} else {
-			delete_post_meta( $post_id, 'cleanlink_redirect_url' );
-			delete_post_meta( $post_id, 'cleanlink_redirect_nofollow' );
 		}
 	}
 
@@ -202,7 +219,7 @@ class PostType {
 	public function action_add_url_metabox() {
 		add_meta_box( 'cleanlink_redirection_settings', esc_html__( 'Redirection Settings', 'cleanlinks' ), array( $this, 'link_metabox' ), 'clean_links', 'normal', 'core' );
 	}
-
+	
 	/**
 	 * Echoes HTML for link meta box
 	 *
@@ -211,13 +228,32 @@ class PostType {
 	 * @return void
 	 */
 	public function link_metabox( $post ) {
-
+		// Add nonce field
 		wp_nonce_field( 'cleanlink-save-redirect-meta', 'cleanlink_redirect_nonce' );
 
+		// Get the redirect URL
 		$url = get_post_meta( $post->ID, 'cleanlink_redirect_url', true );
+		// Get the nofollow value
 		$nofollow = get_post_meta( $post->ID, 'cleanlink_redirect_nofollow', true );
-		?>
+		// Display the redirect URL field
+		$this->render_redirect_url_field( $url, $nofollow );
+		
+		// Display access count
+		$this->render_access_count( $post->ID );
+	}
 
+	/**
+	 * Render the redirect URL field
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 * 
+	 * @param string $url The current redirect URL
+	 * @param string $nofollow The current nofollow value
+	 * @return void
+	 */
+	private function render_redirect_url_field( $url, $nofollow = '0' ) {
+		?>
 		<p>
 			<label for="cleanlink_redirect_url"><strong><?php esc_html_e( 'Redirect to:', 'cleanlinks' ); ?></strong></label><br />
 			<input class="widefat" type="url" name="cleanlink_redirect_url" id="cleanlink_redirect_url" value="<?php echo esc_attr( $url ); ?>" />
@@ -233,7 +269,20 @@ class PostType {
 		<p><span class="description"><?php esc_html_e( 'If checked, the nofollow attribute will be added to the redirect to prevent search engines from following the link.', 'cleanlinks' ); ?> </span></p>
 		
 		<?php
-		$count = isset( $post->ID ) ? get_post_meta( $post->ID, 'cleanlink_redirect_count', true ) : 0;
+	}
+
+	/**
+	 * Render the access count information
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 * 
+	 * @param int $post_id The post ID
+	 * @return void
+	 */
+	private function render_access_count( $post_id ) {
+		$count = Helpers::get_total_access_count( $post_id );
+		
 		/* translators: %d is the counter of clicks. */
 		echo '<p>' . sprintf( esc_html__( 'This URL has been accessed %d times', 'cleanlinks' ), esc_attr( $count ) ) . '</p>';
 	}
