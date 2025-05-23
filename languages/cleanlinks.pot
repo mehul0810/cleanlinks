@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Mehul Gohil <hello@mehulgohil.com>\n"
-"POT-Creation-Date: 2025-05-23 08:45+0000\n"
+"POT-Creation-Date: 2025-05-23 08:49+0000\n"
 "Report-Msgid-Bugs-To: https://github.com/mehul0810/cleanlinks/issues/new\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -98,7 +98,7 @@ msgstr ""
 
 #: src/Includes/PostType.php:46
 msgctxt "Add New on Toolbar"
-msgid "CleanLink"
+msgid "Link"
 msgstr ""
 
 #: src/Includes/PostType.php:47, src/Includes/PostType.php:48
@@ -122,93 +122,73 @@ msgid "All Links"
 msgstr ""
 
 #: src/Includes/PostType.php:53
-msgid "Search CleanLinks"
+msgid "Search links"
 msgstr ""
 
 #: src/Includes/PostType.php:54
-msgid "Parent CleanLinks:"
+msgid "Parent links:"
 msgstr ""
 
 #: src/Includes/PostType.php:55
-msgid "No CleanLinks found."
+msgid "No link found."
 msgstr ""
 
 #: src/Includes/PostType.php:56
-msgid "No CleanLinks found in Trash."
+msgid "No links found in Trash."
 msgstr ""
 
 #: src/Includes/PostType.php:57
-msgctxt "Overrides the “Featured Image” phrase for this post type. Added in 4.3"
-msgid "CleanLink Cover Image"
-msgstr ""
-
-#: src/Includes/PostType.php:58
-msgctxt "Overrides the “Set featured image” phrase for this post type. Added in 4.3"
-msgid "Set cover image"
-msgstr ""
-
-#: src/Includes/PostType.php:59
-msgctxt "Overrides the “Remove featured image” phrase for this post type. Added in 4.3"
-msgid "Remove cover image"
-msgstr ""
-
-#: src/Includes/PostType.php:60
-msgctxt "Overrides the “Use as featured image” phrase for this post type. Added in 4.3"
-msgid "Use as cover image"
-msgstr ""
-
-#: src/Includes/PostType.php:61
 msgctxt "The post type archive label used in nav menus. Default “Post Archives”. Added in 4.4"
 msgid "CleanLink archives"
 msgstr ""
 
-#: src/Includes/PostType.php:62
+#: src/Includes/PostType.php:58
 msgctxt "Overrides the “Insert into post”/”Insert into page” phrase (used when inserting media into a post). Added in 4.4"
-msgid "Insert into CleanLink"
+msgid "Insert into Link"
 msgstr ""
 
-#: src/Includes/PostType.php:63
+#: src/Includes/PostType.php:59
 msgctxt "Overrides the “Uploaded to this post”/”Uploaded to this page” phrase (used when viewing media attached to a post). Added in 4.4"
-msgid "Uploaded to this CleanLink"
+msgid "Uploaded to this Link"
 msgstr ""
 
-#: src/Includes/PostType.php:64
+#: src/Includes/PostType.php:60
 msgctxt "Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4"
-msgid "Filter CleanLinks list"
+msgid "Filter Links list"
 msgstr ""
 
-#: src/Includes/PostType.php:65
+#: src/Includes/PostType.php:61
 msgctxt "Screen reader text for the pagination heading on the post type listing screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
-msgid "CleanLinks list navigation"
+msgid "Links list navigation"
 msgstr ""
 
-#: src/Includes/PostType.php:66
+#: src/Includes/PostType.php:62
 msgctxt "Screen reader text for the items list heading on the post type listing screen. Default “Posts list”/”Pages list”. Added in 4.4"
-msgid "CleanLinks list"
+msgid "Links list"
 msgstr ""
 
-#: src/Includes/PostType.php:220
+#: src/Includes/PostType.php:216
 msgid "Redirection Settings"
 msgstr ""
 
-#: src/Includes/PostType.php:258
+#: src/Includes/PostType.php:254
 msgid "Redirect to:"
 msgstr ""
 
-#: src/Includes/PostType.php:261
+#: src/Includes/PostType.php:257
 msgid "This is the URL that the Redirect Link you create on this page will redirect to when accessed in a web browser."
 msgstr ""
 
-#: src/Includes/PostType.php:266
+#: src/Includes/PostType.php:262
 msgid "Add nofollow attribute to redirect"
 msgstr ""
 
-#: src/Includes/PostType.php:269
+#: src/Includes/PostType.php:265
 msgid "If checked, the nofollow attribute will be added to the redirect to prevent search engines from following the link."
 msgstr ""
 
 #. translators: %d is the counter of clicks.
-#: src/Includes/PostType.php:287
+#: src/Includes/PostType.php:283
 msgid "This URL has been accessed %d times"
 msgstr ""
 

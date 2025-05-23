@@ -43,27 +43,23 @@ class PostType {
 			'name'                  => _x( 'CleanLinks', 'Post type general name', 'cleanlinks' ),
 			'singular_name'         => _x( 'CleanLink', 'Post type singular name', 'cleanlinks' ),
 			'menu_name'             => _x( 'CleanLinks', 'Admin Menu text', 'cleanlinks' ),
-			'name_admin_bar'        => _x( 'CleanLink', 'Add New on Toolbar', 'cleanlinks' ),
+			'name_admin_bar'        => _x( 'Link', 'Add New on Toolbar', 'cleanlinks' ),
 			'add_new'               => __( 'Add New Link', 'cleanlinks' ),
 			'add_new_item'          => __( 'Add New Link', 'cleanlinks' ),
 			'new_item'              => __( 'New CleanLink', 'cleanlinks' ),
 			'edit_item'             => __( 'Edit CleanLink', 'cleanlinks' ),
 			'view_item'             => __( 'View CleanLink', 'cleanlinks' ),
 			'all_items'             => __( 'All Links', 'cleanlinks' ),
-			'search_items'          => __( 'Search CleanLinks', 'cleanlinks' ),
-			'parent_item_colon'     => __( 'Parent CleanLinks:', 'cleanlinks' ),
-			'not_found'             => __( 'No CleanLinks found.', 'cleanlinks' ),
-			'not_found_in_trash'    => __( 'No CleanLinks found in Trash.', 'cleanlinks' ),
-			'featured_image'        => _x( 'CleanLink Cover Image', 'Overrides the “Featured Image” phrase for this post type. Added in 4.3', 'cleanlinks' ),
-			'set_featured_image'    => _x( 'Set cover image', 'Overrides the “Set featured image” phrase for this post type. Added in 4.3', 'cleanlinks' ),
-			'remove_featured_image' => _x( 'Remove cover image', 'Overrides the “Remove featured image” phrase for this post type. Added in 4.3', 'cleanlinks' ),
-			'use_featured_image'    => _x( 'Use as cover image', 'Overrides the “Use as featured image” phrase for this post type. Added in 4.3', 'cleanlinks' ),
+			'search_items'          => __( 'Search links', 'cleanlinks' ),
+			'parent_item_colon'     => __( 'Parent links:', 'cleanlinks' ),
+			'not_found'             => __( 'No link found.', 'cleanlinks' ),
+			'not_found_in_trash'    => __( 'No links found in Trash.', 'cleanlinks' ),
 			'archives'              => _x( 'CleanLink archives', 'The post type archive label used in nav menus. Default “Post Archives”. Added in 4.4', 'cleanlinks' ),
-			'insert_into_item'      => _x( 'Insert into CleanLink', 'Overrides the “Insert into post”/”Insert into page” phrase (used when inserting media into a post). Added in 4.4', 'cleanlinks' ),
-			'uploaded_to_this_item' => _x( 'Uploaded to this CleanLink', 'Overrides the “Uploaded to this post”/”Uploaded to this page” phrase (used when viewing media attached to a post). Added in 4.4', 'cleanlinks' ),
-			'filter_items_list'     => _x( 'Filter CleanLinks list', 'Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4', 'cleanlinks' ),
-			'items_list_navigation' => _x( 'CleanLinks list navigation', 'Screen reader text for the pagination heading on the post type listing screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4', 'cleanlinks' ),
-			'items_list'            => _x( 'CleanLinks list', 'Screen reader text for the items list heading on the post type listing screen. Default “Posts list”/”Pages list”. Added in 4.4', 'cleanlinks' ),
+			'insert_into_item'      => _x( 'Insert into Link', 'Overrides the “Insert into post”/”Insert into page” phrase (used when inserting media into a post). Added in 4.4', 'cleanlinks' ),
+			'uploaded_to_this_item' => _x( 'Uploaded to this Link', 'Overrides the “Uploaded to this post”/”Uploaded to this page” phrase (used when viewing media attached to a post). Added in 4.4', 'cleanlinks' ),
+			'filter_items_list'     => _x( 'Filter Links list', 'Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4', 'cleanlinks' ),
+			'items_list_navigation' => _x( 'Links list navigation', 'Screen reader text for the pagination heading on the post type listing screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4', 'cleanlinks' ),
+			'items_list'            => _x( 'Links list', 'Screen reader text for the items list heading on the post type listing screen. Default “Posts list”/”Pages list”. Added in 4.4', 'cleanlinks' ),
 		);
 	}
 
@@ -122,10 +118,10 @@ class PostType {
 	 *
 	 * @since 1.0.0
 	 * @access private
-	 * 
+	 *
 	 * @param string $nonce_value The nonce value from the form.
 	 * @param string $nonce_action The nonce action to verify against.
-	 * 
+	 *
 	 * @return bool True if nonce is valid, false otherwise.
 	 */
 	private function verify_nonce( $nonce_value, $nonce_action ) {
@@ -179,27 +175,27 @@ class PostType {
 
 	/**
 	 * Save the redirect URL for a clean link
-	 * 
+	 *
 	 * @since 1.0.0
 	 * @access private
-	 * 
+	 *
 	 * @param int $post_id Post ID
 	 * @return void
 	 */
 	private function save_redirect_url( $post_id ) {
 		// Sanitize post data.
 		$post_data = Helpers::clean( $_POST );
-		
+
 		// Process the redirect URL
 		if ( ! empty( $post_data['cleanlink_redirect_url'] ) ) {
 			// Validate and sanitize URL
 			$valid_url = Helpers::validate_url( $post_data['cleanlink_redirect_url'] );
-			
+
 			if ( $valid_url ) {
 
 				// Store the sanitized URL in post meta
 				update_post_meta( $post_id, 'cleanlink_redirect_url', $valid_url );
-				
+
 				// Save nofollow setting
 				$nofollow = isset( $post_data['cleanlink_redirect_nofollow'] ) ? '1' : '0';
 				update_post_meta( $post_id, 'cleanlink_redirect_nofollow', $nofollow );
@@ -219,7 +215,7 @@ class PostType {
 	public function action_add_url_metabox() {
 		add_meta_box( 'cleanlink_redirection_settings', esc_html__( 'Redirection Settings', 'cleanlinks' ), array( $this, 'link_metabox' ), 'clean_links', 'normal', 'core' );
 	}
-	
+
 	/**
 	 * Echoes HTML for link meta box
 	 *
@@ -237,7 +233,7 @@ class PostType {
 		$nofollow = get_post_meta( $post->ID, 'cleanlink_redirect_nofollow', true );
 		// Display the redirect URL field
 		$this->render_redirect_url_field( $url, $nofollow );
-		
+
 		// Display access count
 		$this->render_access_count( $post->ID );
 	}
@@ -247,7 +243,7 @@ class PostType {
 	 *
 	 * @since 1.0.0
 	 * @access private
-	 * 
+	 *
 	 * @param string $url The current redirect URL
 	 * @param string $nofollow The current nofollow value
 	 * @return void
@@ -259,7 +255,7 @@ class PostType {
 			<input class="widefat" type="url" name="cleanlink_redirect_url" id="cleanlink_redirect_url" value="<?php echo esc_attr( $url ); ?>" />
 		</p>
 		<p><span class="description"><?php esc_html_e( 'This is the URL that the Redirect Link you create on this page will redirect to when accessed in a web browser.', 'cleanlinks' ); ?> </span></p>
-		
+
 		<p>
 			<label for="cleanlink_redirect_nofollow">
 				<input type="checkbox" name="cleanlink_redirect_nofollow" id="cleanlink_redirect_nofollow" value="1" <?php checked( $nofollow, '1' ); ?> />
@@ -267,7 +263,7 @@ class PostType {
 			</label>
 		</p>
 		<p><span class="description"><?php esc_html_e( 'If checked, the nofollow attribute will be added to the redirect to prevent search engines from following the link.', 'cleanlinks' ); ?> </span></p>
-		
+
 		<?php
 	}
 
@@ -276,13 +272,13 @@ class PostType {
 	 *
 	 * @since 1.0.0
 	 * @access private
-	 * 
+	 *
 	 * @param int $post_id The post ID
 	 * @return void
 	 */
 	private function render_access_count( $post_id ) {
 		$count = Helpers::get_total_access_count( $post_id );
-		
+
 		/* translators: %d is the counter of clicks. */
 		echo '<p>' . sprintf( esc_html__( 'This URL has been accessed %d times', 'cleanlinks' ), esc_attr( $count ) ) . '</p>';
 	}
