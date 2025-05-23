@@ -3,11 +3,11 @@
  * Plugin Name: CleanLinks - Powerful Link Branding Plugin for WordPress
  * Plugin URI: https://github.com/mehul0810/cleanlinks
  * Description: The most Powerful Link Branding Plugin for WordPress.
- * Author: mehulgohil
+ * Author: Mehul Gohil
  * Author URI: https://mehulgohil.com/
  * Version: 1.0.0
  * Requires at least: 5.5
- * Requires PHP: 8.0
+ * Requires PHP: 7.4
  * Text Domain: cleanlinks
  * Domain Path: /languages
  * License: GPLv3

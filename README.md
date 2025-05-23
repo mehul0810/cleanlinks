@@ -1,84 +1,90 @@
-# CleanLinks
+=== CleanLinks – Link Cloaking Plugin for WordPress ===
+Contributors: mehul0810, ankur0812
+Tags: link cloaking, link shortener, branded links, affiliate links, url shortener
+Donate link: https://www.buymeacoffee.com/mehulgohil
+Requires at least: 5.5
+Tested up to: 6.8
+Requires PHP: 7.4
+Stable tag: 1.0.0
+License: GPLv3
+License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-**CleanLinks** is a lightweight WordPress link manager plugin designed to help you organize, cloak, and track your affiliate or outbound links with ease. Built with performance and simplicity in mind, CleanLinks is the perfect tool for bloggers, marketers, and site owners who want a no-fuss way to manage their external links from the WordPress dashboard.
+CleanLinks is the fastest, easiest way to cloak affiliate links and manage your affiliate links from a single place.
 
----
+== Description ==
 
-## 🚀 Features
+**CleanLinks** is the powerful WordPress plugin for affiliate link cloaking, and link management – designed for bloggers, marketers, and anyone who wants full control of their outbound links.
 
-* **Create & Manage Clean Links**
-  Add, edit, and organize affiliate or external links using a simple, user-friendly admin interface.
+Tired of long, messy affiliate URLs? CleanLinks lets you instantly cloak, brand, and organize your links under your own domain (e.g. `yourdomain.com/recommends/offer`). With one-click CSV export, built-in analytics (future pro version), and more, CleanLinks gives you professional link management without the bloat.
 
-* **Custom Slugs**
-  Assign unique, memorable slugs to your links (e.g. `yourdomain.com/go/your-link`).
+Whether you’re tracking affiliate conversions, simplifying URLs for social sharing, or organizing outbound links for SEO, CleanLinks is your all-in-one link shortener and redirect solution.
 
-* **Click Tracking**
-  Monitor how many times each link has been clicked right from your dashboard.
+= Features at a Glance =
 
-* **Categories**
-  Group your links by category for better organization and reporting.
+- **Branded Link Shortener:** Create memorable, clean short links under your own domain.
+- **Affiliate Link Cloaking:** Cloak affiliate and referral links for higher trust and better CTR.
+- **CSV Export:** Export all your links with click stats for easy backup or reporting.
+- **Organize with Groups:** Group and search your links for effortless management.
+- **Nofollow Options:** Easily add `nofollow`.
+- **SEO & Performance Optimized:** Fast, lightweight, and compatible with top SEO/caching plugins.
+- **Developer Friendly:** 100% GPL, extendable via WordPress hooks and filters.
 
-* **Admin Table View**
-  Easily view, search, sort, and manage all your links from a single table.
+= Who is CleanLinks for? =
 
-* **Enable/Disable Links**
-  Temporarily turn off specific links without deleting them.
+- Affiliate marketers wanting better link tracking and cloaking
+- Bloggers and content creators sharing branded, memorable URLs
+- Agencies managing multiple client links or campaigns
+- Anyone who wants full control over outbound links in WordPress
 
-* **Nofollow & New Tab Options**
-  Optionally mark links as “nofollow” and open them in a new tab.
+== Installation ==
 
----
+= Automatic Installation =
 
-## 🛠️ Installation
+1. In your WordPress dashboard, go to **Plugins → Add New**.
+2. Search for "CleanLinks".
+3. Click "Install Now" and then activate.
 
-1. Download the plugin ZIP and upload it via **Plugins → Add New → Upload Plugin** in your WordPress dashboard.
-2. Activate the plugin.
-3. Go to **CleanLinks** in your admin sidebar to start adding and managing your links.
+= Manual Installation =
 
----
+1. Download the CleanLinks plugin ZIP.
+2. Upload it to your `/wp-content/plugins/` directory via FTP.
+3. Activate the plugin via **Plugins** in the WordPress dashboard.
+4. Start managing your links from the new **CleanLinks** menu.
 
-## 📋 Usage
+== Frequently Asked Questions ==
 
-1. **Add a New Link:**
+= Can I export my links? =
+Yes! CleanLinks lets you export all your links and click data as a CSV file with a single click.
 
-   * Navigate to **CleanLinks → Add New**.
-   * Enter your destination URL, custom slug, and optional settings.
-   * Assign a category if desired.
-   * Click **Publish**.
+= Does CleanLinks support affiliate links? =
+Absolutely. CleanLinks is built for affiliate marketers, letting you cloak and track affiliate URLs with ease.
 
-2. **Manage Links:**
+= Is click tracking available? =
+Yes. Each link includes click analytics directly in your dashboard.
 
-   * View all links in **CleanLinks → All Links**.
-   * Use bulk actions to enable/disable or delete multiple links at once.
-   * View click stats for each link at a glance.
+= Is CleanLinks compatible with SEO and caching plugins? =
+Yes, it works seamlessly with leading SEO and caching plugins for best performance.
 
----
+= Can I use my own domain for short links? =
+Yes, all links use your own site’s domain for maximum trust and branding.
 
-## 🧩 Roadmap
+== Screenshots ==
 
-* **Advanced Analytics** (Pro): Unique clicks, referrer tracking, export stats
-* **Redirection Methods** (301/302 support)
-* **Gutenberg Block & Shortcode**
-* **A/B Testing, Geo-Redirects, and More**
+1. CleanLinks admin panel – Manage all branded links from one place.
+2. Add/Edit link – Custom slug, destination URL, redirect type, and more.
+3. Export to CSV – Download all links and stats instantly.
 
-*Have suggestions? Open an issue or contribute!*
+== Changelog ==
 
----
+= 1.0.0 =
+* Initial release – Create branded short links, cloak affiliate URLs, enable click tracking, and export links to CSV.
 
-## 💡 Why Use CleanLinks?
+== Upgrade Notice ==
 
-* **Blazing fast and minimal:** No bloat, no ads, no branding.
-* **Perfect for affiliates:** Track performance of your outbound links.
-* **100% free and open source:** MIT licensed and developer-friendly.
+= 1.0.0 =
+First stable version of CleanLinks. Includes branded short links, affiliate link cloaking, CSV export, and basic analytics.
 
----
+== Roadmap ==
 
-## 📝 Contributing
-
-Pull requests are welcome! For major changes, please open an issue first to discuss what you’d like to change.
-
----
-
-## 📄 License
-
-This project is licensed under the GPL.
+* **Advanced Analytics:** Unique clicks, referrers, device data (Pro)
+* **Geo-redirects & A/B Testing** (Pro)

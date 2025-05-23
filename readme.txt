@@ -1,10 +1,10 @@
 === CleanLinks – Powerful Link Branding Plugin for WordPress ===
 Contributors: mehul0810, ankur0812
-Tags: link shortener, link branding, affiliate links, link cloaking, redirect manager
+Tags: link cloaking, link branding, affiliate links, link shortener, redirect manager
 Donate link: https://www.buymeacoffee.com/mehulgohil
 Requires at least: 5.5
 Tested up to: 6.8
-Requires PHP: 8.0
+Requires PHP: 7.4
 Stable tag: 1.0.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -48,16 +48,16 @@ Designed to be lightweight yet powerful, CleanLinks lets you create 301 and 302 
 
 == Frequently Asked Questions ==
 
-= Can I export all my links? =  
+= Can I export all my links? =
 Yes! CleanLinks includes a simple Export tool that lets you download all your links in CSV format with a single click.
 
-= Does CleanLinks support affiliate links? =  
+= Does CleanLinks support affiliate links? =
 Absolutely. You can cloak affiliate links using 301 or 302 redirects and group them with tags for easy management.
 
-= Can I track clicks on my links? =  
+= Can I track clicks on my links? =
 Yes. Click tracking is available per link.
 
-= Is it compatible with caching and SEO plugins? =  
+= Is it compatible with caching and SEO plugins? =
 Yes, CleanLinks is fully compatible with popular caching and SEO plugins.
 
 == Screenshots ==
