@@ -69,11 +69,15 @@ class Filters {
 	 */
 	public function add_plugin_action_links( $links, $file ) {
 		if ( $file === CLEANLINKS_PLUGIN_BASENAME ) {
-			$links[] = sprintf(
-				'<a href="%s">%s</a>',
-				esc_url( admin_url( 'edit.php?post_type=cleanlinks' ) ),
-				esc_html__( 'Manage Links', 'cleanlinks' )
-			);
+			$manage_link = [
+				'manage_links' => sprintf(
+					'<a href="%s">%s</a>',
+					esc_url( admin_url( 'edit.php?post_type=cleanlinks' ) ),
+					esc_html__( 'Manage Links', 'cleanlinks' )
+				),
+			];
+			// Prepend the manage link before other links (like Deactivate)
+			$links = array_merge( $manage_link, $links );
 		}
 
 		return $links;

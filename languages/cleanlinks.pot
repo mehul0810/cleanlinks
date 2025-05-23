@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Mehul Gohil <hello@mehulgohil.com>\n"
-"POT-Creation-Date: 2025-05-23 08:49+0000\n"
+"POT-Creation-Date: 2025-05-23 09:23+0000\n"
 "Report-Msgid-Bugs-To: https://github.com/mehul0810/cleanlinks/issues/new\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -20,15 +20,15 @@ msgstr ""
 msgid "Export"
 msgstr ""
 
-#: src/Admin/Actions.php:147
+#: src/Admin/Actions.php:149
 msgid "Copy URL"
 msgstr ""
 
-#: src/Admin/Actions.php:155
+#: src/Admin/Actions.php:157
 msgid "Copied!"
 msgstr ""
 
-#: src/Admin/Actions.php:208
+#: src/Admin/Actions.php:210
 msgid "Viewed:"
 msgstr ""
 
@@ -57,27 +57,27 @@ msgstr ""
 msgid "Thanks :)"
 msgstr ""
 
-#: src/Admin/Filters.php:75
+#: src/Admin/Filters.php:76
 msgid "Manage Links"
 msgstr ""
 
-#: src/Admin/Filters.php:92
+#: src/Admin/Filters.php:96
 msgid "Title"
 msgstr ""
 
-#: src/Admin/Filters.php:93
+#: src/Admin/Filters.php:97
 msgid "Permalink"
 msgstr ""
 
-#: src/Admin/Filters.php:94
+#: src/Admin/Filters.php:98
 msgid "Redirect To"
 msgstr ""
 
-#: src/Admin/Filters.php:95
+#: src/Admin/Filters.php:99
 msgid "Total Clicks"
 msgstr ""
 
-#: src/Admin/Filters.php:96
+#: src/Admin/Filters.php:100
 msgid "Date"
 msgstr ""
 
@@ -167,85 +167,88 @@ msgctxt "Screen reader text for the items list heading on the post type listing 
 msgid "Links list"
 msgstr ""
 
-#: src/Includes/PostType.php:216
-msgid "Redirection Settings"
+#: src/Includes/PostType.php:214
+msgid "Redirect Link Settings"
 msgstr ""
 
-#: src/Includes/PostType.php:254
-msgid "Redirect to:"
+#: src/Includes/PostType.php:252
+msgid "Destination URL:"
 msgstr ""
 
-#: src/Includes/PostType.php:257
-msgid "This is the URL that the Redirect Link you create on this page will redirect to when accessed in a web browser."
+#: src/Includes/PostType.php:253
+msgid "Enter the full destination URL (e.g., https://example.com)"
 msgstr ""
 
-#: src/Includes/PostType.php:262
-msgid "Add nofollow attribute to redirect"
+#: src/Includes/PostType.php:256
+msgid "Visitors will be redirected to this URL when they access your link."
+msgstr ""
+
+#: src/Includes/PostType.php:263
+msgid "Add nofollow to this redirect"
 msgstr ""
 
 #: src/Includes/PostType.php:265
-msgid "If checked, the nofollow attribute will be added to the redirect to prevent search engines from following the link."
+msgid "Check this option to prevent search engines from following this redirect."
 msgstr ""
 
-#. translators: %d is the counter of clicks.
-#: src/Includes/PostType.php:283
-msgid "This URL has been accessed %d times"
+#: src/Includes/PostType.php:284
+msgid "This link has been visited %d times"
 msgstr ""
 
-#: src/Includes/TaxoNomy.php:40
+#: src/Includes/Taxonomy.php:40
 msgctxt "taxonomy general name"
 msgid "Groups"
 msgstr ""
 
-#: src/Includes/TaxoNomy.php:41
+#: src/Includes/Taxonomy.php:41
 msgctxt "taxonomy singular name"
 msgid "Group"
 msgstr ""
 
-#: src/Includes/TaxoNomy.php:42
+#: src/Includes/Taxonomy.php:42
 msgid "Search Groups"
 msgstr ""
 
-#: src/Includes/TaxoNomy.php:43
+#: src/Includes/Taxonomy.php:43
 msgid "Popular Groups"
 msgstr ""
 
-#: src/Includes/TaxoNomy.php:44
+#: src/Includes/Taxonomy.php:44
 msgid "All Groups"
 msgstr ""
 
-#: src/Includes/TaxoNomy.php:45
+#: src/Includes/Taxonomy.php:45
 msgid "Edit Group"
 msgstr ""
 
-#: src/Includes/TaxoNomy.php:46
+#: src/Includes/Taxonomy.php:46
 msgid "Update Group"
 msgstr ""
 
-#: src/Includes/TaxoNomy.php:47
+#: src/Includes/Taxonomy.php:47
 msgid "Add New Group"
 msgstr ""
 
-#: src/Includes/TaxoNomy.php:48
+#: src/Includes/Taxonomy.php:48
 msgid "New Group Name"
 msgstr ""
 
-#: src/Includes/TaxoNomy.php:49
+#: src/Includes/Taxonomy.php:49
 msgid "Separate groups with commas"
 msgstr ""
 
-#: src/Includes/TaxoNomy.php:50
+#: src/Includes/Taxonomy.php:50
 msgid "Add or remove groups"
 msgstr ""
 
-#: src/Includes/TaxoNomy.php:51
+#: src/Includes/Taxonomy.php:51
 msgid "Choose from the most used groups"
 msgstr ""
 
-#: src/Includes/TaxoNomy.php:52
+#: src/Includes/Taxonomy.php:52
 msgid "No groups found"
 msgstr ""
 
-#: src/Includes/TaxoNomy.php:53
+#: src/Includes/Taxonomy.php:53
 msgid "Groups"
 msgstr ""
