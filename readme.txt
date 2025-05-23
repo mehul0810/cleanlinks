@@ -1,4 +1,4 @@
-=== CleanLinks – Powerful Link Branding Plugin for WordPress ===
+=== CleanLinks ===
 Contributors: mehul0810, ankur0812
 Tags: link cloaking, link branding, affiliate links, link shortener, redirect manager
 Donate link: https://www.buymeacoffee.com/mehulgohil

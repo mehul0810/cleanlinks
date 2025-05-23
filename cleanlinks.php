@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: CleanLinks - Link Cloaking Plugin for WordPress
+ * Plugin Name: CleanLinks
  * Plugin URI: https://github.com/mehul0810/cleanlinks
  * Description: The most robust, flexible, and intuitive way to build your brand using link building strategy.
  * Author: Mehul Gohil
