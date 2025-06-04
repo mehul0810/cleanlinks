@@ -1,6 +1,8 @@
 {
 	"name": "mehulgohil/cleanlinks",
-	"description": "The most robust, flexible, and intuitive way to build your brand using link building strategy.",
+	"type": "wordpress-plugin",
+	"description": "Create branded short links and manage redirects to support your link-building strategy—all from your WordPress dashboard.",
+	"license": "GPL-3.0-or-later",
 	"authors": [
 		{
 			"name": "mehulgohil",

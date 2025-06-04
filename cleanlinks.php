@@ -2,7 +2,7 @@
 /**
  * Plugin Name: CleanLinks
  * Plugin URI: https://github.com/mehul0810/cleanlinks
- * Description: The most robust, flexible, and intuitive way to build your brand using link building strategy.
+ * Description: Create branded short links and manage redirects to support your link-building strategy—all from your WordPress dashboard.
  * Author: Mehul Gohil
  * Author URI: https://mehulgohil.com/
  * Version: 1.0.0

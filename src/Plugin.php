@@ -38,9 +38,6 @@ final class Plugin {
 
 		// Register services used throughout the plugin.
 		add_action( 'plugins_loaded', array( $this, 'register_services' ) );
-
-		// Load text domain.
-		add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
 	}
 
 	/**
@@ -62,22 +59,6 @@ final class Plugin {
 			new Admin\Actions();
 			new Admin\Export();
 		}
-	}
-
-	/**
-	 * Loads the plugin's translated strings.
-	 *
-	 * @since  1.0.0
-	 * @access public
-	 *
-	 * @return void
-	 */
-	public function load_plugin_textdomain() {
-		load_plugin_textdomain(
-			'cleanlinks',
-			false,
-			dirname( plugin_basename( CLEANLINKS_PLUGIN_FILE ) ) . '/languages/'
-		);
 	}
 
 	/**
