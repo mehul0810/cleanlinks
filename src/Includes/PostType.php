@@ -159,11 +159,11 @@ class PostType {
 			return;
 		}
 
-		// Prepare nonce variable.
-		$nonce = isset($_POST['cleanlink_redirect_nonce']) ? sanitize_text_field($_POST['cleanlink_redirect_nonce']) : '';
-
-		// Bailout, if the nonce is not verified.
-		if ( ! $this->verify_nonce( $nonce, 'cleanlink-save-redirect-meta' ) ) {
+		// Check and verify nonce properly
+		if (
+		! isset( $_POST['cleanlink_redirect_nonce'] ) ||
+		! $this->verify_nonce( wp_unslash( $_POST['cleanlink_redirect_nonce'] ), 'cleanlink-save-redirect-meta' )
+		) {
 			return;
 		}
 
@@ -181,6 +181,8 @@ class PostType {
 	 * @return void
 	 */
 	private function save_redirect_url( $post_id ) {
+		// Nonce is already verified before this method is called.
+		
 		// Sanitize post data.
 		$post_data = Helpers::clean( $_POST );
 
@@ -281,7 +283,13 @@ class PostType {
 		?>
 		<div class="cleanlinks--access-count">
 			<span class="dashicons dashicons-chart-bar"></span>
-			<?php echo sprintf( esc_html__( 'This link has been visited %d times', 'cleanlinks' ), esc_attr( $count ) ); ?>
+			<?php
+			// Translators: %d is the number of times the link has been visited.
+			printf(
+				esc_html__( 'This link has been visited %d times', 'cleanlinks' ),
+				esc_html( $count )
+			);
+			?>
 		</div>
 		<?php
 	}
