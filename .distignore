@@ -8,7 +8,6 @@
 
 /tests
 /node_modules
-/assets
 /vendor/bin
 /vendor/composer/installers
 /wp-org-assets
@@ -37,7 +36,6 @@
 .nvmrc
 .npmrc
 .phpcs.xml.dist
-composer.json
 composer.lock
 package.json
 package-lock.json

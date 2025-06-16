@@ -160,7 +160,7 @@ class PostType {
 		}
 
 		// Prepare nonce variable.
-		$nonce = filter_input( INPUT_POST, 'cleanlink_redirect_nonce', FILTER_UNSAFE_RAW );
+		$nonce = isset($_POST['cleanlink_redirect_nonce']) ? sanitize_text_field($_POST['cleanlink_redirect_nonce']) : '';
 
 		// Bailout, if the nonce is not verified.
 		if ( ! $this->verify_nonce( $nonce, 'cleanlink-save-redirect-meta' ) ) {
