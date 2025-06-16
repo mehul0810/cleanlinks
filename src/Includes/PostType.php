@@ -182,7 +182,7 @@ class PostType {
 	 */
 	private function save_redirect_url( $post_id ) {
 		// Nonce is already verified before this method is called.
-		
+
 		// Sanitize post data.
 		$post_data = Helpers::clean( $_POST );
 
@@ -284,7 +284,7 @@ class PostType {
 		<div class="cleanlinks--access-count">
 			<span class="dashicons dashicons-chart-bar"></span>
 			<?php
-			// Translators: %d is the number of times the link has been visited.
+			/* Translators: %d is the number of times the link has been visited. */
 			printf(
 				esc_html__( 'This link has been visited %d times', 'cleanlinks' ),
 				esc_html( $count )
