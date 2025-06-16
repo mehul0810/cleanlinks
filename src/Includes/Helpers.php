@@ -73,7 +73,7 @@ class Helpers {
 	 */
 	public static function validate_url( $url ) {
 		// Remove all illegal characters from a url
-		$url = esc_url_raw( trim( $url ));
+		$url = trim( $url );
 
 		// Validate url
 		if ( filter_var( $url, FILTER_VALIDATE_URL ) ) {
