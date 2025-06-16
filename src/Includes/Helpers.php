@@ -75,9 +75,12 @@ class Helpers {
 		// Remove all illegal characters from a url
 		$url = trim( $url );
 
-		// Validate url
-		if ( filter_var( $url, FILTER_VALIDATE_URL ) ) {
-			return esc_url( $url );
+		// Validate using WordPress core function
+		$validated_url = wp_http_validate_url( $url );
+
+		if ( $validated_url ) {
+			// Escape for safe output
+			return esc_url( $validated_url );
 		}
 
 		return false;
