@@ -79,6 +79,7 @@ final class Plugin {
 		// Flush rewrite rules to ensure the new post type is recognized.
 		// This is necessary to avoid 404 errors on the first load.
 		// This should be done only on activation, not on every page load.
+		// phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.flush_rewrite_rules_flush_rewrite_rules -- Safe to use on plugin activation only
 		flush_rewrite_rules();
 	}
 
