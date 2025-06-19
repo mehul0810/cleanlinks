@@ -9,6 +9,7 @@ jobs:
         permissions:
             pull-requests: write
         steps:
+            - uses: actions/checkout@v4
             - uses: mshick/add-pr-comment@v2
               with:
                   message: |

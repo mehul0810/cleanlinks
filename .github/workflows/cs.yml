@@ -66,3 +66,11 @@ jobs:
             - name: Show PHPCS results in PR
               if: ${{ always() && steps.phpcs.outcome == 'failure' }}
               run: cs2pr ./phpcs-report.xml
+
+            - name: Upload PHPCS report artifact
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                name: phpcs-report
+                path: ./phpcs-report.xml
+                retention-days: 7
