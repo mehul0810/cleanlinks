@@ -9,7 +9,7 @@
 
 namespace MG\CleanLinks\Admin;
 
-use MG\CleanLinks\includes\Helpers;
+use MG\CleanLinks\Includes\Helpers;
 
 /**
  *  Bailout, if accessed directly.
