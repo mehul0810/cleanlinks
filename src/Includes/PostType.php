@@ -161,8 +161,9 @@ class PostType {
 
 		// Check and verify nonce properly
 		if (
-		! isset( $_POST['cleanlink_redirect_nonce'] ) ||
-		! $this->verify_nonce( wp_unslash( $_POST['cleanlink_redirect_nonce'] ), 'cleanlink-save-redirect-meta' )
+			! isset( $_POST['cleanlink_redirect_nonce'] ) // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified below
+		 ||
+			! $this->verify_nonce( sanitize_text_field( wp_unslash( $_POST['cleanlink_redirect_nonce'] ) ), 'cleanlink-save-redirect-meta' ) // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified here
 		) {
 			return;
 		}
@@ -182,8 +183,7 @@ class PostType {
 	 */
 	private function save_redirect_url( $post_id ) {
 		// Nonce is already verified before this method is called.
-
-		// Sanitize post data.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified in save_link_meta
 		$post_data = Helpers::clean( $_POST );
 
 		// Process the redirect URL
