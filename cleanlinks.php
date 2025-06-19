@@ -7,7 +7,7 @@
  * Author URI: https://mehulgohil.com/
  * Version: 1.0.0
  * Requires at least: 5.5
- * Requires PHP: 7.4
+ * Requires PHP: 8.1
  * Text Domain: cleanlinks
  * Domain Path: /languages
  * License: GPLv3
