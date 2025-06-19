@@ -284,10 +284,12 @@ class PostType {
 		<div class="cleanlinks--access-count">
 			<span class="dashicons dashicons-chart-bar"></span>
 			<?php
-			/* Translators: %d is the number of times the link has been visited. */
+			/* Translators: %1$s is the text before the count, %2$d is the count, %3$s is the text after the count. */
 			printf(
-				esc_html__( 'This link has been visited %d times', 'cleanlinks' ),
-				esc_html( $count )
+				'%1$s %2$d %3$s',
+				esc_html__( 'This link has been visited', 'cleanlinks' ),
+				absint( $count ),
+				esc_html__( 'times', 'cleanlinks' )
 			);
 			?>
 		</div>
