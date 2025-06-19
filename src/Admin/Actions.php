@@ -122,12 +122,17 @@ class Actions {
 	}
 
 	/**
-	 * Register this filter globally
-	 * Add the type="module" attribute to the script
+	 * Filter the script tag for specific handles to add type="module".
+	 *
+	 * @param string $tag    The original script tag.
+	 * @param string $handle The script's registered handle.
+	 * @param string $src    The script's source URL.
+	 * @return string        Modified script tag if handle matches, original otherwise.
 	 */
-	 public function add_module_type_to_script( $tag, $handle, $src ) {
-		if ( 'cleanlink-admin' === $handle ) {
-			return '<script type="module" src="' . esc_url( $src ) . '"></script>';
+	public function add_module_type_to_script( $tag, $handle, $src ) {
+		if ( 'cleanlink-admin' === (string) $handle ) {
+			// Add type="module" to the existing tag instead of replacing it
+			return str_replace( '<script ', '<script type="module" ', $tag );
 		}
 		return $tag;
 	}
