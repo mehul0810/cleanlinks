@@ -44,9 +44,9 @@ class Export {
 			wp_die( esc_html__( 'Security check failed.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 403 ) );
 		}
 
-		// Check user capabilities
+		// Check permissions
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You do not have sufficient permissions to perform this action.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You do not have permission.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 403 ) );
 		}
 
 		// Load WP_Filesystem
@@ -56,8 +56,13 @@ class Export {
 		WP_Filesystem();
 		global $wp_filesystem;
 
-		// Prepare CSV content
-		$header_args = array( 'ID', 'Title', 'Redirect From', 'Redirect To' );
+		if ( ! $wp_filesystem || ! is_object( $wp_filesystem ) ) {
+			wp_die( esc_html__( 'Filesystem API not available.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 500 ) );
+		}
+
+		// Build CSV content manually
+		$csv_lines = array();
+		$csv_lines[] = '"ID","Title","Redirect From","Redirect To"';
 
 		$args = array(
 			'post_type'              => 'cleanlinks',
@@ -70,45 +75,52 @@ class Export {
 		);
 
 		$query = new \WP_Query( $args );
-		$results = $query->posts;
 
-		// Create CSV in a temp file
-		$tmp_file = wp_tempnam( 'export_cleanlink.csv' );
-		if ( ! $tmp_file ) {
-			wp_die( esc_html__( 'Could not create a temporary file.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 500 ) );
-		}
+		foreach ( $query->posts as $post_id ) {
+			$post      = get_post( $post_id );
+			$permalink = get_permalink( $post_id );
 
-		$csv_content = fopen( $tmp_file, 'w' );
-		fputcsv( $csv_content, $header_args );
-
-		foreach ( $results as $post_id ) {
-			$post           = get_post( $post_id );
-			$permalink 		= get_permalink( $post_id );
-			$parts 			= explode( '/', rtrim( $permalink, '/' ) );
-			$slug 			= $parts[count($parts)-2];
-
-			$modified_values = array(
+			$row = array(
 				$post_id,
 				$post->post_title,
 				$permalink,
 				get_post_meta( $post_id, 'cleanlink_redirect_url', true ),
 			);
-			fputcsv( $csv_content, $modified_values );
-		}
-		fclose( $csv_content );
 
-		// Read file contents using WP_Filesystem
-		$csv_data = $wp_filesystem->get_contents( $tmp_file );
-		if ( false === $csv_data ) {
-			wp_die( esc_html__( 'Could not read the CSV file.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 500 ) );
+			$escaped = array_map(
+				function ( $value ) {
+					return '"' . str_replace( '"', '""', $value ) . '"';
+				},
+				$row
+			);
+
+			$csv_lines[] = implode( ',', $escaped );
 		}
 
-		// Output headers and file content
+		$csv_data = implode( "\r\n", $csv_lines );
+
+		// Write to temp file
+		$tmp_file = wp_tempnam( 'export_cleanlink.csv' );
+		if ( ! $tmp_file ) {
+			wp_die( esc_html__( 'Could not create a temp file.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 500 ) );
+		}
+
+		if ( ! $wp_filesystem->put_contents( $tmp_file, $csv_data, FS_CHMOD_FILE ) ) {
+			wp_die( esc_html__( 'Could not write CSV file.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 500 ) );
+		}
+
+		// Read and download
+		$file_contents = $wp_filesystem->get_contents( $tmp_file );
+		if ( false === $file_contents ) {
+			wp_die( esc_html__( 'Could not read CSV file.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 500 ) );
+		}
+
 		header( 'Content-Type: text/csv; charset=utf-8' );
 		header( 'Content-Disposition: attachment; filename=export_cleanlink.csv' );
-		echo $csv_data;
 
-		// Clean up temp file
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Outputting raw CSV data for file download
+		echo $file_contents;
+
 		$wp_filesystem->delete( $tmp_file );
 
 		exit;
