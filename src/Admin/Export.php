@@ -49,15 +49,15 @@ class Export {
 			wp_die( esc_html__( 'You do not have sufficient permissions to perform this action.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 403 ) );
 		}
 
-		// Start the output buffer.
-		ob_start();
+		// Load WP_Filesystem
+		if ( ! function_exists( 'request_filesystem_credentials' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+		}
+		WP_Filesystem();
+		global $wp_filesystem;
 
-		// Set PHP headers for CSV output.
-		header( 'Content-Type: text/csv; charset=utf-8' );
-		header( 'Content-Disposition: attachment; filename=export_cleanlink.csv' );
-
-		// Create the headers.
-		$header_args = array( 'Id', 'Title', 'Slug', 'Redirect To' );
+		// Prepare CSV content
+		$header_args = array( 'ID', 'Title', 'Redirect From', 'Redirect To' );
 
 		$args = array(
 			'post_type'              => 'cleanlinks',
@@ -70,36 +70,47 @@ class Export {
 		);
 
 		$query = new \WP_Query( $args );
-
 		$results = $query->posts;
 
-		// Clean up output buffer before writing anything to CSV file.
-		ob_end_clean();
+		// Create CSV in a temp file
+		$tmp_file = wp_tempnam( 'export_cleanlink.csv' );
+		if ( ! $tmp_file ) {
+			wp_die( esc_html__( 'Could not create a temporary file.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 500 ) );
+		}
 
-		// Create a file pointer with PHP.
-		$output = fopen( 'php://output', 'w' );
+		$csv_content = fopen( $tmp_file, 'w' );
+		fputcsv( $csv_content, $header_args );
 
-		// Write headers to CSV file.
-		fputcsv( $output, $header_args );
-
-		// Loop through the prepared data to output it to CSV file.
 		foreach ( $results as $post_id ) {
 			$post           = get_post( $post_id );
 			$permalink 		= get_permalink( $post_id );
 			$parts 			= explode( '/', rtrim( $permalink, '/' ) );
-       		$slug 			= $parts[count($parts)-2]; // Get the slug part
+			$slug 			= $parts[count($parts)-2];
 
 			$modified_values = array(
 				$post_id,
 				$post->post_title,
-				$slug,
+				$permalink,
 				get_post_meta( $post_id, 'cleanlink_redirect_url', true ),
 			);
-			fputcsv( $output, $modified_values );
+			fputcsv( $csv_content, $modified_values );
+		}
+		fclose( $csv_content );
+
+		// Read file contents using WP_Filesystem
+		$csv_data = $wp_filesystem->get_contents( $tmp_file );
+		if ( false === $csv_data ) {
+			wp_die( esc_html__( 'Could not read the CSV file.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 500 ) );
 		}
 
-		// Close the file pointer with PHP with the updated output.
-		fclose( $output );
+		// Output headers and file content
+		header( 'Content-Type: text/csv; charset=utf-8' );
+		header( 'Content-Disposition: attachment; filename=export_cleanlink.csv' );
+		echo $csv_data;
+
+		// Clean up temp file
+		$wp_filesystem->delete( $tmp_file );
+
 		exit;
 	}
 
