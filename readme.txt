@@ -5,7 +5,7 @@ Donate link: https://www.buymeacoffee.com/mehulgohil
 Requires at least: 5.5
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -68,6 +68,12 @@ Yes, CleanLinks is fully compatible with popular caching and SEO plugins.
 4. Analytics and click tracking interface.
 
 == Changelog ==
+
+= 1.0.3 =
+* Update blueprint.json
+
+= 1.0.2 =
+* Update blueprint.json
 
 = 1.0.1 =
 * Update blueprint.json

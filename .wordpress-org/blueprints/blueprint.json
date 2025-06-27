@@ -1,23 +1,20 @@
 {
-	"landingPage": "/wp-admin/edit.php?post_type=cleanlinks",
-	"plugins": [
-		"cleanlinks"
-  	],
-	"steps": [
-		{
-			"step": "installPlugin",
-			"pluginData": {
-				"resource": "wordpress.org/plugins",
-				"slug": "cleanlinks"
-			},
-			"options": {
-				"activate": true
-			}
-		}
-  	],
-  	"preferredVersions": {
-    	"php": "8.1",
-    	"wp": "latest"
-  	},
-	"login": true
+  "landingPage": "/wp-admin/edit.php?post_type=cleanlinks",
+  "plugins": [
+    "cleanlinks"
+  ],
+  "steps": [
+    {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "wordpress.org/plugins",
+        "slug": "cleanlinks"
+      }
+    }
+  ],
+  "preferredVersions": {
+    "php": "8.1",
+    "wp": "latest"
+  },
+  "login": true
 }
