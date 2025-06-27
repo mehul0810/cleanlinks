@@ -1,9 +1,9 @@
 {
 	"name": "cleanlinks",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "The most robust, flexible, and intuitive way to build your brand using link building strategy.",
 	"author": "mehulgohil",
-	"license": "GPL-2.0-or-later",
+	"license": "GPL-3.0-or-later",
 	"keywords": [],
 	"homepage": "https://github.com/mehul0810/cleanlinks#readme",
 	"repository": {
