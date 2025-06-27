@@ -70,7 +70,7 @@ Yes, CleanLinks is fully compatible with popular caching and SEO plugins.
 == Changelog ==
 
 = 1.0.1 =
-* update blueprint.json
+* Update blueprint.json
 
 = 1.0.0 =
 * Initial release.
