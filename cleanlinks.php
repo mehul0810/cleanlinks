@@ -5,7 +5,7 @@
  * Description: Create branded short links and manage redirects to support your link-building strategy—all from your WordPress dashboard.
  * Author: Mehul Gohil
  * Author URI: https://mehulgohil.com/
- * Version: 1.0.1
+ * Version: 1.0.2
  * Requires at least: 5.5
  * Requires PHP: 8.1
  * Text Domain: cleanlinks
