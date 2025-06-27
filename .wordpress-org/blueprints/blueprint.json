@@ -1,11 +1,26 @@
 {
 	"landingPage": "/wp-admin/edit.php?post_type=cleanlinks",
+	"login": true,
+	"preferredVersions": {
+            "php": "8.1",
+            "wp": "latest"
+      	},
 	"steps": [
 		{
-			"step": "login",
-			"username": "admin",
-			"password": "password"
+			"step": "installPlugin",
+	        "pluginData": {
+	            "resource": "wordpress.org/plugins",
+	            "slug": "cleanlinks"
+	        },
+	        "options": {
+	            "activate": true
+	        }
 		},
+		{
+	        "step": "login",
+	        "username": "admin",
+            "password": "password"
+	    },
 		{
 			"step": "defineWpConfigConsts",
 			"consts": {
