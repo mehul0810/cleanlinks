@@ -25,7 +25,7 @@ Whether you’re tracking affiliate conversions, simplifying URLs for social sha
 - **Affiliate Link Cloaking:** Cloak affiliate and referral links for higher trust and better CTR.
 - **CSV Export:** Export all your links with click stats for easy backup or reporting.
 - **Organize with Groups:** Group and search your links for effortless management.
-- **Nofollow Options:** Easily add `nofollow`.
+- **SEO Protection:** All redirect pages are automatically set to `noindex` to prevent search engine indexing. Optionally add `nofollow` per link.
 - **SEO & Performance Optimized:** Fast, lightweight, and compatible with top SEO/caching plugins.
 - **Developer Friendly:** 100% GPL, extendable via WordPress hooks and filters.
 

@@ -264,7 +264,7 @@ class PostType {
 				<input type="checkbox" name="cleanlink_redirect_nofollow" id="cleanlink_redirect_nofollow" value="1" <?php checked( $nofollow, '1' ); ?> />
 				<?php esc_html_e( 'Add nofollow to this redirect', 'cleanlinks' ); ?>
 			</label>
-			<span class="description"><?php esc_html_e( 'Check this option to prevent search engines from following this redirect.', 'cleanlinks' ); ?> </span>
+			<span class="description"><?php esc_html_e( 'Adds nofollow directive to prevent search engines from following links. Note: All redirect pages are automatically noindexed.', 'cleanlinks' ); ?> </span>
 		</p>
 		<?php
 	}
