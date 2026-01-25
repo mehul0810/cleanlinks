@@ -25,6 +25,38 @@ class Actions {
 	 */
 	public function __construct() {
 		add_action( 'template_redirect', array( $this, 'cleanlink_redirect_and_count' ) );
+		add_action( 'wp_head', array( $this, 'add_robots_meta_tag' ), 1 );
+	}
+
+	/**
+	 * Add robots meta tag for cleanlinks pages
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	public function add_robots_meta_tag() {
+		// Only add meta tag for cleanlinks post type
+		if ( ! is_singular( 'cleanlinks' ) ) {
+			return;
+		}
+
+		global $wp_query;
+		$post_id = isset( $wp_query->post->ID ) ? $wp_query->post->ID : 0;
+
+		if ( ! $post_id ) {
+			return;
+		}
+
+		// Check if nofollow is enabled for this specific link
+		$nofollow = get_post_meta( $post_id, 'cleanlink_redirect_nofollow', true );
+
+		// Always add noindex to prevent search engines from indexing redirect pages
+		// Add nofollow based on the per-link setting
+		if ( '1' === $nofollow ) {
+			echo '<meta name="robots" content="noindex, nofollow" />' . "\n";
+		} else {
+			echo '<meta name="robots" content="noindex" />' . "\n";
+		}
 	}
 
 	/**
@@ -122,16 +154,6 @@ class Actions {
 	 */
 	private function perform_redirect( $redirect, $post_id ) {
 		if ( ! empty( $redirect ) ) {
-			// Check if nofollow is enabled
-			$nofollow = get_post_meta( $post_id, 'cleanlink_redirect_nofollow', true );
-
-			if ( '1' === $nofollow ) {
-				// Add nofollow meta tag before redirect
-				echo '<meta name="robots" content="nofollow">';
-				// Ensure the output is sent before the redirect
-				flush();
-			}
-
 			wp_redirect( esc_url_raw( $redirect ), 301 );
 			exit;
 		} else {
