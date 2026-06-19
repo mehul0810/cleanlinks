@@ -52,10 +52,8 @@ class Test_PostType extends WP_UnitTestCase {
 	 * Test CleanLinks CPT Exists
 	 */
     public function test_register_post_type() {
-        global $wp_post_types;
-
-		$wp_post_types = get_post_types( array(), 'names' );
-		$this->assertArrayHasKey( 'cleanlinks', $wp_post_types );
+		$post_types = get_post_types( array(), 'names' );
+		$this->assertArrayHasKey( 'cleanlinks', $post_types );
     }
 
     /**
