@@ -64,6 +64,9 @@ jobs:
                   # Bust the cache at least once a month - output format: YYYY-MM-DD.
                   custom-cache-suffix: $(date -u -d "-0 month -$(($(date +%d)-1)) days" "+%F")
 
+            - name: Install SVN client
+              run: sudo apt-get update && sudo apt-get install -y subversion
+
             - name: Change permissions for install-wp-tests.sh
               run: chmod +x tests/bin/install-wp-tests.sh
 
