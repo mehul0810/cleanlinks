@@ -18,8 +18,8 @@ $cleanlinks = get_posts([
     'post_type' => 'cleanlinks',
     'numberposts' => -1,
 ]);
-foreach ($cleanlinks as $link) {
-    wp_delete_post($link->ID, true);
+foreach ($cleanlinks as $cleanlink) {
+    wp_delete_post($cleanlink->ID, true);
 }
 
 // Delete custom taxonomy terms
@@ -27,8 +27,8 @@ $terms = get_terms([
     'taxonomy' => 'cleanlinks_groups',
     'hide_empty' => false,
 ]);
-foreach ($terms as $term) {
-    wp_delete_term($term->term_id, 'cleanlinks_groups');
+foreach ($terms as $cleanlinks_group) {
+    wp_delete_term($cleanlinks_group->term_id, 'cleanlinks_groups');
 }
 
 // Delete plugin options
