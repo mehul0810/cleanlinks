@@ -60,7 +60,7 @@ class Test_Helpers extends WP_UnitTestCase {
 		// Test with string input
 		$dirty_string = '<script>alert("XSS")</script>Sample text';
 		$clean_string = Helpers::clean($dirty_string);
-		$this->assertEquals('alert("XSS")Sample text', $clean_string);
+		$this->assertEquals('Sample text', $clean_string);
 
 		// Test with array input
 		$dirty_array = [
@@ -69,7 +69,7 @@ class Test_Helpers extends WP_UnitTestCase {
 		];
 		$clean_array = Helpers::clean($dirty_array);
 		$this->assertEquals([
-			'key1' => 'alert("XSS")Sample text',
+			'key1' => 'Sample text',
 			'key2' => 'Clean text'
 		], $clean_array);
 	}
