@@ -1,0 +1,60 @@
+# CleanLinks Release Guide
+
+CleanLinks is a WordPress.org plugin published under the `cleanlinks` slug. Keep release work conservative and source-of-truth driven.
+
+## Current Release Model
+
+- Production releases are GitHub releases/tags that trigger the WordPress.org deploy workflow.
+- The current default branch is `main`.
+- Latest known production line at the time this guide was added: `1.0.3`.
+- Prerelease GitHub releases build a ZIP artifact but do not publish to WordPress.org.
+- Stable GitHub releases trigger `.github/workflows/deploy.yml`, which uses `10up/action-wordpress-plugin-deploy` with `SLUG=cleanlinks`.
+
+Always verify the latest GitHub releases, tags, open PRs, milestones, and workflow status before release work.
+
+## Version Prep Checklist
+
+Before preparing a release PR or release tag, verify and update as needed:
+
+- `cleanlinks.php` plugin header version.
+- `readme.txt` stable tag and changelog.
+- `README.md` public metadata when it mirrors WordPress.org content.
+- `package.json` and `composer.json` versions when package metadata is part of the release.
+- `.wordpress-org/blueprints/blueprint.json` if the release changes Playground behavior.
+- Generated assets and translation files when source changes require them.
+
+## Validation Checklist
+
+Use the smallest reliable validation for the changed boundary, then broaden for release candidates:
+
+- `git diff --check`
+- `php -l` for touched PHP files
+- `composer lint`
+- `composer check-cs`
+- `composer test`
+- `npm run build` when assets or release packaging are affected
+- `composer lint-blueprint` when Playground metadata changes
+
+If a validation command fails because of pre-existing unrelated debt, document the exact failure and keep the PR scoped.
+
+## GitHub Release Behavior
+
+- Draft or prerelease GitHub releases must not be treated as production.
+- A prerelease runs `.github/workflows/prerelease.yml` and uploads `cleanlinks.zip` only.
+- A stable GitHub release runs `.github/workflows/deploy.yml`, deploys to WordPress.org SVN, and uploads `cleanlinks.zip`.
+- Do not create tags, prereleases, stable releases, or WordPress.org deploys without explicit current owner approval.
+
+## Milestones
+
+- Milestones should represent active release trains and have due dates.
+- The open `1.0.0` milestone is stale launch-planning state: it has no open issues and predates the current `1.0.3` production line.
+- Do not assign new work to `1.0.0` unless the owner explicitly reopens that release train.
+- Before closing, renaming, or superseding the old milestone, confirm the intended next release line and due date policy with the owner.
+
+## Stale PR Handling
+
+Older draft PRs should be reviewed against current `main`, current issues, and current product direction before use.
+
+- Do not merge stale drafts as-is.
+- If still relevant, convert the scope into a current issue-backed branch/PR with fresh validation.
+- If obsolete, ask for owner approval before closing the PR.
