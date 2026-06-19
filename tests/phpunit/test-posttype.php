@@ -69,11 +69,11 @@ class Test_PostType extends WP_UnitTestCase {
 		$this->assertEquals( 'New CleanLink', $wp_post_types['cleanlinks']->labels->new_item );
 		$this->assertEquals( 'All Links', $wp_post_types['cleanlinks']->labels->all_items );
 		$this->assertEquals( 'View CleanLink', $wp_post_types['cleanlinks']->labels->view_item );
-		$this->assertEquals( 'Search CleanLinks', $wp_post_types['cleanlinks']->labels->search_items );
-		$this->assertEquals( 'No CleanLinks found.', $wp_post_types['cleanlinks']->labels->not_found );
-		$this->assertEquals( 'No CleanLinks found in Trash.', $wp_post_types['cleanlinks']->labels->not_found_in_trash );
+		$this->assertEquals( 'Search links', $wp_post_types['cleanlinks']->labels->search_items );
+		$this->assertEquals( 'No link found.', $wp_post_types['cleanlinks']->labels->not_found );
+		$this->assertEquals( 'No links found in Trash.', $wp_post_types['cleanlinks']->labels->not_found_in_trash );
 		$this->assertEquals( 'CleanLinks', $wp_post_types['cleanlinks']->labels->menu_name );
-		$this->assertEquals( 'CleanLink', $wp_post_types['cleanlinks']->labels->name_admin_bar );
+		$this->assertEquals( 'Link', $wp_post_types['cleanlinks']->labels->name_admin_bar );
 		$this->assertEquals( 1, $wp_post_types['cleanlinks']->publicly_queryable );
 		$this->assertEquals( 'post', $wp_post_types['cleanlinks']->capability_type );
 	}
