@@ -5,12 +5,27 @@ CleanLinks is a WordPress.org plugin published under the `cleanlinks` slug. Keep
 ## Current Release Model
 
 - Production releases are GitHub releases/tags that trigger the WordPress.org deploy workflow.
-- The current default branch is `main`.
+- `main` is production-only. Do not target `main` for routine product, docs, tooling, or release-prep PRs.
+- Use `develop` for unmilestoned development integration and prep work that is not yet assigned to a release train.
+- Use `release/<release-version>` for milestone stabilization once the active release train exists, for example `release/1.1.0`.
 - Latest known production line at the time this guide was added: `1.0.3`.
 - Prerelease GitHub releases build a ZIP artifact but do not publish to WordPress.org.
 - Stable GitHub releases trigger `.github/workflows/deploy.yml`, which uses `10up/action-wordpress-plugin-deploy` with `SLUG=cleanlinks`.
 
 Always verify the latest GitHub releases, tags, open PRs, milestones, and workflow status before release work.
+
+## Branch and PR Base Rules
+
+CleanLinks uses a production-protected branch model:
+
+- `main` is production-only and should receive only owner-approved production release or hotfix integration.
+- `develop` is the default base for unmilestoned, non-production work such as docs, tooling, product-design prep, WordPress.org presentation prep, and reversible backlog work.
+- Milestone-assigned work targets `release/<release-version>`, where `<release-version>` comes from the active release train name such as `1.1.0`. Do not use the GitHub milestone ID as the release branch name.
+- Create the release branch from the verified current integration base when the active release train is opened.
+- If a PR is opened against the wrong base, preserve the work by retargeting or replaying it onto the correct non-production base; do not merge the wrong-base PR into `main`.
+- Production or beta release actions still require explicit current owner approval: release tags, GitHub releases, prereleases, WordPress.org deploys, or final release approval.
+
+Until the next post-`1.0.3` milestone and due date are created, keep #50-#57 and similar prep work unmilestoned or on `develop` unless a release branch already exists for that exact release train.
 
 ## Version Prep Checklist
 
