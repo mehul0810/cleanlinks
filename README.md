@@ -9,18 +9,18 @@ Stable tag: 1.0.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Create branded short links, manage redirects, cloak affiliate URLs, and export links via CSV - all from your WordPress dashboard.
+Create branded short links, manage redirects, cloak affiliate URLs, migrate supported links, and export links via CSV.
 
 == Description ==
 
 **CleanLinks** is your all-in-one solution for creating branded, customizable short links directly within WordPress. Whether you're managing affiliate campaigns, simplifying external URLs, or just looking for a professional way to share links, CleanLinks makes it easy.
 
-Designed to be lightweight yet powerful, CleanLinks lets you create 301 and 302 redirects, track clicks, categorize links, and export all your links to CSV - with a single click.
+Designed to be lightweight yet powerful, CleanLinks lets you create 301 and 302 redirects, track clicks, categorize links, migrate supported links, and export your links to CSV.
 
 = Key Features =
 
 - **Branded Short Links:** Cloak long URLs under your own domain.
-- **CSV Export Tool:** Export all your links in CSV format with one click for backup or reporting.
+- **Import and Export Tools:** Migrate supported links and export your CleanLinks list in CSV format.
 - **Click Tracking:** Optional built-in analytics to track link clicks.
 - **Organize Your Links:** Group links with tags for easy management.
 - **SEO-Friendly:** Compatible with SEO and caching plugins.
@@ -51,6 +51,9 @@ Designed to be lightweight yet powerful, CleanLinks lets you create 301 and 302 
 
 = Can I export my links? =
 Yes! CleanLinks includes a simple Export tool that lets you download all your links in CSV format with a single click.
+
+= Can I migrate links from another plugin? =
+Yes. CleanLinks includes an Import tool for supported link-management plugins so you can bring existing links into CleanLinks.
 
 = Does CleanLinks support affiliate links? =
 Absolutely. You can cloak affiliate links using 301 or 302 redirects and group them with tags for easy management.
