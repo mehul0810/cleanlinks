@@ -45,9 +45,11 @@ class Test_Admin_Actions extends WP_UnitTestCase {
 	public function test_register_hooks() {
 		// These assertions should be checked here as these actions will be called on construct of Admin\Actions class.
 		$this->assertSame( 10, has_action( 'admin_enqueue_scripts', [ self::$class_instance, 'register_assets' ] ) );
-		$this->assertSame( 10, has_action( 'admin_menu', [ self::$class_instance, 'add_admin_pages' ] ) );
-		$this->assertSame( 10, has_action( 'manage_simplifiedwp_links_posts_custom_column', [ self::$class_instance, 'simplifiedwp_links_custom_column_values' ] ), 10, 3 );
-		$this->assertSame( 10, has_action( 'post_submitbox_minor_actions', [ self::$class_instance, 'before_preview_changes' ] ), 10, 2 );
+		$this->assertSame( 10, has_action( 'wp_ajax_simplified_import', [ self::$class_instance, 'simplified_import_all_links' ] ) );
+		$this->assertSame( 10, has_action( 'admin_menu', [ self::$class_instance, 'register_admin_pages' ] ) );
+		$this->assertSame( 10, has_action( 'manage_simplifiedwp_links_posts_custom_column', [ self::$class_instance, 'register_custom_columns' ] ) );
+		$this->assertSame( 10, has_action( 'post_submitbox_misc_actions', [ self::$class_instance, 'before_preview_changes' ] ) );
+		$this->assertSame( 10, has_action( 'admin_post_export', [ self::$class_instance, 'export_csv' ] ) );
 	}
 
 	/**
@@ -67,15 +69,15 @@ class Test_Admin_Actions extends WP_UnitTestCase {
 	 /**
      * Test adding admin pages.
      */
-    public function test_add_admin_pages() {
-        // Create a new instance of the Actions class
-        self::$class_instance->add_admin_pages();
+	    public function test_add_admin_pages() {
+	        // Create a new instance of the Actions class
+	        self::$class_instance->register_admin_pages();
 
-        // Check if the admin pages are added
-        $this->assertTrue( $this->admin_page_exists( 'simplified_links_reports' ) );
-        $this->assertTrue( $this->admin_page_exists( 'simplified_links_support' ) );
-        $this->assertTrue( $this->admin_page_exists( 'simplified_links_more_plugins' ) );
-    }
+	        // Check if the admin pages are added
+	        $this->assertTrue( $this->admin_page_exists( 'simplified_links_migrate' ) );
+	        $this->assertTrue( $this->admin_page_exists( 'simplified_links_import_export' ) );
+	        $this->assertTrue( $this->admin_page_exists( 'simplified_links_more_plugins' ) );
+	    }
 
 	/**
      * Check if a specific admin page exists.
