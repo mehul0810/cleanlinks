@@ -65,19 +65,25 @@ class Test_Admin_Actions extends WP_UnitTestCase {
 
 		$this->assertTrue( wp_script_is( 'simplified-admin', 'enqueued' ) );
 	}
-	
-	 /**
-     * Test adding admin pages.
-     */
-	    public function test_add_admin_pages() {
-	        // Create a new instance of the Actions class
-	        self::$class_instance->register_admin_pages();
 
-	        // Check if the admin pages are added
-	        $this->assertTrue( $this->admin_page_exists( 'simplified_links_migrate' ) );
-	        $this->assertTrue( $this->admin_page_exists( 'simplified_links_import_export' ) );
-	        $this->assertTrue( $this->admin_page_exists( 'simplified_links_more_plugins' ) );
-	    }
+	/**
+	 * Test adding admin pages.
+	 */
+	public function test_add_admin_pages() {
+		wp_set_current_user(
+			self::factory()->user->create(
+				array(
+					'role' => 'administrator',
+				)
+			)
+		);
+
+		self::$class_instance->register_admin_pages();
+
+		$this->assertTrue( $this->admin_page_exists( 'simplified_links_migrate' ) );
+		$this->assertTrue( $this->admin_page_exists( 'simplified_links_import_export' ) );
+		$this->assertTrue( $this->admin_page_exists( 'simplified_links_more_plugins' ) );
+	}
 
 	/**
      * Check if a specific admin page exists.
@@ -85,17 +91,17 @@ class Test_Admin_Actions extends WP_UnitTestCase {
      * @param string $page_slug The slug of the admin page to check.
      * @return bool True if the page exists, false otherwise.
      */
-    private function admin_page_exists( $page_slug ) {
-        global $submenu;
+	private function admin_page_exists( $page_slug ) {
+		global $submenu;
 
-        if ( isset( $submenu['edit.php?post_type=simplifiedwp_links'] ) ) {
-            foreach ( $submenu['edit.php?post_type=simplifiedwp_links'] as $submenu_item ) {
-                if ( isset( $submenu_item[2] ) && $submenu_item[2] === $page_slug ) {
-                    return true;
-                }
-            }
-        }
+		if ( isset( $submenu['edit.php?post_type=simplifiedwp_links'] ) ) {
+			foreach ( $submenu['edit.php?post_type=simplifiedwp_links'] as $submenu_item ) {
+				if ( isset( $submenu_item[2] ) && $submenu_item[2] === $page_slug ) {
+					return true;
+				}
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 }
