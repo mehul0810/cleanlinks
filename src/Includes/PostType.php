@@ -138,6 +138,7 @@ class PostType {
 		}
 
 		// Sanitize post data.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified before post meta is updated below.
 		$_post = Helpers::clean( $_POST );
 
 		// Update post meta for simplifiedwp links

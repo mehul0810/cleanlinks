@@ -54,7 +54,8 @@ class Test_PostType extends WP_UnitTestCase {
     public function test_register_post_type() {
         global $wp_post_types;
 
-		$wp_post_types = get_post_types( array(), 'names' );
+			// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test reads the registered post type map.
+			$wp_post_types = get_post_types( array(), 'names' );
 		$this->assertArrayHasKey( 'simplifiedwp_links', $wp_post_types );
     }
 

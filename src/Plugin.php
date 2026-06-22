@@ -92,12 +92,13 @@ final class Plugin {
 	 *                           all network sites or a single site. Default false.
 	 *
 	 * @return void
-	 */
-	public function activate( $network_wide = false ) {
-		$post_type = new Includes\PostType();
-		$post_type->register_post_type();
-		flush_rewrite_rules();
-	}
+		 */
+		public function activate( $network_wide = false ) {
+			$post_type = new Includes\PostType();
+			$post_type->register_post_type();
+			// phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.flush_rewrite_rules_flush_rewrite_rules -- Activation-only rewrite flush.
+			flush_rewrite_rules();
+		}
 
 	/**
 	 * Handles deactivation procedures.

@@ -77,9 +77,9 @@ class Helpers {
 			LIMIT 1
 		';
 
-		$sql_prepare = $wpdb->prepare( $sql, $post_name, $post_id, 'simplifiedwp_links' );
+		$sql_prepare = $wpdb->prepare( $sql, $post_name, $post_id, 'simplifiedwp_links' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Dynamic table name is from $wpdb; values are prepared here.
 
-		$row     = $wpdb->get_row( $sql_prepare, 'ARRAY_A' ); // phpcs:ignore
+		$row = $wpdb->get_row( $sql_prepare, 'ARRAY_A' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Prepared above with dynamic table name.
 
 		return $row ? $row : false;
 	}

@@ -55,13 +55,13 @@ if($simplified_links_clean_up === true) {
         )
     );
 
-    // Delete Terms.
-    if ($terms) {
-        foreach ($terms as $term) {
-            $wpdb->delete($wpdb->term_taxonomy, ['term_taxonomy_id' => $term->term_taxonomy_id]);
-            $wpdb->delete($wpdb->terms, ['term_id' => $term->term_id]);
-        }
-    }
+	// Delete Terms.
+	if ($terms) {
+		foreach ($terms as $delete_term) {
+			$wpdb->delete($wpdb->term_taxonomy, ['term_taxonomy_id' => $delete_term->term_taxonomy_id]);
+			$wpdb->delete($wpdb->terms, ['term_id' => $delete_term->term_id]);
+		}
+	}
 
     // Delete Taxonomies.
     $wpdb->delete($wpdb->term_taxonomy, ['taxonomy' => $simplified_taxonomy], ['%s']);
