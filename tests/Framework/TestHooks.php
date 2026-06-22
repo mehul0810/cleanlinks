@@ -29,6 +29,7 @@ class TestHooks
         } else {
             $idx = self::buildUniqueIdFromFunction($function_to_add);
 
+            // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test hook shim mirrors WordPress' global hook store.
             $wp_filter[$tag][$priority][$idx] = array(
                 'function' => $function_to_add,
                 'accepted_args' => $accepted_args,

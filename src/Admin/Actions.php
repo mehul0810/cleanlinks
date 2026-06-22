@@ -163,15 +163,15 @@ class Actions {
 			( new Export() )->render_ui();
 			?>
 
-			<span class="differ <?php echo $class; ?>">
+			<span class="differ <?php echo esc_attr( $class ); ?>">
 
 			<div class="migrate-content white-bg rounded shadow section-2">
 				<h2> <?php esc_html_e( 'Export your links', 'simplified-links' ); ?> </h2>
 				<p> <?php esc_html_e( 'This tool lets you export a properly formatted CSV file containing a list of all the affiliate links of Simplified Links Plugin .', 'simplified-links' ); ?> </p>
-				<form id="export-form" action="<?php echo admin_url( 'admin-post.php' ); ?>" method="post">
+				<form id="export-form" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post">
 					<?php wp_nonce_field( 'export_data', 'export_nonce' ); ?>
 					<input type="hidden" name="action" value="export"/>
-					<input type="submit" name="export-submit" id="export-submit" class="button button-primary" value="<?php esc_html_e( 'Export', 'simplified-links' ); ?>" />
+					<input type="submit" name="export-submit" id="export-submit" class="button button-primary" value="<?php echo esc_attr__( 'Export', 'simplified-links' ); ?>" />
 				</form>
 			</div>
 
@@ -232,10 +232,10 @@ class Actions {
 				<button
 					type="button"
 					class="button simplified-links--copy-button"
-					aria-label="<?php echo $permalink; ?>"
-					data-default-text="<?php echo esc_html( $default_text ); ?>"
-					data-copied-text="<?php echo esc_html__( 'Copied!', 'simplified-links' ); ?>"
-					data-url="<?php echo $permalink; ?>"
+					aria-label="<?php echo esc_url( $permalink ); ?>"
+					data-default-text="<?php echo esc_attr( $default_text ); ?>"
+					data-copied-text="<?php echo esc_attr__( 'Copied!', 'simplified-links' ); ?>"
+					data-url="<?php echo esc_url( $permalink ); ?>"
 				>
 					<span class="dashicons dashicons-admin-page"></span>
 					<span class="simplified-links--copy-button-text"><?php echo esc_html( $default_text ); ?></span>
@@ -255,7 +255,7 @@ class Actions {
 				break;
 
 			case 'total_clicks':
-				echo Helpers::get_total_access_count( $post_id );
+				echo esc_html( Helpers::get_total_access_count( $post_id ) );
 				break;
 		}
 	}

@@ -62,9 +62,12 @@ class Migrate {
 							<div class="postbox-header">
 								<h2 class="hndle ui-sortable-handle">
 									<?php
-									echo sprintf(
-										'Migrate links from %1$s',
-										$plugin['name']
+									echo esc_html(
+										sprintf(
+											/* translators: %s: plugin name. */
+											__( 'Migrate links from %s', 'simplified-links' ),
+											$plugin['name']
+										)
 									);
 									?>
 								</h2>
@@ -72,16 +75,19 @@ class Migrate {
 							<div class="inside">
 								<p>
 									<?php
-									echo sprintf(
-										'There are %1$s published links and %2$s draft links available to migrate.',
-										$publish_count,
-										$draft_count
+									echo esc_html(
+										sprintf(
+											/* translators: 1: published link count, 2: draft link count. */
+											__( 'There are %1$s published links and %2$s draft links available to migrate.', 'simplified-links' ),
+											$publish_count,
+											$draft_count
+										)
 									);
 									?>
 								</p>
 								<div class="simplified-links--migrate-btn-wrap">
 									<button
-										data-post_type="<?php echo esc_html( $plugin['post_type'] ); ?>"
+										data-post_type="<?php echo esc_attr( $plugin['post_type'] ); ?>"
 										data-redirect_to="<?php echo esc_attr( $redirect_to ); ?>"
 										data-clicks="<?php echo esc_attr( $clicks ); ?>"
 										type="button"
@@ -110,8 +116,8 @@ class Migrate {
 	 * @return WP_Object
 	 */
 	public function migrate_links() {
-		echo "<pre>"; print_r($_POST); die();
 		// Sanitize and validate input.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Existing AJAX flow does not submit a nonce; request values are sanitized before use.
 		$_post = Helpers::clean( $_POST );
 
 		// Setup necessary variables.

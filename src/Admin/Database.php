@@ -99,9 +99,9 @@ class Database {
 				WHERE ID = %d;
 			";
 
-			$update_sql = $wpdb->prepare( $update_sql, $slug, 'simplifiedwp_links', $id ); // phpcs:ignore
+			$update_sql = $wpdb->prepare( $update_sql, $slug, 'simplifiedwp_links', $id ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Dynamic table name is from $wpdb; values are prepared here.
 
-			$wpdb->query( $update_sql );
+			$wpdb->query( $update_sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Prepared immediately above with dynamic table name.
 
 			$result1 = 'simplifiedwp_links' === get_post_type( $id );
 		}

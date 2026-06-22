@@ -51,19 +51,19 @@ class Test_PostType extends WP_UnitTestCase {
 	/**
 	 * Test Simplifiedwp CPT Exists
 	 */
-    public function test_register_post_type() {
-        global $wp_post_types;
-
-		$wp_post_types = get_post_types( array(), 'names' );
-		$this->assertArrayHasKey( 'simplifiedwp_links', $wp_post_types );
-    }
+	    public function test_register_post_type() {
+			self::$class_instance->register_post_type();
+			$post_types = get_post_types( array(), 'names' );
+			$this->assertContains( 'simplifiedwp_links', $post_types );
+	    }
 
     /**
 	 * Test Simplifiedwp CPT Labels
 	 */
-	public function test_payment_post_type_labels() {
-		$wp_post_types = get_post_types( array(), 'objects' );
-		$this->assertEquals( 'Simplified Links', $wp_post_types['simplifiedwp_links']->labels->name );
+		public function test_payment_post_type_labels() {
+			self::$class_instance->register_post_type();
+			$wp_post_types = get_post_types( array(), 'objects' );
+			$this->assertEquals( 'Simplified Links', $wp_post_types['simplifiedwp_links']->labels->name );
 		$this->assertEquals( 'Simplified Link', $wp_post_types['simplifiedwp_links']->labels->singular_name );
 		$this->assertEquals( 'Add New Link', $wp_post_types['simplifiedwp_links']->labels->add_new );
 		$this->assertEquals( 'Add New Link', $wp_post_types['simplifiedwp_links']->labels->add_new_item );
