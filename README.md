@@ -1,6 +1,6 @@
-=== CleanLinks – Link Cloaking Plugin for WordPress ===
+=== CleanLinks ===
 Contributors: mehul0810, ankur0812
-Tags: link cloaking, link shortener, branded links, affiliate links, url shortener
+Tags: link cloaking, link branding, affiliate links, link shortener, redirect manager
 Donate link: https://www.buymeacoffee.com/mehulgohil
 Requires at least: 5.5
 Tested up to: 6.8
@@ -9,32 +9,28 @@ Stable tag: 1.0.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-CleanLinks is the fastest, easiest way to cloak affiliate links and manage your affiliate links from a single place.
+Create branded short links, manage redirects, cloak affiliate URLs, and export links via CSV - all from your WordPress dashboard.
 
 == Description ==
 
-**CleanLinks** is the powerful WordPress plugin for affiliate link cloaking, and link management – designed for bloggers, marketers, and anyone who wants full control of their outbound links.
+**CleanLinks** is your all-in-one solution for creating branded, customizable short links directly within WordPress. Whether you're managing affiliate campaigns, simplifying external URLs, or just looking for a professional way to share links, CleanLinks makes it easy.
 
-Tired of long, messy affiliate URLs? CleanLinks lets you instantly cloak, brand, and organize your links under your own domain (e.g. `yourdomain.com/recommends/offer`). With one-click CSV export, built-in analytics (future pro version), and more, CleanLinks gives you professional link management without the bloat.
+Designed to be lightweight yet powerful, CleanLinks lets you create 301 and 302 redirects, track clicks, categorize links, and export all your links to CSV - with a single click.
 
-Whether you’re tracking affiliate conversions, simplifying URLs for social sharing, or organizing outbound links for SEO, CleanLinks is your all-in-one link shortener and redirect solution.
+= Key Features =
 
-= Features at a Glance =
+- **Branded Short Links:** Cloak long URLs under your own domain.
+- **CSV Export Tool:** Export all your links in CSV format with one click for backup or reporting.
+- **Click Tracking:** Optional built-in analytics to track link clicks.
+- **Organize Your Links:** Group links with tags for easy management.
+- **SEO-Friendly:** Compatible with SEO and caching plugins.
+- **Developer Friendly:** Built using WordPress standards with hooks/filters.
 
-- **Branded Link Shortener:** Create memorable, clean short links under your own domain.
-- **Affiliate Link Cloaking:** Cloak affiliate and referral links for higher trust and better CTR.
-- **CSV Export:** Export all your links with click stats for easy backup or reporting.
-- **Organize with Groups:** Group and search your links for effortless management.
-- **Nofollow Options:** Easily add `nofollow`.
-- **SEO & Performance Optimized:** Fast, lightweight, and compatible with top SEO/caching plugins.
-- **Developer Friendly:** 100% GPL, extendable via WordPress hooks and filters.
+= Minimum Requirements =
 
-= Who is CleanLinks for? =
-
-- Affiliate marketers wanting better link tracking and cloaking
-- Bloggers and content creators sharing branded, memorable URLs
-- Agencies managing multiple client links or campaigns
-- Anyone who wants full control over outbound links in WordPress
+- WordPress 5.5 or higher
+- PHP 8.1 or higher
+- MySQL 5.5 or higher
 
 == Installation ==
 
@@ -54,13 +50,13 @@ Whether you’re tracking affiliate conversions, simplifying URLs for social sha
 == Frequently Asked Questions ==
 
 = Can I export my links? =
-Yes! CleanLinks lets you export all your links and click data as a CSV file with a single click.
+Yes! CleanLinks includes a simple Export tool that lets you download all your links in CSV format with a single click.
 
 = Does CleanLinks support affiliate links? =
-Absolutely. CleanLinks is built for affiliate marketers, letting you cloak and track affiliate URLs with ease.
+Absolutely. You can cloak affiliate links using 301 or 302 redirects and group them with tags for easy management.
 
 = Is click tracking available? =
-Yes. Each link includes click analytics directly in your dashboard.
+Yes. Click tracking is available per link.
 
 = Is CleanLinks compatible with SEO and caching plugins? =
 Yes, it works seamlessly with leading SEO and caching plugins for best performance.
@@ -68,23 +64,25 @@ Yes, it works seamlessly with leading SEO and caching plugins for best performan
 = Can I use my own domain for short links? =
 Yes, all links use your own site’s domain for maximum trust and branding.
 
-== Screenshots ==
-
-1. CleanLinks admin panel – Manage all branded links from one place.
-2. Add/Edit link – Custom slug, destination URL, redirect type, and more.
-3. Export to CSV – Download all links and stats instantly.
-
 == Changelog ==
 
+= 1.0.3 =
+* Update blueprint.json
+
+= 1.0.2 =
+* Update blueprint.json
+
+= 1.0.1 =
+* Update blueprint.json
+
 = 1.0.0 =
-* Initial release – Create branded short links, cloak affiliate URLs, enable click tracking, and export links to CSV.
+* Initial release.
+* Create and manage branded links.
+* One-click export to CSV.
+* Built-in click tracking.
+* Lightweight and SEO-friendly.
 
 == Upgrade Notice ==
 
 = 1.0.0 =
 First stable version of CleanLinks. Includes branded short links, affiliate link cloaking, CSV export, and basic analytics.
-
-== Roadmap ==
-
-* **Advanced Analytics:** Unique clicks, referrers, device data (Pro)
-* **Geo-redirects & A/B Testing** (Pro)

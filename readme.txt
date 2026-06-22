@@ -9,13 +9,13 @@ Stable tag: 1.0.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Create branded short links, manage redirects, cloak affiliate URLs, and export links via CSV – all from your WordPress dashboard.
+Create branded short links, manage redirects, cloak affiliate URLs, and export links via CSV - all from your WordPress dashboard.
 
 == Description ==
 
 **CleanLinks** is your all-in-one solution for creating branded, customizable short links directly within WordPress. Whether you’re managing affiliate campaigns, simplifying external URLs, or just looking for a professional way to share links, CleanLinks makes it easy.
 
-Designed to be lightweight yet powerful, CleanLinks lets you create 301 and 302 redirects, track clicks, categorize links, and export all your links to CSV – with a single click.
+Designed to be lightweight yet powerful, CleanLinks lets you create 301 and 302 redirects, track clicks, categorize links, and export all your links to CSV - with a single click.
 
 = Key Features =
 
@@ -29,7 +29,7 @@ Designed to be lightweight yet powerful, CleanLinks lets you create 301 and 302 
 = Minimum Requirements =
 
 - WordPress 5.5 or higher
-- PHP 8.0 or higher
+- PHP 8.1 or higher
 - MySQL 5.5 or higher
 
 = Automatic Installation =
@@ -59,13 +59,6 @@ Yes. Click tracking is available per link.
 
 = Is it compatible with caching and SEO plugins? =
 Yes, CleanLinks is fully compatible with popular caching and SEO plugins.
-
-== Screenshots ==
-
-1. Admin interface showing branded link management.
-2. Redirect settings with 301/302 options.
-3. Export tool with one-click CSV export.
-4. Analytics and click tracking interface.
 
 == Changelog ==
 

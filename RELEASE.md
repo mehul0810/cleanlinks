@@ -37,6 +37,41 @@ Use the smallest reliable validation for the changed boundary, then broaden for 
 
 If a validation command fails because of pre-existing unrelated debt, document the exact failure and keep the PR scoped.
 
+## WordPress.org Presentation Prep
+
+Use this checklist for prep-only WordPress.org page work such as issue #57. It is documentation and asset readiness work until the owner separately approves a release train, tag, GitHub release, and WordPress.org deploy.
+
+Current public state verified on 2026-06-22:
+
+- WordPress.org API reports CleanLinks `1.0.3`, requires WordPress `5.5`, tested up to `6.8.5`, requires PHP `8.1`, active installs `0`, and download link `cleanlinks.1.0.3.zip`.
+- Public support state is zero support threads, zero resolved threads, zero ratings, and zero reviews.
+- Public WordPress.org metadata exposes no screenshots, banners, or icons through the plugin information API.
+- GitHub latest stable release is `1.0.3`, published 2025-06-27, and is not a draft or prerelease.
+- `readme.txt` keeps `Stable tag: 1.0.3`; do not change it for presentation prep unless the owner confirms the next release train and the version metadata changes in the same release-prep scope.
+
+Supported WordPress.org asset filenames and dimensions to validate before a publishing release:
+
+- Banners: `banner-772x250.(jpg|png)` and optional high-DPI `banner-1544x500.(jpg|png)`. The high-DPI banner is an add-on and must not be the only banner.
+- Icons: `icon-128x128.(png|jpg|gif)`, optional high-DPI `icon-256x256.(png|jpg|gif)`, or `icon.svg`.
+- Screenshots: `screenshot-1.(png|jpg)`, `screenshot-2.(png|jpg)`, and so on. Screenshot captions in `readme.txt` must match the committed screenshot files.
+- Localized variants may use locale suffixes such as `-rtl`, `-es`, or `-es_ES` when a localized asset is intentionally prepared.
+
+Prep and validation steps:
+
+- Keep WordPress.org page copy to current released functionality unless the owner confirms the target release line for unreleased work.
+- Keep the short description within WordPress.org limits and use no more than five competitor-neutral tags.
+- Review `.distignore` before packaging so source-only docs, tests, development tooling, and `.wordpress-org` metadata are not bundled into the runtime ZIP unless intentionally required.
+- Validate `readme.txt` with the official WordPress.org readme validator or an equivalent documented checklist before release.
+- Validate asset filenames and image dimensions before any stable GitHub release that will deploy to WordPress.org.
+
+Non-goals unless explicitly approved by the owner:
+
+- Do not publish to WordPress.org.
+- Do not create or push release tags.
+- Do not create draft, prerelease, or stable GitHub releases.
+- Do not close issues, retarget milestones, or change due dates.
+- Do not advertise future `1.1.0` functionality, pro functionality, pricing, licensing, privacy changes, or support promises as shipped.
+
 ## GitHub Release Behavior
 
 - Draft or prerelease GitHub releases must not be treated as production.
