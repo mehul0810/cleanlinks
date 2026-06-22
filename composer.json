@@ -41,12 +41,12 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"MG\\CleanLinks\\": "src/"
+			"SimplifiedWP\\Links\\": "src/"
 		}
 	},
 	"autoload-dev": {
 		"psr-4": {
-			"MG\\CleanLinks\\Tests\\": "tests/"
+			"SimplifiedWP\\Links\\Tests\\": "tests/"
 		}
 	},
 	"config": {
