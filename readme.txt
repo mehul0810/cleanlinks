@@ -3,7 +3,7 @@ Contributors: mehul0810, ankur0812
 Tags: link cloaking, link branding, affiliate links, link shortener, redirect manager
 Donate link: https://www.buymeacoffee.com/mehulgohil
 Requires at least: 5.5
-Tested up to: 6.8
+Tested up to: 7.0
 Requires PHP: 8.1
 Stable tag: 1.0.3
 License: GPLv3
