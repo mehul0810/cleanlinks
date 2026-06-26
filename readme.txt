@@ -63,6 +63,13 @@ Yes. Click tracking is available per link.
 = Is it compatible with caching and SEO plugins? =
 Yes, CleanLinks is fully compatible with popular caching and SEO plugins.
 
+== Screenshots ==
+
+1. Manage branded short links from the CleanLinks list, including target URLs and click totals.
+2. Set the destination URL for each branded link from the Redirection Settings panel.
+3. Import supported links from the CleanLinks import screen.
+4. Export CleanLinks data to CSV from the Import/Export screen.
+
 == Changelog ==
 
 = 1.0.3 =
