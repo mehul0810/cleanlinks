@@ -15,7 +15,7 @@
 		"lint:pkg-json": "wp-scripts lint-pkg-json",
 		"packages-update": "wp-scripts packages-update",
 		"plugin-zip": "wp-scripts plugin-zip",
-		"test:e2e": "wp-scripts test-e2e",
+		"test:e2e": "wp-scripts test-playwright",
 		"test:unit": "wp-scripts test-unit-js"
 	},
 	"repository": {
