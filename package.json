@@ -29,6 +29,7 @@
 	},
 	"homepage": "https://github.com/simplifiedwp/simplified-links#readme",
 	"devDependencies": {
+		"@playwright/test": "^1.43.1",
 		"@wordpress/scripts": "^27.6.0",
 		"css-loader": "^7.1.1",
 		"file-loader": "^6.2.0",

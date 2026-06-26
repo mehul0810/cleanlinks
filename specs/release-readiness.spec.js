@@ -156,7 +156,9 @@ test.describe.serial( 'CleanLinks release-readiness admin screenshots', () => {
 		await expect( redirectField ).toBeVisible();
 		await redirectField.fill( SEED_REDIRECT_URL );
 		await expect( redirectField ).toHaveValue( SEED_REDIRECT_URL );
-		await expect( page.getByText( 'Redirection Settings' ) ).toBeVisible();
+		await expect(
+			page.getByRole( 'heading', { name: 'Redirection Settings' } )
+		).toBeVisible();
 
 		await captureReleaseEvidence(
 			page,
