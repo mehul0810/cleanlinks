@@ -73,6 +73,7 @@ Supported WordPress.org asset filenames and dimensions to validate before a publ
 
 Prep and validation steps:
 
+- Route owner-supplied WordPress.org asset replacements through the CleanLinks product/release path: duplicate-screen for an issue/PR, use a clean non-production branch or release branch, and keep the dirty primary checkout as a source only until the assets are committed through review.
 - Keep WordPress.org page copy to current released functionality unless the owner confirms the target release line for unreleased work.
 - Keep the short description within WordPress.org limits and use no more than five competitor-neutral tags.
 - Review `.distignore` before packaging so source-only docs, tests, development tooling, and `.wordpress-org` metadata are not bundled into the runtime ZIP unless intentionally required.
