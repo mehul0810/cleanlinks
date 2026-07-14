@@ -1,4 +1,4 @@
-# Copyright (C) 2025 CleanLinks
+# Copyright (C) 2026 CleanLinks
 # This file is distributed under the same license as the CleanLinks package.
 msgid ""
 msgstr ""
@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Mehul Gohil <hello@mehulgohil.com>\n"
-"POT-Creation-Date: 2025-05-23 09:23+0000\n"
+"POT-Creation-Date: 2026-07-14 10:38+0000\n"
 "Report-Msgid-Bugs-To: https://github.com/mehul0810/cleanlinks/issues/new\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -16,19 +16,19 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/Admin/Actions.php:52, src/Admin/Actions.php:53, src/Admin/Export.php:114, src/Admin/Export.php:122
+#: src/Admin/Actions.php:52, src/Admin/Actions.php:53, src/Admin/Export.php:137, src/Admin/Export.php:145
 msgid "Export"
 msgstr ""
 
-#: src/Admin/Actions.php:149
+#: src/Admin/Actions.php:154
 msgid "Copy URL"
 msgstr ""
 
-#: src/Admin/Actions.php:157
+#: src/Admin/Actions.php:162
 msgid "Copied!"
 msgstr ""
 
-#: src/Admin/Actions.php:210
+#: src/Admin/Actions.php:215
 msgid "Viewed:"
 msgstr ""
 
@@ -36,15 +36,31 @@ msgstr ""
 msgid "Security check failed."
 msgstr ""
 
-#: src/Admin/Export.php:44, src/Admin/Export.php:49
+#: src/Admin/Export.php:44, src/Admin/Export.php:49, src/Admin/Export.php:60, src/Admin/Export.php:105, src/Admin/Export.php:109, src/Admin/Export.php:115
 msgid "Error"
 msgstr ""
 
 #: src/Admin/Export.php:49
-msgid "You do not have sufficient permissions to perform this action."
+msgid "You do not have permission."
 msgstr ""
 
-#: src/Admin/Export.php:118
+#: src/Admin/Export.php:60
+msgid "Filesystem API not available."
+msgstr ""
+
+#: src/Admin/Export.php:105
+msgid "Could not create a temp file."
+msgstr ""
+
+#: src/Admin/Export.php:109
+msgid "Could not write CSV file."
+msgstr ""
+
+#: src/Admin/Export.php:115
+msgid "Could not read CSV file."
+msgstr ""
+
+#: src/Admin/Export.php:141
 msgid "Using this tool, you can have a seamless experience to export your links to a CSV (Comma Separated Values) file with just a single click."
 msgstr ""
 
@@ -167,88 +183,92 @@ msgctxt "Screen reader text for the items list heading on the post type listing 
 msgid "Links list"
 msgstr ""
 
-#: src/Includes/PostType.php:214
+#: src/Includes/PostType.php:216
 msgid "Redirect Link Settings"
 msgstr ""
 
-#: src/Includes/PostType.php:252
+#: src/Includes/PostType.php:254
 msgid "Destination URL:"
 msgstr ""
 
-#: src/Includes/PostType.php:253
+#: src/Includes/PostType.php:255
 msgid "Enter the full destination URL (e.g., https://example.com)"
 msgstr ""
 
-#: src/Includes/PostType.php:256
+#: src/Includes/PostType.php:258
 msgid "Visitors will be redirected to this URL when they access your link."
 msgstr ""
 
-#: src/Includes/PostType.php:263
+#: src/Includes/PostType.php:265
 msgid "Add nofollow to this redirect"
 msgstr ""
 
-#: src/Includes/PostType.php:265
+#: src/Includes/PostType.php:267
 msgid "Check this option to prevent search engines from following this redirect."
 msgstr ""
 
-#: src/Includes/PostType.php:284
-msgid "This link has been visited %d times"
+#: src/Includes/PostType.php:290
+msgid "This link has been visited"
 msgstr ""
 
-#: src/Includes/Taxonomy.php:40
+#: src/Includes/PostType.php:292
+msgid "times"
+msgstr ""
+
+#: src/Includes/TaxoNomy.php:40
 msgctxt "taxonomy general name"
 msgid "Groups"
 msgstr ""
 
-#: src/Includes/Taxonomy.php:41
+#: src/Includes/TaxoNomy.php:41
 msgctxt "taxonomy singular name"
 msgid "Group"
 msgstr ""
 
-#: src/Includes/Taxonomy.php:42
+#: src/Includes/TaxoNomy.php:42
 msgid "Search Groups"
 msgstr ""
 
-#: src/Includes/Taxonomy.php:43
+#: src/Includes/TaxoNomy.php:43
 msgid "Popular Groups"
 msgstr ""
 
-#: src/Includes/Taxonomy.php:44
+#: src/Includes/TaxoNomy.php:44
 msgid "All Groups"
 msgstr ""
 
-#: src/Includes/Taxonomy.php:45
+#: src/Includes/TaxoNomy.php:45
 msgid "Edit Group"
 msgstr ""
 
-#: src/Includes/Taxonomy.php:46
+#: src/Includes/TaxoNomy.php:46
 msgid "Update Group"
 msgstr ""
 
-#: src/Includes/Taxonomy.php:47
+#: src/Includes/TaxoNomy.php:47
 msgid "Add New Group"
 msgstr ""
 
-#: src/Includes/Taxonomy.php:48
+#: src/Includes/TaxoNomy.php:48
 msgid "New Group Name"
 msgstr ""
 
-#: src/Includes/Taxonomy.php:49
+#: src/Includes/TaxoNomy.php:49
 msgid "Separate groups with commas"
 msgstr ""
 
-#: src/Includes/Taxonomy.php:50
+#: src/Includes/TaxoNomy.php:50
 msgid "Add or remove groups"
 msgstr ""
 
-#: src/Includes/Taxonomy.php:51
+#: src/Includes/TaxoNomy.php:51
 msgid "Choose from the most used groups"
 msgstr ""
 
-#: src/Includes/Taxonomy.php:52
+#: src/Includes/TaxoNomy.php:52
 msgid "No groups found"
 msgstr ""
 
-#: src/Includes/Taxonomy.php:53
+#: src/Includes/TaxoNomy.php:53
 msgid "Groups"
 msgstr ""
