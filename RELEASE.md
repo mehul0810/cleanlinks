@@ -34,9 +34,16 @@ Use the smallest reliable validation for the changed boundary, then broaden for 
 - `composer check-cs`
 - `composer test`
 - `npm run build` when assets or release packaging are affected
+- `npm run package:release -- /tmp/cleanlinks-release.zip` when validating a release ZIP locally
 - `composer lint-blueprint` when Playground metadata changes
 
 If a validation command fails because of pre-existing unrelated debt, document the exact failure and keep the PR scoped.
+
+## Local Release Package
+
+Use `npm run package:release -- /tmp/cleanlinks-release.zip` as the authoritative local package command. It mirrors the prerelease workflow by installing production Composer dependencies, building npm assets, copying the release payload through `.distignore`, and writing a ZIP.
+
+The generated ZIP must include runtime plugin files such as `cleanlinks.php`, `config/`, `src/`, `vendor/autoload.php`, `dist/`, `languages/`, `uninstall.php`, `readme.txt`, and the `.wordpress-org/` release assets. It must exclude development-only files such as `.git/`, `.github/`, `node_modules/`, `tests/`, package manifests, CI/config files, source ZIPs, and nested release output.
 
 ## GitHub Release Behavior
 
