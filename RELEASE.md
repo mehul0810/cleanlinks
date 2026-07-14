@@ -21,6 +21,7 @@ Before preparing a release PR or release tag, verify and update as needed:
 - `README.md` public metadata when it mirrors WordPress.org content.
 - `package.json` and `composer.json` versions when package metadata is part of the release.
 - `.wordpress-org/blueprints/blueprint.json` if the release changes Playground behavior.
+- `.wordpress-org/` icon and banner PNGs only through the CleanLinks PO/release path when owner-supplied WordPress.org artwork changes.
 - Generated assets and translation files when source changes require them.
 
 ## Validation Checklist
