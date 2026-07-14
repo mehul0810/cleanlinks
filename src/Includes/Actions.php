@@ -46,6 +46,10 @@ class Actions {
 			return;
 		}
 
+		if ( ! $this->is_published_cleanlink( $post_id ) ) {
+			return;
+		}
+
 		// Update the access count
 		$this->update_access_count( $post_id );
 
@@ -66,12 +70,29 @@ class Actions {
 	 * @return int The new count value
 	 */
 	private function update_access_count( $post_id ) {
+		if ( ! $this->is_published_cleanlink( $post_id ) ) {
+			return (int) get_post_meta( $post_id, 'cleanlink_redirect_count', true );
+		}
+
 		$count = (int) get_post_meta( $post_id, 'cleanlink_redirect_count', true );
 		$new_count = $count + 1;
 
 		update_post_meta( $post_id, 'cleanlink_redirect_count', $new_count );
 
 		return $new_count;
+	}
+
+	/**
+	 * Check whether a post is a published cleanlink.
+	 *
+	 * @since 1.1.0
+	 * @access private
+	 *
+	 * @param int $post_id The post ID.
+	 * @return bool True when the post is a published cleanlink.
+	 */
+	private function is_published_cleanlink( $post_id ) {
+		return 'cleanlinks' === get_post_type( $post_id ) && 'publish' === get_post_status( $post_id );
 	}
 
 	/**
