@@ -58,6 +58,7 @@ class Actions {
 
 		// Perform the redirect
 		$this->perform_redirect( $redirect, $post_id );
+		exit;
 	}
 
 	/**
@@ -143,21 +144,16 @@ class Actions {
 	 */
 	private function perform_redirect( $redirect, $post_id ) {
 		if ( ! empty( $redirect ) ) {
-			// Check if nofollow is enabled
 			$nofollow = get_post_meta( $post_id, 'cleanlink_redirect_nofollow', true );
 
-			if ( '1' === $nofollow ) {
-				// Add nofollow meta tag before redirect
-				echo '<meta name="robots" content="nofollow">';
-				// Ensure the output is sent before the redirect
-				flush();
-			}
+			$redirected = wp_redirect( esc_url_raw( $redirect ), 301 ); // phpcs:ignore WordPressVIPMinimum.Security.ExitAfterRedirect.NoExit -- The caller exits immediately after this method returns.
 
-			wp_redirect( esc_url_raw( $redirect ), 301 );
-			exit;
+			if ( $redirected && '1' === $nofollow ) {
+				// Preserve the crawl directive without sending a response body before redirect headers.
+				header( 'X-Robots-Tag: nofollow', true );
+			}
 		} else {
-			wp_safe_redirect( home_url(), 302 );
-			exit;
+			wp_safe_redirect( home_url(), 302 ); // phpcs:ignore WordPressVIPMinimum.Security.ExitAfterRedirect.NoExit -- The caller exits immediately after this method returns.
 		}
 	}
 }
