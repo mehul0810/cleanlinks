@@ -8,6 +8,7 @@
 
 /tests
 /scripts
+/assets
 /node_modules
 /vendor/bin
 /vendor/composer/installers
@@ -36,6 +37,7 @@
 .prettierignore
 .nvmrc
 .npmrc
+/.npmpackagejsonlintrc.json
 .phpcs.xml.dist
 composer.json
 composer.lock
