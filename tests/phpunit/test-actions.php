@@ -15,6 +15,46 @@ use WP_UnitTestCase;
 
 class Test_Actions extends WP_UnitTestCase {
 	/**
+	 * Test that the default redirect keeps its status and destination without output.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return void
+	 */
+	public function test_default_redirect_sends_301_without_output() {
+		$post_id     = $this->factory->post->create( array( 'post_type' => 'cleanlinks' ) );
+		$destination = 'https://example.com/default-destination';
+
+		update_post_meta( $post_id, 'cleanlink_redirect_nofollow', '0' );
+
+		$response = $this->capture_redirect_response( $destination, $post_id );
+
+		$this->assertSame( $destination, $response['location'] );
+		$this->assertSame( 301, $response['status'] );
+		$this->assertSame( '', $response['output'] );
+	}
+
+	/**
+	 * Test that nofollow redirects send the same response without premature output.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return void
+	 */
+	public function test_nofollow_redirect_sends_301_without_output() {
+		$post_id     = $this->factory->post->create( array( 'post_type' => 'cleanlinks' ) );
+		$destination = 'https://example.com/nofollow-destination';
+
+		update_post_meta( $post_id, 'cleanlink_redirect_nofollow', '1' );
+
+		$response = $this->capture_redirect_response( $destination, $post_id );
+
+		$this->assertSame( $destination, $response['location'] );
+		$this->assertSame( 301, $response['status'] );
+		$this->assertSame( '', $response['output'] );
+	}
+
+	/**
 	 * Test that published cleanlinks increment the redirect count.
 	 *
 	 * @since 1.1.0
@@ -73,5 +113,47 @@ class Test_Actions extends WP_UnitTestCase {
 		$method->setAccessible( true );
 
 		return $method->invoke( new Actions(), $post_id );
+	}
+
+	/**
+	 * Capture a redirect response without sending headers from the test process.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $destination The redirect destination.
+	 * @param int    $post_id     The cleanlink post ID.
+	 * @return array The captured redirect response.
+	 */
+	private function capture_redirect_response( $destination, $post_id ) {
+		$location = null;
+		$status   = null;
+		$filter   = static function ( $redirect_location, $redirect_status ) use ( &$location, &$status ) {
+			$location = $redirect_location;
+			$status   = $redirect_status;
+
+			return false;
+		};
+
+		add_filter( 'wp_redirect', $filter, 10, 2 );
+		ob_start();
+
+		try {
+			$method = new ReflectionMethod( Actions::class, 'perform_redirect' );
+			$method->setAccessible( true );
+			$method->invoke( new Actions(), $destination, $post_id );
+			$output = ob_get_clean();
+		} finally {
+			remove_filter( 'wp_redirect', $filter, 10 );
+
+			if ( false === isset( $output ) && ob_get_level() ) {
+				ob_end_clean();
+			}
+		}
+
+		return array(
+			'location' => $location,
+			'status'   => $status,
+			'output'   => $output,
+		);
 	}
 }
