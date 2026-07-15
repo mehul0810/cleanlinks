@@ -10,7 +10,8 @@
 /scripts
 /assets
 /node_modules
-/vendor
+/vendor/bin
+/vendor/composer/installers
 /wp-org-assets
 /.release
 

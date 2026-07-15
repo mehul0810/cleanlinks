@@ -8,6 +8,11 @@ RELEASE_DIR="${ROOT_DIR}/.release/package"
 
 cd "${ROOT_DIR}"
 
+if grep -Eq '^[[:space:]]*/?vendor/?[[:space:]]*$' "${ROOT_DIR}/.distignore"; then
+	printf 'Release configuration error: .distignore must not exclude the root vendor directory.\n' >&2
+	exit 1
+fi
+
 if [[ "${OUTPUT_ZIP}" != /* ]]; then
 	OUTPUT_ZIP="${ROOT_DIR}/${OUTPUT_ZIP}"
 fi
@@ -20,10 +25,10 @@ CLEANLINKS_SKIP_WP_POT=1 npm run build
 
 rm -f "${OUTPUT_ZIP}"
 rm -rf "${RELEASE_DIR}"
-mkdir -p "${RELEASE_DIR}" "$(dirname "${OUTPUT_ZIP}")"
+mkdir -p "${RELEASE_DIR}"
 trap 'rm -rf "${RELEASE_DIR}"' EXIT
 
-rsync -rc --exclude-from="${ROOT_DIR}/.distignore" "${ROOT_DIR}/" "${RELEASE_DIR}/" --delete --delete-excluded
+rsync -rc --exclude=/vendor --exclude-from="${ROOT_DIR}/.distignore" "${ROOT_DIR}/" "${RELEASE_DIR}/" --delete --delete-excluded
 
 cp "${ROOT_DIR}/composer.json" "${ROOT_DIR}/composer.lock" "${RELEASE_DIR}/"
 
@@ -38,6 +43,8 @@ rm -rf \
 	"${RELEASE_DIR}/composer.lock" \
 	"${RELEASE_DIR}/vendor/bin" \
 	"${RELEASE_DIR}/vendor/composer/installers"
+
+mkdir -p "$(dirname "${OUTPUT_ZIP}")"
 
 (
 	cd "${RELEASE_DIR}"

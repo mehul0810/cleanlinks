@@ -71,6 +71,49 @@ foreach ( $required_files as $required_file ) {
 	}
 }
 
+$plugin_file = $zip->getFromName( 'cleanlinks.php' );
+$readme_file = $zip->getFromName( 'readme.txt' );
+
+if ( false !== $plugin_file && false !== $readme_file ) {
+	$metadata_checks = array(
+		'plugin version' => array(
+			'plugin_pattern' => '/^[ \t]*\*[ \t]+Version:[ \t]*(.+)$/mi',
+			'readme_pattern' => '/^Stable tag:[ \t]*(.+)$/mi',
+		),
+		'minimum WordPress version' => array(
+			'plugin_pattern' => '/^[ \t]*\*[ \t]+Requires at least:[ \t]*(.+)$/mi',
+			'readme_pattern' => '/^Requires at least:[ \t]*(.+)$/mi',
+		),
+		'minimum PHP version' => array(
+			'plugin_pattern' => '/^[ \t]*\*[ \t]+Requires PHP:[ \t]*(.+)$/mi',
+			'readme_pattern' => '/^Requires PHP:[ \t]*(.+)$/mi',
+		),
+		'license' => array(
+			'plugin_pattern' => '/^[ \t]*\*[ \t]+License:[ \t]*(.+)$/mi',
+			'readme_pattern' => '/^License:[ \t]*(.+)$/mi',
+		),
+	);
+
+	foreach ( $metadata_checks as $metadata_name => $metadata_check ) {
+		$plugin_match = array();
+		$readme_match = array();
+
+		if ( 1 !== preg_match( $metadata_check['plugin_pattern'], $plugin_file, $plugin_match ) ) {
+			$validation_errors[] = "Missing packaged plugin {$metadata_name} metadata.";
+			continue;
+		}
+
+		if ( 1 !== preg_match( $metadata_check['readme_pattern'], $readme_file, $readme_match ) ) {
+			$validation_errors[] = "Missing packaged readme {$metadata_name} metadata.";
+			continue;
+		}
+
+		if ( trim( $plugin_match[1] ) !== trim( $readme_match[1] ) ) {
+			$validation_errors[] = "Packaged {$metadata_name} metadata does not match between cleanlinks.php and readme.txt.";
+		}
+	}
+}
+
 $forbidden_patterns = array(
 	'#^(?:\.git(?:/|$)|\.github/|\.release/|assets/|node_modules/|scripts/|tests/)#',
 	'#^(?:AGENTS\.md|CONTRIBUTING\.md|README\.md|RELEASE\.md|composer\.(?:json|lock)|package(?:-lock)?\.json|phpunit\.xml(?:\.dist)?|webpack\.config\.js|\.distignore|\.npmpackagejsonlintrc\.json)$#',
