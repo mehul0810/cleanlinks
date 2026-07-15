@@ -34,16 +34,20 @@ Use the smallest reliable validation for the changed boundary, then broaden for 
 - `composer check-cs`
 - `composer test`
 - `npm run build` when assets or release packaging are affected
+- `npm run lint:pkg-json`
 - `npm run package:release -- /tmp/cleanlinks-release.zip` when validating a release ZIP locally
+- `npm run validate:package -- /tmp/cleanlinks-release.zip` when revalidating an existing ZIP
 - `composer lint-blueprint` when Playground metadata changes
 
 If a validation command fails because of pre-existing unrelated debt, document the exact failure and keep the PR scoped.
 
 ## Local Release Package
 
-Use `npm run package:release -- /tmp/cleanlinks-release.zip` as the authoritative local package command. It mirrors the prerelease workflow by installing production Composer dependencies, building npm assets, copying the release payload through `.distignore`, and writing a ZIP.
+Use `npm run package:release -- /tmp/cleanlinks-release.zip` as the authoritative local package command. The `npm run plugin-zip` command is an alias for the same builder. It mirrors the prerelease workflow by building npm assets, copying the release payload through `.distignore`, installing production-only Composer dependencies into the clean staging directory, and writing a validated ZIP. The builder never copies the developer's existing `vendor/` directory.
 
-The generated ZIP must include runtime plugin files such as `cleanlinks.php`, `config/`, `src/`, `vendor/autoload.php`, `dist/`, `languages/`, `uninstall.php`, `readme.txt`, and the `.wordpress-org/` release assets. It must exclude development-only files such as `.git/`, `.github/`, `node_modules/`, `tests/`, package manifests, CI/config files, source ZIPs, and nested release output.
+The generated ZIP must include runtime plugin files such as `cleanlinks.php`, `config/`, `src/`, `vendor/autoload.php`, `dist/`, `languages/`, `uninstall.php`, `readme.txt`, and the `.wordpress-org/` release assets. It must exclude development-only files such as `.git/`, `.github/`, `node_modules/`, `tests/`, source assets, Composer development packages, package manifests, CI/config files, source ZIPs, and nested release output. Package generation runs `scripts/validate-release-package.php` against the exact ZIP and fails when required files are missing or forbidden content is present.
+
+The repository package-json lint configuration extends the WordPress preset but requires `GPL-3.0-or-later` for this plugin. This resolves the preset's GPL-2.0-only valid-value rule without changing or weakening the GPLv3-or-later terms in plugin metadata.
 
 ## GitHub Release Behavior
 

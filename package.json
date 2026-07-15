@@ -41,9 +41,10 @@
 		"lint:pkg-json": "wp-scripts lint-pkg-json",
 		"packages-update": "wp-scripts packages-update",
 		"package:release": "bash scripts/build-release-zip.sh",
-		"plugin-zip": "wp-scripts plugin-zip",
+		"plugin-zip": "npm run package:release -- cleanlinks.zip",
 		"test:e2e": "wp-scripts test-e2e",
-		"test:unit": "wp-scripts test-unit-js"
+		"test:unit": "wp-scripts test-unit-js",
+		"validate:package": "php scripts/validate-release-package.php"
 	},
 	"lint-staged": {
 		"*.js": [

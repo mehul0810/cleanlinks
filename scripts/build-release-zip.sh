@@ -8,10 +8,8 @@ RELEASE_DIR="${ROOT_DIR}/.release/package"
 
 cd "${ROOT_DIR}"
 
-if [ ! -f vendor/autoload.php ]; then
-	composer install --no-dev --optimize-autoloader
-else
-	composer dump-autoload --no-dev --optimize
+if [[ "${OUTPUT_ZIP}" != /* ]]; then
+	OUTPUT_ZIP="${ROOT_DIR}/${OUTPUT_ZIP}"
 fi
 
 if [ ! -x node_modules/.bin/wp-scripts ]; then
@@ -22,15 +20,30 @@ CLEANLINKS_SKIP_WP_POT=1 npm run build
 
 rm -f "${OUTPUT_ZIP}"
 rm -rf "${RELEASE_DIR}"
-mkdir -p "${RELEASE_DIR}"
+mkdir -p "${RELEASE_DIR}" "$(dirname "${OUTPUT_ZIP}")"
+trap 'rm -rf "${RELEASE_DIR}"' EXIT
 
 rsync -rc --exclude-from="${ROOT_DIR}/.distignore" "${ROOT_DIR}/" "${RELEASE_DIR}/" --delete --delete-excluded
+
+cp "${ROOT_DIR}/composer.json" "${ROOT_DIR}/composer.lock" "${RELEASE_DIR}/"
+
+composer install \
+	--working-dir="${RELEASE_DIR}" \
+	--no-dev \
+	--no-interaction \
+	--optimize-autoloader
+
+rm -rf \
+	"${RELEASE_DIR}/composer.json" \
+	"${RELEASE_DIR}/composer.lock" \
+	"${RELEASE_DIR}/vendor/bin" \
+	"${RELEASE_DIR}/vendor/composer/installers"
 
 (
 	cd "${RELEASE_DIR}"
 	zip -qr "${OUTPUT_ZIP}" .
 )
 
-if [[ "${OUTPUT_ZIP}" != /* ]]; then
-	mv "${RELEASE_DIR}/${OUTPUT_ZIP}" "${ROOT_DIR}/${OUTPUT_ZIP}"
-fi
+php "${ROOT_DIR}/scripts/validate-release-package.php" "${OUTPUT_ZIP}"
+
+printf 'Release package: %s\n' "${OUTPUT_ZIP}"
