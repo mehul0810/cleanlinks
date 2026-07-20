@@ -7,10 +7,13 @@
 /.storybook
 
 /tests
+/scripts
+/assets
 /node_modules
 /vendor/bin
 /vendor/composer/installers
 /wp-org-assets
+/.release
 
 .scrutinizer.yml
 .travis.yml
@@ -32,16 +35,20 @@
 .huskyrc
 .husky
 .prettierignore
-.wordpress-org
 .nvmrc
 .npmrc
+/.npmpackagejsonlintrc.json
 .phpcs.xml.dist
+composer.json
 composer.lock
 package.json
 package-lock.json
+/*.zip
 phpunit.xml
 phpunit.xml.dist
 CHANGELOG.md
+AGENTS.md
+RELEASE.md
 README.md
 readme.md
 phpcs.ruleset.xml

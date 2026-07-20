@@ -28,7 +28,7 @@ const config = {
 	plugins: [ ...defaultConfig.plugins ],
 };
 
-if ( isProduction ) {
+if ( isProduction && '1' !== process.env.CLEANLINKS_SKIP_WP_POT ) {
 	// POT file.
 	wpPot({
 		package: 'CleanLinks',

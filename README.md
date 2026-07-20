@@ -3,9 +3,9 @@ Contributors: mehul0810, ankur0812
 Tags: link cloaking, link shortener, branded links, affiliate links, url shortener
 Donate link: https://www.buymeacoffee.com/mehulgohil
 Requires at least: 5.5
-Tested up to: 6.8
+Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 1.0.3
+Stable tag: 1.1.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -76,10 +76,18 @@ Yes, all links use your own site’s domain for maximum trust and branding.
 
 == Changelog ==
 
+= 1.1.0 =
+* Count redirect clicks only for published CleanLinks to avoid analytics changes for drafts and non-public links.
+* Add WordPress.org icon and banner assets for the CleanLinks plugin listing.
+* Confirm release metadata compatibility through WordPress 7.0.
+
 = 1.0.0 =
 * Initial release – Create branded short links, cloak affiliate URLs, enable click tracking, and export links to CSV.
 
 == Upgrade Notice ==
+
+= 1.1.0 =
+Click tracking now records redirects only for published CleanLinks; draft and non-public links continue to avoid analytics side effects.
 
 = 1.0.0 =
 First stable version of CleanLinks. Includes branded short links, affiliate link cloaking, CSV export, and basic analytics.

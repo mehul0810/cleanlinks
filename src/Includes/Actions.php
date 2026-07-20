@@ -46,6 +46,10 @@ class Actions {
 			return;
 		}
 
+		if ( ! $this->is_published_cleanlink( $post_id ) ) {
+			return;
+		}
+
 		// Update the access count
 		$this->update_access_count( $post_id );
 
@@ -54,6 +58,7 @@ class Actions {
 
 		// Perform the redirect
 		$this->perform_redirect( $redirect, $post_id );
+		exit;
 	}
 
 	/**
@@ -66,12 +71,29 @@ class Actions {
 	 * @return int The new count value
 	 */
 	private function update_access_count( $post_id ) {
+		if ( ! $this->is_published_cleanlink( $post_id ) ) {
+			return (int) get_post_meta( $post_id, 'cleanlink_redirect_count', true );
+		}
+
 		$count = (int) get_post_meta( $post_id, 'cleanlink_redirect_count', true );
 		$new_count = $count + 1;
 
 		update_post_meta( $post_id, 'cleanlink_redirect_count', $new_count );
 
 		return $new_count;
+	}
+
+	/**
+	 * Check whether a post is a published cleanlink.
+	 *
+	 * @since 1.1.0
+	 * @access private
+	 *
+	 * @param int $post_id The post ID.
+	 * @return bool True when the post is a published cleanlink.
+	 */
+	private function is_published_cleanlink( $post_id ) {
+		return 'cleanlinks' === get_post_type( $post_id ) && 'publish' === get_post_status( $post_id );
 	}
 
 	/**
@@ -122,21 +144,16 @@ class Actions {
 	 */
 	private function perform_redirect( $redirect, $post_id ) {
 		if ( ! empty( $redirect ) ) {
-			// Check if nofollow is enabled
 			$nofollow = get_post_meta( $post_id, 'cleanlink_redirect_nofollow', true );
 
-			if ( '1' === $nofollow ) {
-				// Add nofollow meta tag before redirect
-				echo '<meta name="robots" content="nofollow">';
-				// Ensure the output is sent before the redirect
-				flush();
-			}
+			$redirected = wp_redirect( esc_url_raw( $redirect ), 301 ); // phpcs:ignore WordPressVIPMinimum.Security.ExitAfterRedirect.NoExit -- The caller exits immediately after this method returns.
 
-			wp_redirect( esc_url_raw( $redirect ), 301 );
-			exit;
+			if ( $redirected && '1' === $nofollow ) {
+				// Preserve the crawl directive without sending a response body before redirect headers.
+				header( 'X-Robots-Tag: nofollow', true );
+			}
 		} else {
-			wp_safe_redirect( home_url(), 302 );
-			exit;
+			wp_safe_redirect( home_url(), 302 ); // phpcs:ignore WordPressVIPMinimum.Security.ExitAfterRedirect.NoExit -- The caller exits immediately after this method returns.
 		}
 	}
 }
