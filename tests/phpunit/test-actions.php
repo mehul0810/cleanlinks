@@ -96,7 +96,7 @@ class Test_Actions extends WP_UnitTestCase {
 		update_post_meta( $post_id, 'cleanlink_redirect_count', 2 );
 		update_post_meta( $post_id, 'cleanlink_redirect_url', 'https://example.com/destination' );
 		update_post_meta( $post_id, 'cleanlink_redirect_nofollow', '0' );
-		$this->assertSame( 2, Helpers::get_total_access_count( $post_id ) );
+		$this->assertSame( 2, (int) Helpers::get_total_access_count( $post_id ) );
 
 		$this->go_to( get_permalink( $post_id ) );
 		$location = null;
@@ -120,7 +120,7 @@ class Test_Actions extends WP_UnitTestCase {
 			remove_filter( 'wp_redirect', $filter, 10 );
 		}
 
-		$this->assertSame( 3, Helpers::get_total_access_count( $post_id ) );
+		$this->assertSame( 3, (int) Helpers::get_total_access_count( $post_id ) );
 	}
 
 	/**
