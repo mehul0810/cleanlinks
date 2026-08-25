@@ -3,9 +3,9 @@ Contributors: mehul0810, ankur0812
 Tags: link cloaking, link branding, affiliate links, link shortener, redirect manager
 Donate link: https://www.buymeacoffee.com/mehulgohil
 Requires at least: 5.5
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -68,6 +68,11 @@ Yes, CleanLinks is fully compatible with popular caching and SEO plugins.
 4. Analytics and click tracking interface.
 
 == Changelog ==
+
+= 1.1.1 =
+* Confirm compatibility through WordPress 7.1.
+* Invalidate cached click counts after redirect clicks are recorded.
+* Remediate Composer development-tool security advisories.
 
 = 1.1.0 =
 * Count redirect clicks only for published CleanLinks to avoid analytics changes for drafts and non-public links.
