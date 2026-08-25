@@ -71,7 +71,7 @@ Yes, CleanLinks is fully compatible with popular caching and SEO plugins.
 
 = 1.1.1 =
 * Confirm compatibility through WordPress 7.1.
-* Invalidate cached click counts when CleanLinks are updated.
+* Invalidate cached click counts after redirect clicks are recorded.
 * Remediate Composer development-tool security advisories.
 
 = 1.1.0 =
