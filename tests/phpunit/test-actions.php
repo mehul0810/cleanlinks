@@ -10,6 +10,7 @@
 namespace MG\CleanLinks\Tests;
 
 use MG\CleanLinks\Includes\Actions;
+use MG\CleanLinks\Includes\Helpers;
 use ReflectionMethod;
 use WP_UnitTestCase;
 
@@ -75,6 +76,51 @@ class Test_Actions extends WP_UnitTestCase {
 
 		$this->assertSame( 3, $count );
 		$this->assertSame( '3', get_post_meta( $post_id, 'cleanlink_redirect_count', true ) );
+	}
+
+	/**
+	 * Test that published redirects invalidate the cached access count.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @return void
+	 */
+	public function test_published_cleanlinks_invalidate_cached_access_count_after_redirect() {
+		$post_id = $this->factory->post->create(
+			array(
+				'post_type'   => 'cleanlinks',
+				'post_status' => 'publish',
+			)
+		);
+
+		update_post_meta( $post_id, 'cleanlink_redirect_count', 2 );
+		update_post_meta( $post_id, 'cleanlink_redirect_url', 'https://example.com/destination' );
+		update_post_meta( $post_id, 'cleanlink_redirect_nofollow', '0' );
+		$this->assertSame( 2, (int) Helpers::get_total_access_count( $post_id ) );
+
+		$this->go_to( get_permalink( $post_id ) );
+		$location = null;
+		$status   = null;
+		$filter   = static function ( $redirect_location, $redirect_status ) use ( &$location, &$status ) {
+			$location = $redirect_location;
+			$status   = $redirect_status;
+
+			throw new \RuntimeException( 'Stop redirect for test.' );
+		};
+
+		add_filter( 'wp_redirect', $filter, 10, 2 );
+
+		try {
+			( new Actions() )->cleanlink_redirect_and_count();
+			$this->fail( 'The redirect path should invoke wp_redirect.' );
+		} catch ( \RuntimeException $exception ) {
+			$this->assertSame( 'https://example.com/destination', $location );
+			$this->assertSame( 301, $status );
+		} finally {
+			remove_filter( 'wp_redirect', $filter, 10 );
+		}
+
+		$this->assertSame( 3, (int) Helpers::get_total_access_count( $post_id ) );
 	}
 
 	/**

@@ -79,6 +79,7 @@ class Actions {
 		$new_count = $count + 1;
 
 		update_post_meta( $post_id, 'cleanlink_redirect_count', $new_count );
+		wp_cache_delete( 'cleanlink_count_' . $post_id );
 
 		return $new_count;
 	}
