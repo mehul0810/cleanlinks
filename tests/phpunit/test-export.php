@@ -121,4 +121,38 @@ class Test_Export extends WP_UnitTestCase {
 		$this->assertSame( $post_ids, $exported_ids );
 		$this->assertLessThan( 20, $query_count );
 	}
+
+	/**
+	 * Export iterator preserves exact IDs for a ten-thousand-row dataset.
+	 *
+	 * @since 1.1.1
+	 * @access public
+	 *
+	 * @return void
+	 */
+	public function test_export_query_iterates_ten_thousand_rows_with_bounded_queries() {
+		global $wpdb;
+
+		$post_ids = array();
+		for ( $index = 0; $index < 10000; $index++ ) {
+			$post_ids[] = (int) $this->factory->post->create(
+				array(
+					'post_type'   => 'cleanlinks',
+					'post_status' => 'publish',
+					'post_title'  => 'Ten thousand row ' . $index,
+				)
+			);
+		}
+
+		$queries_before = $wpdb->num_queries;
+		$rows           = iterator_to_array( ( new ExportQuery() )->iterate_rows() );
+		$query_count    = $wpdb->num_queries - $queries_before;
+
+		$this->assertCount( 10000, $rows );
+		$exported_ids = wp_list_pluck( $rows, 0 );
+		sort( $post_ids );
+		sort( $exported_ids );
+		$this->assertSame( $post_ids, $exported_ids );
+		$this->assertLessThan( 250, $query_count );
+	}
 }

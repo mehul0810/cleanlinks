@@ -89,33 +89,107 @@ class Export {
 			wp_die( esc_html__( 'Filesystem API not available.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 500 ) );
 		}
 
-		$csv_data = $this->serializer->serialize( $this->query->get_rows() );
-
 		// Write to temp file
 		$tmp_file = wp_tempnam( 'export_cleanlink.csv' );
 		if ( ! $tmp_file ) {
 			wp_die( esc_html__( 'Could not create a temp file.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 500 ) );
 		}
 
-		if ( ! $wp_filesystem->put_contents( $tmp_file, $csv_data, FS_CHMOD_FILE ) ) {
+		// Preserve compatibility with injected legacy query/serializer doubles.
+		if ( ! method_exists( $this->query, 'iterate_rows' ) || ! method_exists( $this->serializer, 'serialize_header' ) || ! method_exists( $this->serializer, 'serialize_chunk' ) ) {
+			$csv_data = $this->serializer->serialize( $this->query->get_rows() );
+			if ( ! $wp_filesystem->put_contents( $tmp_file, $csv_data, FS_CHMOD_FILE ) ) {
+				$wp_filesystem->delete( $tmp_file );
+				wp_die( esc_html__( 'Could not write CSV file.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 500 ) );
+			}
+
+			$file_contents = $wp_filesystem->get_contents( $tmp_file );
+			if ( false === $file_contents ) {
+				$wp_filesystem->delete( $tmp_file );
+				wp_die( esc_html__( 'Could not read CSV file.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 500 ) );
+			}
+
+			header( 'Content-Type: text/csv; charset=utf-8' );
+			header( 'Content-Disposition: attachment; filename=export_cleanlink.csv' );
+
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Outputting raw CSV data for file download
+			echo $file_contents;
+
+			$wp_filesystem->delete( $tmp_file );
+			exit;
+		}
+
+		// Use a native stream so the complete export is not held in memory.
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations -- wp_tempnam() provides a local temporary path.
+		$file_handle = fopen( $tmp_file, 'wb' );
+		if ( false === $file_handle ) {
+			$wp_filesystem->delete( $tmp_file );
 			wp_die( esc_html__( 'Could not write CSV file.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 500 ) );
 		}
 
-		// Read and download
-		$file_contents = $wp_filesystem->get_contents( $tmp_file );
-		if ( false === $file_contents ) {
+		$write_succeeded = $this->write_file_contents( $file_handle, $this->serializer->serialize_header() );
+		$rows            = method_exists( $this->query, 'iterate_rows' ) ? $this->query->iterate_rows() : $this->query->get_rows();
+		$chunk           = array();
+		foreach ( $rows as $row ) {
+			$chunk[] = $row;
+			if ( count( $chunk ) < ExportQuery::PAGE_SIZE ) {
+				continue;
+			}
+
+			$write_succeeded = $write_succeeded && $this->write_file_contents( $file_handle, "\r\n" . $this->serializer->serialize_chunk( $chunk ) );
+			$chunk           = array();
+		}
+
+		if ( ! empty( $chunk ) ) {
+			$write_succeeded = $write_succeeded && $this->write_file_contents( $file_handle, "\r\n" . $this->serializer->serialize_chunk( $chunk ) );
+		}
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations -- Close the local temporary stream opened above.
+		fclose( $file_handle );
+		if ( ! $write_succeeded ) {
+			$wp_filesystem->delete( $tmp_file );
 			wp_die( esc_html__( 'Could not read CSV file.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 500 ) );
 		}
 
 		header( 'Content-Type: text/csv; charset=utf-8' );
 		header( 'Content-Disposition: attachment; filename=export_cleanlink.csv' );
 
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Outputting raw CSV data for file download
-		echo $file_contents;
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations -- Stream the local temporary file without duplicating it in memory.
+		if ( false === readfile( $tmp_file ) ) {
+			$wp_filesystem->delete( $tmp_file );
+			wp_die( esc_html__( 'Could not read CSV file.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 500 ) );
+		}
 
 		$wp_filesystem->delete( $tmp_file );
 
 		exit;
+	}
+
+	/**
+	 * Write all content to an open temporary file stream.
+	 *
+	 * @since 1.1.1
+	 * @access private
+	 *
+	 * @param resource $handle  Open file handle.
+	 * @param string   $contents Content to write.
+	 * @return bool
+	 */
+	private function write_file_contents( $handle, $contents ) {
+		$length = strlen( $contents );
+		$offset = 0;
+
+		while ( $offset < $length ) {
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations -- Write to the local temporary stream.
+			$written = fwrite( $handle, substr( $contents, $offset ) );
+			if ( false === $written || 0 === $written ) {
+				return false;
+			}
+
+			$offset += $written;
+		}
+
+		return true;
 	}
 
 	public function render_ui() {
