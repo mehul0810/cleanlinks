@@ -42,6 +42,45 @@ class AccessCounter {
 	private const LOCK_TIMEOUT_SECONDS = 2;
 
 	/**
+	 * Poll interval for the portable lock fallback.
+	 *
+	 * @var int
+	 */
+	private const LOCK_POLL_MICROSECONDS = 10000;
+
+	/**
+	 * Optional lock callbacks used by deterministic tests and integrations.
+	 *
+	 * @var callable|null
+	 */
+	private $lock_acquirer;
+
+	/**
+	 * Optional lock release callback used by deterministic tests and integrations.
+	 *
+	 * @var callable|null
+	 */
+	private $lock_releaser;
+
+	/**
+	 * Initialize the counter.
+	 *
+	 * The callbacks are intentionally optional. Production requests use the
+	 * database advisory lock with a portable local fallback; tests can inject a
+	 * bounded lock failure without depending on a particular database driver.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @param callable|null $lock_acquirer Lock callback receiving post ID and timeout.
+	 * @param callable|null $lock_releaser Release callback receiving the lock token.
+	 * @return void
+	 */
+	public function __construct( $lock_acquirer = null, $lock_releaser = null ) {
+		$this->lock_acquirer = is_callable( $lock_acquirer ) ? $lock_acquirer : null;
+		$this->lock_releaser = is_callable( $lock_releaser ) ? $lock_releaser : null;
+	}
+
+	/**
 	 * Get the total access count for a cleanlink.
 	 *
 	 * @since 1.1.1
@@ -81,11 +120,32 @@ class AccessCounter {
 		}
 
 		/*
-		 * Keep the metadata short-circuit contract while avoiding the
-		 * read-modify-write race in update_post_meta(). The regular path uses a
-		 * single SQL UPDATE, so concurrent requests cannot overwrite one another.
+		 * When an extension observes or short-circuits post-meta updates, use the
+		 * WordPress API while a bounded per-link lock is held. This preserves the
+		 * complete metadata contract without reintroducing a read-modify-write race.
 		 */
-		if ( ! $this->allows_count_update( $post_id ) ) {
+		$lock_failed = false;
+
+		if ( $this->requires_metadata_contract() ) {
+			$lock = $this->acquire_count_lock( $post_id );
+
+			if ( false !== $lock ) {
+				try {
+					return $this->increment_with_metadata_api( $post_id );
+				} finally {
+					$this->release_count_lock( $lock );
+				}
+			}
+
+			$lock_failed = true;
+		}
+
+		/*
+		 * A lock timeout or unsupported lock driver must not suppress the click.
+		 * Apply the short-circuit filter once, then use the database-side atomic
+		 * path and its action mirror as the bounded fallback.
+		 */
+		if ( null !== $this->apply_update_metadata_filter( $post_id ) ) {
 			return (int) get_post_meta( $post_id, self::COUNT_META_KEY, true );
 		}
 
@@ -95,13 +155,33 @@ class AccessCounter {
 			return (int) get_post_meta( $post_id, self::COUNT_META_KEY, true );
 		}
 
-		if ( 0 === $updated && ! $this->initialize_count( $post_id ) ) {
+		if ( 0 === $updated && ! $this->initialize_count( $post_id, $lock_failed ) ) {
 			return (int) get_post_meta( $post_id, self::COUNT_META_KEY, true );
 		}
 
 		$this->invalidate_count_caches( $post_id );
 
 		// Read back the stored value so callers never expose an unpersisted count.
+		return (int) get_post_meta( $post_id, self::COUNT_META_KEY, true );
+	}
+
+	/**
+	 * Increment through WordPress metadata APIs while a per-link lock is held.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @param int $post_id Post ID.
+	 * @return int The current or new count value.
+	 */
+	private function increment_with_metadata_api( $post_id ) {
+		// Discard a local metadata cache populated before the lock was acquired.
+		wp_cache_delete( $post_id, 'post_meta' );
+
+		$count = (int) get_post_meta( $post_id, self::COUNT_META_KEY, true );
+		update_post_meta( $post_id, self::COUNT_META_KEY, $count + 1 );
+
+		$this->invalidate_count_caches( $post_id );
+
 		return (int) get_post_meta( $post_id, self::COUNT_META_KEY, true );
 	}
 
@@ -115,15 +195,17 @@ class AccessCounter {
 	 * @since 1.1.1
 	 *
 	 * @param int $post_id Post ID.
-	 * @return bool True when the count may be incremented.
+	 * @return mixed Null when the update may continue, otherwise the filter's
+	 *               short-circuit value.
 	 */
-	private function allows_count_update( $post_id ) {
+	private function apply_update_metadata_filter( $post_id ) {
 		if ( false === has_filter( 'update_post_metadata' ) ) {
-			return true;
+			return null;
 		}
 
 		$count = (int) get_post_meta( $post_id, self::COUNT_META_KEY, true );
-		$check = apply_filters(
+
+		return apply_filters(
 			'update_post_metadata',
 			null,
 			$post_id,
@@ -131,8 +213,6 @@ class AccessCounter {
 			$count + 1,
 			''
 		);
-
-		return null === $check;
 	}
 
 	/**
@@ -219,6 +299,142 @@ class AccessCounter {
 	}
 
 	/**
+	 * Check whether the full metadata contract must be serialized.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @return bool True when the WordPress metadata API path is required.
+	 */
+	private function requires_metadata_contract() {
+		return false !== has_filter( 'update_post_metadata' ) || $this->has_count_meta_actions();
+	}
+
+	/**
+	 * Acquire a bounded per-link lock.
+	 *
+	 * MySQL and MariaDB use database advisory locks. SQLite and other drivers
+	 * fall back to a local file lock, while a failure of both mechanisms falls
+	 * through to the atomic/optimistic write path instead of dropping a click.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @param int $post_id Post ID.
+	 * @return mixed Lock token, or false when no lock was acquired.
+	 */
+	private function acquire_count_lock( $post_id ) {
+		if ( null !== $this->lock_acquirer ) {
+			return ( $this->lock_acquirer )( $post_id, self::LOCK_TIMEOUT_SECONDS );
+		}
+
+		global $wpdb;
+
+		$lock_name = $this->get_lock_name( $post_id );
+
+		if ( ! $this->is_sqlite_database() ) {
+			$acquired = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Per-link advisory lock.
+				$wpdb->prepare(
+					'SELECT GET_LOCK(%s, %d)',
+					$lock_name,
+					self::LOCK_TIMEOUT_SECONDS
+				)
+			);
+
+			if ( 1 === (int) $acquired ) {
+				return array(
+					'type' => 'database',
+					'name' => $lock_name,
+				);
+			}
+		}
+
+		return $this->acquire_file_lock( $lock_name );
+	}
+
+	/**
+	 * Release a lock returned by acquire_count_lock().
+	 *
+	 * @since 1.1.1
+	 *
+	 * @param mixed $lock Lock token.
+	 * @return void
+	 */
+	private function release_count_lock( $lock ) {
+		if ( null !== $this->lock_releaser ) {
+			( $this->lock_releaser )( $lock );
+			return;
+		}
+
+		if ( ! is_array( $lock ) || ! isset( $lock['type'] ) ) {
+			return;
+		}
+
+		if ( 'database' === $lock['type'] && isset( $lock['name'] ) ) {
+			global $wpdb;
+
+			$wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Release per-link advisory lock.
+				$wpdb->prepare(
+					'SELECT RELEASE_LOCK(%s)',
+					$lock['name']
+				)
+			);
+			return;
+		}
+
+		if ( 'file' === $lock['type'] && isset( $lock['handle'] ) ) {
+			flock( $lock['handle'], LOCK_UN ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_flock -- Release local lock.
+			fclose( $lock['handle'] ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Release local lock.
+		}
+	}
+
+	/**
+	 * Acquire the portable local lock fallback without waiting indefinitely.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @param string $lock_name Database-independent lock name.
+	 * @return array|false Lock token, or false when the fallback cannot be used.
+	 */
+	private function acquire_file_lock( $lock_name ) {
+		$lock_path = trailingslashit( sys_get_temp_dir() ) . 'cleanlinks-count-' . md5( $lock_name ) . '.lock';
+		$handle    = @fopen( $lock_path, 'c' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged,WordPress.WP.AlternativeFunctions.file_system_operations_fopen -- Lock fallback must fail closed without emitting a request warning.
+
+		if ( false === $handle ) {
+			return false;
+		}
+
+		$deadline = microtime( true ) + self::LOCK_TIMEOUT_SECONDS;
+
+		while ( microtime( true ) < $deadline ) {
+			if ( flock( $handle, LOCK_EX | LOCK_NB ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_flock -- Acquire local lock fallback.
+				return array(
+					'type'   => 'file',
+					'handle' => $handle,
+				);
+			}
+
+			usleep( self::LOCK_POLL_MICROSECONDS );
+		}
+
+		fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Release failed local lock attempt.
+
+		return false;
+	}
+
+	/**
+	 * Detect SQLite before issuing the MySQL-only advisory-lock query.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @return bool True when the active database adapter is SQLite.
+	 */
+	private function is_sqlite_database() {
+		global $wpdb;
+
+		return ( defined( 'DB_ENGINE' ) && 'sqlite' === strtolower( DB_ENGINE ) )
+			|| false !== stripos( get_class( $wpdb ), 'sqlite' );
+	}
+
+	/**
 	 * Get count metadata rows for action compatibility.
 	 *
 	 * @since 1.1.1
@@ -273,53 +489,86 @@ class AccessCounter {
 	 *
 	 * @since 1.1.1
 	 *
+	 * @param int  $post_id    Post ID.
+	 * @param bool $lock_failed Whether the caller already attempted and failed to
+	 *                          acquire the lock.
+	 * @return bool True when a count was persisted.
+	 */
+	private function initialize_count( $post_id, $lock_failed = false ) {
+		$lock = $lock_failed ? false : $this->acquire_count_lock( $post_id );
+
+		if ( false !== $lock ) {
+			try {
+				return $this->initialize_count_under_lock( $post_id );
+			} finally {
+				$this->release_count_lock( $lock );
+			}
+		}
+
+		/*
+		 * A database adapter may not support advisory locks and a local lock may
+		 * be unavailable. Retry the atomic read path around one standard insert so
+		 * a concurrent initializer is observed instead of losing this click.
+		 */
+		return $this->initialize_count_without_lock( $post_id );
+	}
+
+	/**
+	 * Initialize a missing count while the caller owns the per-link lock.
+	 *
+	 * @since 1.1.1
+	 *
 	 * @param int $post_id Post ID.
 	 * @return bool True when a count was persisted.
 	 */
-	private function initialize_count( $post_id ) {
-		global $wpdb;
+	private function initialize_count_under_lock( $post_id ) {
+		$updated = $this->increment_persisted_count( $post_id );
 
-		$lock_name = $this->get_lock_name( $post_id );
-		$acquired  = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- First-write lock.
-			$wpdb->prepare(
-				'SELECT GET_LOCK(%s, %d)',
-				$lock_name,
-				self::LOCK_TIMEOUT_SECONDS
-			)
-		);
-
-		if ( 1 !== (int) $acquired ) {
+		if ( false === $updated ) {
 			return false;
 		}
 
-		try {
-			// Another request may have initialized the row before this lock was acquired.
-			$updated = $this->increment_persisted_count( $post_id );
-
-			if ( false === $updated ) {
-				return false;
-			}
-
-			if ( 0 < $updated ) {
-				return true;
-			}
-
-			$added = add_post_meta( $post_id, self::COUNT_META_KEY, self::INITIAL_COUNT, true );
-
-			if ( false !== $added ) {
-				return true;
-			}
-
-			// A concurrent writer outside this lock may have created the row.
-			return 0 < $this->increment_persisted_count( $post_id );
-		} finally {
-			$wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Release lock.
-				$wpdb->prepare(
-					'SELECT RELEASE_LOCK(%s)',
-					$lock_name
-				)
-			);
+		if ( 0 < $updated ) {
+			return true;
 		}
+
+		$added = add_post_meta( $post_id, self::COUNT_META_KEY, self::INITIAL_COUNT, true );
+
+		if ( false !== $added ) {
+			return true;
+		}
+
+		// A concurrent writer outside this lock may have created the row.
+		return 0 < $this->increment_persisted_count( $post_id );
+	}
+
+	/**
+	 * Initialize a missing count after lock acquisition failed.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @param int $post_id Post ID.
+	 * @return bool True when a count was persisted.
+	 */
+	private function initialize_count_without_lock( $post_id ) {
+		$updated = $this->increment_persisted_count( $post_id );
+
+		if ( false === $updated ) {
+			return false;
+		}
+
+		if ( 0 < $updated ) {
+			return true;
+		}
+
+		$added = add_post_meta( $post_id, self::COUNT_META_KEY, self::INITIAL_COUNT, true );
+
+		if ( false !== $added ) {
+			return true;
+		}
+
+		// A concurrent writer may have inserted the row after the first probe.
+		return 0 < $this->increment_persisted_count( $post_id );
 	}
 
 	/**

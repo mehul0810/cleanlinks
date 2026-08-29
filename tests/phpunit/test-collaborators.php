@@ -62,6 +62,89 @@ class Test_Collaborators extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A bounded lock failure still records a cold-row click.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @return void
+	 */
+	public function test_access_counter_falls_back_when_lock_acquisition_fails() {
+		$post_id = $this->factory->post->create(
+			array(
+				'post_type'   => 'cleanlinks',
+				'post_status' => 'publish',
+			)
+		);
+
+		$attempts = 0;
+		$timeout  = null;
+		$locked_post_id = null;
+		$acquire        = static function ( $received_post_id, $received_timeout ) use ( &$attempts, &$timeout, &$locked_post_id ) {
+			++$attempts;
+			$timeout = $received_timeout;
+			$locked_post_id = $received_post_id;
+
+			return false;
+		};
+		$counter        = new AccessCounter( $acquire );
+
+		$this->assertSame( 1, $counter->increment( $post_id ) );
+		$this->assertSame( 2, $counter->increment( $post_id ) );
+		$this->assertSame( $post_id, $locked_post_id );
+		$this->assertSame( 1, $attempts );
+		$this->assertSame( 2, $timeout );
+		$this->assertSame( '2', get_post_meta( $post_id, 'cleanlink_redirect_count', true ) );
+	}
+
+	/**
+	 * The metadata short-circuit receives the same arguments as update_post_meta().
+	 *
+	 * @since 1.1.1
+	 *
+	 * @return void
+	 */
+	public function test_access_counter_preserves_update_metadata_filter_contract() {
+		$post_id = $this->factory->post->create(
+			array(
+				'post_type'   => 'cleanlinks',
+				'post_status' => 'publish',
+			)
+		);
+
+		update_post_meta( $post_id, 'cleanlink_redirect_count', 2 );
+
+		$filter_args = array();
+		$filter      = static function ( $check, $object_id, $meta_key, $meta_value, $prev_value ) use ( &$filter_args ) {
+			$filter_args = array( $object_id, $meta_key, $meta_value, $prev_value );
+
+			return false;
+		};
+		$released    = false;
+		$acquire     = static function () {
+			return array( 'type' => 'test' );
+		};
+		$release     = static function ( $lock ) use ( &$released ) {
+			$released = ( array( 'type' => 'test' ) === $lock );
+		};
+
+		add_filter( 'update_post_metadata', $filter, 10, 5 );
+
+		try {
+			$count = ( new AccessCounter( $acquire, $release ) )->increment( $post_id );
+		} finally {
+			remove_filter( 'update_post_metadata', $filter, 10 );
+		}
+
+		$this->assertSame(
+			array( $post_id, 'cleanlink_redirect_count', 3, '' ),
+			$filter_args
+		);
+		$this->assertSame( 2, $count );
+		$this->assertTrue( $released );
+		$this->assertSame( '2', get_post_meta( $post_id, 'cleanlink_redirect_count', true ) );
+	}
+
+	/**
 	 * An interleaved writer is not overwritten by a stale count read.
 	 *
 	 * The query filter places a second persisted value immediately before the
@@ -169,7 +252,12 @@ class Test_Collaborators extends WP_UnitTestCase {
 		add_action( 'updated_postmeta', $record_after, 10, 4 );
 
 		try {
-			$count = ( new AccessCounter() )->increment( $post_id );
+			$counter = new AccessCounter(
+				static function () {
+					return false;
+				}
+			);
+			$count = $counter->increment( $post_id );
 		} finally {
 			remove_action( 'update_post_meta', $record_before, 10 );
 			remove_action( 'update_postmeta', $record_before, 10 );
