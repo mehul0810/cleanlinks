@@ -21,6 +21,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class ExportQuery {
 	/**
+	 * Number of rows loaded per export page.
+	 *
+	 * @var int
+	 */
+	const PAGE_SIZE = 200;
+
+	/**
 	 * Get published CleanLinks export rows.
 	 *
 	 * @since 1.1.1
@@ -29,33 +36,39 @@ class ExportQuery {
 	 * @return array
 	 */
 	public function get_rows() {
-		$query = new \WP_Query(
-			array(
-				'post_type'              => 'cleanlinks',
-				'post_status'            => 'publish',
-				'posts_per_page'         => 200,
-				'fields'                 => 'ids',
-				'no_found_rows'          => true,
-				'update_post_meta_cache' => false,
-				'update_post_term_cache' => false,
-			)
-		);
-
 		$rows = array();
+		$page = 1;
 
-		foreach ( $query->posts as $post_id ) {
-			$post = get_post( $post_id );
-			if ( ! $post ) {
-				continue;
+		// Read bounded pages so large exports do not silently stop at the first page.
+		do {
+			$query = new \WP_Query(
+				array(
+					'post_type'              => 'cleanlinks',
+					'post_status'            => 'publish',
+					'posts_per_page'         => self::PAGE_SIZE,
+					'paged'                  => $page,
+					'orderby'                => 'ID',
+					'order'                  => 'ASC',
+					'fields'                 => 'all',
+					'no_found_rows'          => true,
+					'update_post_meta_cache' => true,
+					'update_post_term_cache' => false,
+				)
+			);
+
+			foreach ( $query->posts as $post ) {
+				$post_id = (int) $post->ID;
+
+				$rows[] = array(
+					$post_id,
+					$post->post_title,
+					get_permalink( $post_id ),
+					get_post_meta( $post_id, 'cleanlink_redirect_url', true ),
+				);
 			}
 
-			$rows[] = array(
-				$post_id,
-				$post->post_title,
-				get_permalink( $post_id ),
-				get_post_meta( $post_id, 'cleanlink_redirect_url', true ),
-			);
-		}
+			$page++;
+		} while ( count( $query->posts ) === self::PAGE_SIZE );
 
 		return $rows;
 	}
