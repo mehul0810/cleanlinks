@@ -41,6 +41,337 @@ class Test_Collaborators extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The count collaborator initializes links that have no count metadata.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @return void
+	 */
+	public function test_access_counter_initializes_missing_count_metadata() {
+		$post_id = $this->factory->post->create(
+			array(
+				'post_type'   => 'cleanlinks',
+				'post_status' => 'publish',
+			)
+		);
+
+		$counter = new AccessCounter();
+
+		$this->assertSame( 1, $counter->increment( $post_id ) );
+		$this->assertSame( '1', get_post_meta( $post_id, 'cleanlink_redirect_count', true ) );
+	}
+
+	/**
+	 * A bounded lock failure still records a cold-row click.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @return void
+	 */
+	public function test_access_counter_falls_back_when_lock_acquisition_fails() {
+		$post_id = $this->factory->post->create(
+			array(
+				'post_type'   => 'cleanlinks',
+				'post_status' => 'publish',
+			)
+		);
+
+		$attempts = 0;
+		$timeout  = null;
+		$locked_post_id = null;
+		$acquire        = static function ( $received_post_id, $received_timeout ) use ( &$attempts, &$timeout, &$locked_post_id ) {
+			++$attempts;
+			$timeout = $received_timeout;
+			$locked_post_id = $received_post_id;
+
+			return false;
+		};
+		$counter        = new AccessCounter( $acquire );
+
+		$this->assertSame( 1, $counter->increment( $post_id ) );
+		$this->assertSame( 2, $counter->increment( $post_id ) );
+		$this->assertSame( $post_id, $locked_post_id );
+		$this->assertSame( 1, $attempts );
+		$this->assertSame( 2, $timeout );
+		$this->assertSame( '2', get_post_meta( $post_id, 'cleanlink_redirect_count', true ) );
+	}
+
+	/**
+	 * A database lock contender does not switch to the independent file lock.
+	 *
+	 * An integer zero is the documented GET_LOCK() contention result. The
+	 * external action forces the metadata-contract branch so the test proves
+	 * that contention reaches the atomic fallback instead of the API path.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @return void
+	 */
+	public function test_access_counter_does_not_use_api_after_database_lock_contention() {
+		$post_id = $this->factory->post->create(
+			array(
+				'post_type'   => 'cleanlinks',
+				'post_status' => 'publish',
+			)
+		);
+
+		update_post_meta( $post_id, 'cleanlink_redirect_count', 2 );
+
+		$atomic_update = false;
+		$observe_query = static function ( $query ) use ( &$atomic_update ) {
+			if ( false !== stripos( $query, 'CAST(meta_value AS SIGNED)' ) ) {
+				$atomic_update = true;
+			}
+
+			return $query;
+		};
+		$metadata_action = static function () {};
+
+		add_action( 'update_post_meta', $metadata_action, 10, 4 );
+		add_filter( 'query', $observe_query );
+
+		try {
+			$count = ( new AccessCounter(
+				static function () {
+					return 0;
+				}
+			) )->increment( $post_id );
+		} finally {
+			remove_action( 'update_post_meta', $metadata_action, 10 );
+			remove_filter( 'query', $observe_query );
+		}
+
+		$this->assertTrue( $atomic_update );
+		$this->assertSame( 3, $count );
+		$this->assertSame( '3', get_post_meta( $post_id, 'cleanlink_redirect_count', true ) );
+	}
+
+	/**
+	 * A metadata short-circuit is not evaluated after lock acquisition fails.
+	 *
+	 * Without the lock, the proposed value could be stale by the time an atomic
+	 * fallback write runs. Failing closed keeps the filter contract from
+	 * approving one value while persisting a different one.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @return void
+	 */
+	public function test_access_counter_fails_closed_when_metadata_filter_lock_fails() {
+		$post_id = $this->factory->post->create(
+			array(
+				'post_type'   => 'cleanlinks',
+				'post_status' => 'publish',
+			)
+		);
+
+		update_post_meta( $post_id, 'cleanlink_redirect_count', 2 );
+
+		$filter_calls = 0;
+		$filter       = static function () use ( &$filter_calls ) {
+			++$filter_calls;
+
+			return null;
+		};
+
+		add_filter( 'update_post_metadata', $filter, 10, 5 );
+
+		try {
+			$count = ( new AccessCounter(
+				static function () {
+					return false;
+				}
+			) )->increment( $post_id );
+		} finally {
+			remove_filter( 'update_post_metadata', $filter, 10 );
+		}
+
+		$this->assertSame( 0, $filter_calls );
+		$this->assertSame( 2, $count );
+		$this->assertSame( '2', get_post_meta( $post_id, 'cleanlink_redirect_count', true ) );
+	}
+
+	/**
+	 * The metadata short-circuit receives the same arguments as update_post_meta().
+	 *
+	 * @since 1.1.1
+	 *
+	 * @return void
+	 */
+	public function test_access_counter_preserves_update_metadata_filter_contract() {
+		$post_id = $this->factory->post->create(
+			array(
+				'post_type'   => 'cleanlinks',
+				'post_status' => 'publish',
+			)
+		);
+
+		update_post_meta( $post_id, 'cleanlink_redirect_count', 2 );
+
+		$filter_args = array();
+		$filter      = static function ( $check, $object_id, $meta_key, $meta_value, $prev_value ) use ( &$filter_args ) {
+			$filter_args = array( $object_id, $meta_key, $meta_value, $prev_value );
+
+			return false;
+		};
+		$released    = false;
+		$acquire     = static function () {
+			return array( 'type' => 'test' );
+		};
+		$release     = static function ( $lock ) use ( &$released ) {
+			$released = ( array( 'type' => 'test' ) === $lock );
+		};
+
+		add_filter( 'update_post_metadata', $filter, 10, 5 );
+
+		try {
+			$count = ( new AccessCounter( $acquire, $release ) )->increment( $post_id );
+		} finally {
+			remove_filter( 'update_post_metadata', $filter, 10 );
+		}
+
+		$this->assertSame(
+			array( $post_id, 'cleanlink_redirect_count', 3, '' ),
+			$filter_args
+		);
+		$this->assertSame( 2, $count );
+		$this->assertTrue( $released );
+		$this->assertSame( '2', get_post_meta( $post_id, 'cleanlink_redirect_count', true ) );
+	}
+
+	/**
+	 * An interleaved writer is not overwritten by a stale count read.
+	 *
+	 * The query filter places a second persisted value immediately before the
+	 * counter's UPDATE executes. This models the race that a read-modify-write
+	 * implementation loses while asserting the database-side increment uses the
+	 * latest value.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @return void
+	 */
+	public function test_access_counter_preserves_interleaved_count_update() {
+		$post_id = $this->factory->post->create(
+			array(
+				'post_type'   => 'cleanlinks',
+				'post_status' => 'publish',
+			)
+		);
+
+		update_post_meta( $post_id, 'cleanlink_redirect_count', 2 );
+
+		$interleaved = false;
+		$simulate_concurrent_update = static function ( $query ) use ( &$interleaved, $post_id ) {
+			if ( ! $interleaved && false !== stripos( $query, 'CAST(meta_value AS SIGNED)' ) ) {
+				$interleaved = true;
+				update_post_meta( $post_id, 'cleanlink_redirect_count', 5 );
+			}
+
+			return $query;
+		};
+
+		add_filter( 'query', $simulate_concurrent_update );
+
+		try {
+			$count = ( new AccessCounter() )->increment( $post_id );
+		} finally {
+			remove_filter( 'query', $simulate_concurrent_update );
+		}
+
+		$this->assertTrue( $interleaved );
+		$this->assertSame( 6, $count );
+		$this->assertSame( '6', get_post_meta( $post_id, 'cleanlink_redirect_count', true ) );
+	}
+
+	/**
+	 * Existing duplicate count rows are incremented independently.
+	 *
+	 * CleanLinks initializes this key as unique, but legacy data may contain
+	 * duplicate rows. The atomic update preserves each row's stored integer
+	 * instead of collapsing divergent values to the first row's value.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @return void
+	 */
+	public function test_access_counter_preserves_divergent_duplicate_count_rows() {
+		$post_id = $this->factory->post->create(
+			array(
+				'post_type'   => 'cleanlinks',
+				'post_status' => 'publish',
+			)
+		);
+
+		add_post_meta( $post_id, 'cleanlink_redirect_count', 2 );
+		add_post_meta( $post_id, 'cleanlink_redirect_count', 5 );
+
+		$count = ( new AccessCounter() )->increment( $post_id );
+
+		$this->assertSame( 3, $count );
+		$this->assertSame(
+			array( '3', '6' ),
+			get_post_meta( $post_id, 'cleanlink_redirect_count', false )
+		);
+	}
+
+	/**
+	 * The count collaborator keeps WordPress post-meta action compatibility.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @return void
+	 */
+	public function test_access_counter_dispatches_post_meta_update_actions() {
+		$post_id = $this->factory->post->create(
+			array(
+				'post_type'   => 'cleanlinks',
+				'post_status' => 'publish',
+			)
+		);
+
+		update_post_meta( $post_id, 'cleanlink_redirect_count', 2 );
+
+		$before = array();
+		$after  = array();
+		$record_before = static function () use ( &$before ) {
+			$before[] = current_filter();
+		};
+		$record_after = static function () use ( &$after, $post_id ) {
+			$after[ current_filter() ] = (int) get_post_meta( $post_id, 'cleanlink_redirect_count', true );
+		};
+
+		add_action( 'update_post_meta', $record_before, 10, 4 );
+		add_action( 'update_postmeta', $record_before, 10, 4 );
+		add_action( 'updated_post_meta', $record_after, 10, 4 );
+		add_action( 'updated_postmeta', $record_after, 10, 4 );
+
+		try {
+			$counter = new AccessCounter(
+				static function () {
+					return false;
+				}
+			);
+			$count = $counter->increment( $post_id );
+		} finally {
+			remove_action( 'update_post_meta', $record_before, 10 );
+			remove_action( 'update_postmeta', $record_before, 10 );
+			remove_action( 'updated_post_meta', $record_after, 10 );
+			remove_action( 'updated_postmeta', $record_after, 10 );
+		}
+
+		$this->assertSame( 3, $count );
+		$this->assertSame( array( 'update_post_meta', 'update_postmeta' ), $before );
+		$this->assertSame(
+			array(
+				'updated_post_meta' => 3,
+				'updated_postmeta'  => 3,
+			),
+			$after
+		);
+	}
+
+	/**
 	 * The count collaborator does not change unpublished cleanlinks.
 	 *
 	 * @since 1.1.1
