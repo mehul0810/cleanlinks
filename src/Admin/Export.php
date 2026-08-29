@@ -21,14 +21,43 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Export {
 	/**
-	 * Initiate export.
+	 * Query used to retrieve export rows.
+	 *
+	 * @var ExportQuery
+	 */
+	private $query;
+
+	/**
+	 * Serializer used to build CSV output.
+	 *
+	 * @var ExportCsvSerializer
+	 */
+	private $serializer;
+
+	/**
+	 * Initialize export dependencies.
 	 *
 	 * @since  1.0.0
 	 * @access public
 	 *
+	 * @param ExportQuery         $query      Query used to retrieve export rows.
+	 * @param ExportCsvSerializer $serializer Serializer used to build CSV output.
 	 * @return void
 	 */
-	public function __construct() {
+	public function __construct( ?ExportQuery $query = null, ?ExportCsvSerializer $serializer = null ) {
+		$this->query      = $query ? $query : new ExportQuery();
+		$this->serializer = $serializer ? $serializer : new ExportCsvSerializer();
+	}
+
+	/**
+	 * Register export hooks.
+	 *
+	 * @since 1.1.1
+	 * @access public
+	 *
+	 * @return void
+	 */
+	public function register_hooks() {
 		add_action( 'admin_post_cleanlinks_export', array( $this, 'export_csv' ) );
 	}
 
@@ -60,44 +89,7 @@ class Export {
 			wp_die( esc_html__( 'Filesystem API not available.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 500 ) );
 		}
 
-		// Build CSV content manually
-		$csv_lines = array();
-		$csv_lines[] = '"ID","Title","Redirect From","Redirect To"';
-
-		$args = array(
-			'post_type'              => 'cleanlinks',
-			'post_status'            => 'publish',
-			'posts_per_page'         => 200,
-			'fields'                 => 'ids',
-			'no_found_rows'          => true,
-			'update_post_meta_cache' => false,
-			'update_post_term_cache' => false,
-		);
-
-		$query = new \WP_Query( $args );
-
-		foreach ( $query->posts as $post_id ) {
-			$post      = get_post( $post_id );
-			$permalink = get_permalink( $post_id );
-
-			$row = array(
-				$post_id,
-				$post->post_title,
-				$permalink,
-				get_post_meta( $post_id, 'cleanlink_redirect_url', true ),
-			);
-
-			$escaped = array_map(
-				function ( $value ) {
-					return '"' . str_replace( '"', '""', $value ) . '"';
-				},
-				$row
-			);
-
-			$csv_lines[] = implode( ',', $escaped );
-		}
-
-		$csv_data = implode( "\r\n", $csv_lines );
+		$csv_data = $this->serializer->serialize( $this->query->get_rows() );
 
 		// Write to temp file
 		$tmp_file = wp_tempnam( 'export_cleanlink.csv' );
