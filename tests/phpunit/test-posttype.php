@@ -113,8 +113,8 @@ class Test_PostType extends WP_UnitTestCase {
 	 * @since 1.1.1
 	 */
 	public function test_save_link_meta_removes_invalid_metadata() {
-		$user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
-		$post_id = self::factory()->post->create( array( 'post_type' => 'cleanlinks' ) );
+		$user_id  = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$post_id  = self::factory()->post->create( array( 'post_type' => 'cleanlinks' ) );
 		$post     = get_post( $post_id );
 		$old_post = $_POST;
 

@@ -25,7 +25,7 @@ class UrlValidator {
 	 *
 	 * @since 1.1.1
 	 *
-	 * @param string $url The URL to sanitize and validate.
+	 * @param mixed $url The URL to sanitize and validate.
 	 * @return string|bool The sanitized URL if valid, false otherwise.
 	 */
 	public static function validate( $url ) {
