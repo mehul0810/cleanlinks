@@ -50,7 +50,7 @@ class LinkMetaSaver {
 			return;
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified below.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Type guard precedes unslash/sanitization; nonce is verified below.
 		$raw_nonce = isset( $_POST['cleanlink_redirect_nonce'] ) ? $_POST['cleanlink_redirect_nonce'] : '';
 
 		// Reject malformed nonce input before unslashing or sanitizing it.
@@ -88,7 +88,7 @@ class LinkMetaSaver {
 	 */
 	private function save_redirect_url( $post_id ) {
 		// Nonce is already verified in save(). Read only the fields owned by this form.
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified in save
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce is verified in save; type guard precedes unslash/sanitization.
 		$raw_url = isset( $_POST['cleanlink_redirect_url'] ) ? $_POST['cleanlink_redirect_url'] : '';
 
 		// Reject malformed list/object input before it reaches URL validation.
@@ -101,6 +101,7 @@ class LinkMetaSaver {
 
 		if ( $valid_url ) {
 			update_post_meta( $post_id, 'cleanlink_redirect_url', $valid_url );
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified in save().
 			$nofollow = isset( $_POST['cleanlink_redirect_nofollow'] ) ? '1' : '0';
 			update_post_meta( $post_id, 'cleanlink_redirect_nofollow', $nofollow );
 			return;
