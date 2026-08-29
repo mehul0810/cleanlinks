@@ -65,7 +65,8 @@ class AccessCounter {
 		update_post_meta( $post_id, 'cleanlink_redirect_count', $new_count );
 		wp_cache_delete( $this->get_cache_key( $post_id ) );
 
-		return $new_count;
+		// Read back the stored value so callers never expose an unpersisted count.
+		return (int) get_post_meta( $post_id, 'cleanlink_redirect_count', true );
 	}
 
 	/**

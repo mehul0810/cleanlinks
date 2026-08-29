@@ -10,6 +10,7 @@
 namespace MG\CleanLinks\Tests;
 
 use MG\CleanLinks\Includes\AccessCounter;
+use MG\CleanLinks\Includes\Actions;
 use MG\CleanLinks\Includes\InputSanitizer;
 use MG\CleanLinks\Includes\Redirector;
 use MG\CleanLinks\Includes\UrlValidator;
@@ -58,6 +59,68 @@ class Test_Collaborators extends WP_UnitTestCase {
 
 		$counter = new AccessCounter();
 		$this->assertSame( 2, $counter->increment( $post_id ) );
+		$this->assertSame( '2', get_post_meta( $post_id, 'cleanlink_redirect_count', true ) );
+	}
+
+	/**
+	 * Public redirect hooks receive the persisted count when a write is rejected.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @return void
+	 */
+	public function test_redirect_hooks_receive_persisted_count_when_increment_fails() {
+		$post_id = $this->factory->post->create(
+			array(
+				'post_type'   => 'cleanlinks',
+				'post_status' => 'publish',
+			)
+		);
+
+		update_post_meta( $post_id, 'cleanlink_redirect_count', 2 );
+		update_post_meta( $post_id, 'cleanlink_redirect_url', 'https://example.com/destination' );
+
+		$filtered_count = null;
+		$action_count   = null;
+		$filter         = static function ( $redirect, $count ) use ( &$filtered_count ) {
+			$filtered_count = $count;
+
+			return $redirect;
+		};
+		$action         = static function ( $redirect, $count ) use ( &$action_count ) {
+			$action_count = $count;
+		};
+		$reject_update  = static function ( $check, $object_id, $meta_key ) use ( $post_id ) {
+			if ( $post_id === (int) $object_id && 'cleanlink_redirect_count' === $meta_key ) {
+				return false;
+			}
+
+			return $check;
+		};
+		$stop_redirect = static function () {
+			throw new \RuntimeException( 'Stop redirect for test.' );
+		};
+
+		add_filter( 'cleanlinks_urls_redirect_url', $filter, 10, 2 );
+		add_action( 'cleanlinks_urls_redirect', $action, 10, 2 );
+		add_filter( 'update_post_metadata', $reject_update, 10, 3 );
+		add_filter( 'wp_redirect', $stop_redirect );
+
+		$this->go_to( get_permalink( $post_id ) );
+
+		try {
+			( new Actions() )->cleanlink_redirect_and_count();
+		} catch ( \RuntimeException $exception ) {
+			$this->assertSame( 'Stop redirect for test.', $exception->getMessage() );
+		} finally {
+			remove_filter( 'cleanlinks_urls_redirect_url', $filter, 10 );
+			remove_action( 'cleanlinks_urls_redirect', $action, 10 );
+			remove_filter( 'update_post_metadata', $reject_update, 10 );
+			remove_filter( 'wp_redirect', $stop_redirect, 10 );
+		}
+
+		$this->assertSame( 2, $filtered_count );
+		$this->assertSame( 2, $action_count );
 		$this->assertSame( '2', get_post_meta( $post_id, 'cleanlink_redirect_count', true ) );
 	}
 
