@@ -85,7 +85,7 @@ class Test_Collaborators extends WP_UnitTestCase {
 
 		$interleaved = false;
 		$simulate_concurrent_update = static function ( $query ) use ( &$interleaved, $post_id ) {
-			if ( ! $interleaved && false !== stripos( $query, 'CAST(meta_value AS UNSIGNED)' ) ) {
+			if ( ! $interleaved && false !== stripos( $query, 'CAST(meta_value AS SIGNED)' ) ) {
 				$interleaved = true;
 				update_post_meta( $post_id, 'cleanlink_redirect_count', 5 );
 			}
@@ -104,6 +104,37 @@ class Test_Collaborators extends WP_UnitTestCase {
 		$this->assertTrue( $interleaved );
 		$this->assertSame( 6, $count );
 		$this->assertSame( '6', get_post_meta( $post_id, 'cleanlink_redirect_count', true ) );
+	}
+
+	/**
+	 * Existing duplicate count rows are incremented independently.
+	 *
+	 * CleanLinks initializes this key as unique, but legacy data may contain
+	 * duplicate rows. The atomic update preserves each row's stored integer
+	 * instead of collapsing divergent values to the first row's value.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @return void
+	 */
+	public function test_access_counter_preserves_divergent_duplicate_count_rows() {
+		$post_id = $this->factory->post->create(
+			array(
+				'post_type'   => 'cleanlinks',
+				'post_status' => 'publish',
+			)
+		);
+
+		add_post_meta( $post_id, 'cleanlink_redirect_count', 2 );
+		add_post_meta( $post_id, 'cleanlink_redirect_count', 5 );
+
+		$count = ( new AccessCounter() )->increment( $post_id );
+
+		$this->assertSame( 3, $count );
+		$this->assertSame(
+			array( '3', '6' ),
+			get_post_meta( $post_id, 'cleanlink_redirect_count', false )
+		);
 	}
 
 	/**

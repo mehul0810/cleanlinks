@@ -196,7 +196,7 @@ class AccessCounter {
 				// The table name is supplied by WordPress; count values use placeholders.
 				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				"UPDATE {$wpdb->postmeta}
-				SET meta_value = CAST(meta_value AS UNSIGNED) + 1
+				SET meta_value = CAST(meta_value AS SIGNED) + 1
 				WHERE post_id = %d AND meta_key = %s",
 				$post_id,
 				self::COUNT_META_KEY
