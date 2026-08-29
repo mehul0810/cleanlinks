@@ -107,6 +107,57 @@ class Test_Collaborators extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The count collaborator keeps WordPress post-meta action compatibility.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @return void
+	 */
+	public function test_access_counter_dispatches_post_meta_update_actions() {
+		$post_id = $this->factory->post->create(
+			array(
+				'post_type'   => 'cleanlinks',
+				'post_status' => 'publish',
+			)
+		);
+
+		update_post_meta( $post_id, 'cleanlink_redirect_count', 2 );
+
+		$before = array();
+		$after  = array();
+		$record_before = static function () use ( &$before ) {
+			$before[] = current_filter();
+		};
+		$record_after = static function () use ( &$after, $post_id ) {
+			$after[ current_filter() ] = (int) get_post_meta( $post_id, 'cleanlink_redirect_count', true );
+		};
+
+		add_action( 'update_post_meta', $record_before, 10, 4 );
+		add_action( 'update_postmeta', $record_before, 10, 4 );
+		add_action( 'updated_post_meta', $record_after, 10, 4 );
+		add_action( 'updated_postmeta', $record_after, 10, 4 );
+
+		try {
+			$count = ( new AccessCounter() )->increment( $post_id );
+		} finally {
+			remove_action( 'update_post_meta', $record_before, 10 );
+			remove_action( 'update_postmeta', $record_before, 10 );
+			remove_action( 'updated_post_meta', $record_after, 10 );
+			remove_action( 'updated_postmeta', $record_after, 10 );
+		}
+
+		$this->assertSame( 3, $count );
+		$this->assertSame( array( 'update_post_meta', 'update_postmeta' ), $before );
+		$this->assertSame(
+			array(
+				'updated_post_meta' => 3,
+				'updated_postmeta'  => 3,
+			),
+			$after
+		);
+	}
+
+	/**
 	 * The count collaborator does not change unpublished cleanlinks.
 	 *
 	 * @since 1.1.1

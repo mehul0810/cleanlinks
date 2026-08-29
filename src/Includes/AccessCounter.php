@@ -148,6 +148,47 @@ class AccessCounter {
 	 * @return int|false Number of changed rows, or false on a database error.
 	 */
 	private function increment_persisted_count( $post_id ) {
+		$meta_rows = null;
+
+		if ( $this->has_count_meta_actions() ) {
+			$meta_rows = $this->get_count_meta_rows( $post_id );
+
+			if ( false === $meta_rows ) {
+				return false;
+			}
+
+			if ( empty( $meta_rows ) ) {
+				return 0;
+			}
+
+			$this->fire_count_meta_actions( $post_id, $meta_rows, false );
+		}
+
+		$updated = $this->execute_atomic_count_update( $post_id );
+
+		if ( false === $updated || 0 === $updated ) {
+			return $updated;
+		}
+
+		// Match update_metadata() by invalidating the core cache before after-actions.
+		wp_cache_delete( $post_id, 'post_meta' );
+
+		if ( null !== $meta_rows ) {
+			$this->fire_count_meta_actions( $post_id, $meta_rows, true );
+		}
+
+		return $updated;
+	}
+
+	/**
+	 * Execute the database-side count increment.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @param int $post_id Post ID.
+	 * @return int|false Number of changed rows, or false on a database error.
+	 */
+	private function execute_atomic_count_update( $post_id ) {
 		global $wpdb;
 
 		return $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Atomic increment.
@@ -161,6 +202,66 @@ class AccessCounter {
 				self::COUNT_META_KEY
 			)
 		);
+	}
+
+	/**
+	 * Check whether metadata update actions need to be mirrored.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @return bool True when a metadata action is registered.
+	 */
+	private function has_count_meta_actions() {
+		return false !== has_action( 'update_post_meta' )
+			|| false !== has_action( 'update_postmeta' )
+			|| false !== has_action( 'updated_post_meta' )
+			|| false !== has_action( 'updated_postmeta' );
+	}
+
+	/**
+	 * Get count metadata rows for action compatibility.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @param int $post_id Post ID.
+	 * @return array|false Metadata rows, or false on a database error.
+	 */
+	private function get_count_meta_rows( $post_id ) {
+		global $wpdb;
+
+		return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Read metadata rows.
+			$wpdb->prepare(
+				// The table name is supplied by WordPress; values use placeholders.
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				"SELECT meta_id, meta_value FROM {$wpdb->postmeta}
+				WHERE post_id = %d AND meta_key = %s",
+				$post_id,
+				self::COUNT_META_KEY
+			),
+			ARRAY_A
+		);
+	}
+
+	/**
+	 * Fire the metadata actions that update_post_meta() would dispatch.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @param int   $post_id  Post ID.
+	 * @param array $meta_rows Existing metadata rows.
+	 * @param bool  $updated   Whether to fire after-update actions.
+	 * @return void
+	 */
+	private function fire_count_meta_actions( $post_id, $meta_rows, $updated ) {
+		foreach ( $meta_rows as $meta_row ) {
+			$meta_id     = (int) $meta_row['meta_id'];
+			$new_count   = (int) $meta_row['meta_value'] + 1;
+			$hook        = $updated ? 'updated_post_meta' : 'update_post_meta';
+			$legacy_hook = $updated ? 'updated_postmeta' : 'update_postmeta';
+
+			do_action( $hook, $meta_id, $post_id, self::COUNT_META_KEY, $new_count );
+			do_action( $legacy_hook, $meta_id, $post_id, self::COUNT_META_KEY, $new_count );
+		}
 	}
 
 	/**
