@@ -29,7 +29,13 @@ class Test_Export extends WP_UnitTestCase {
 		$serializer = new ExportCsvSerializer();
 
 		$this->assertSame(
-			'"ID","Title","Redirect From","Redirect To"\r\n"42","Title ""with quotes""","https://example.test/from","https://example.test/to"',
+			implode(
+				"\r\n",
+				array(
+					'"ID","Title","Redirect From","Redirect To"',
+					'"42","Title ""with quotes""","https://example.test/from","https://example.test/to"',
+				)
+			),
 			$serializer->serialize(
 				array(
 					array(
