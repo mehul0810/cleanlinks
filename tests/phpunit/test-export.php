@@ -87,4 +87,109 @@ class Test_Export extends WP_UnitTestCase {
 		);
 		$this->assertNotContains( $draft_id, wp_list_pluck( $rows, 0 ) );
 	}
+
+	/**
+	 * Export query returns all published rows and avoids per-row database lookups.
+	 *
+	 * @since 1.1.1
+	 * @access public
+	 *
+	 * @return void
+	 */
+	public function test_export_query_paginates_large_exports_without_n_plus_one_queries() {
+		global $wpdb;
+
+		$post_ids = array();
+		for ( $index = 0; $index < 205; $index++ ) {
+			$post_ids[] = (int) $this->factory->post->create(
+				array(
+					'post_type'   => 'cleanlinks',
+					'post_status' => 'publish',
+					'post_title'  => 'Large export row ' . $index,
+				)
+			);
+		}
+
+		$queries_before = $wpdb->num_queries;
+		$rows           = ( new ExportQuery() )->get_rows();
+		$query_count    = $wpdb->num_queries - $queries_before;
+
+		$this->assertCount( 205, $rows );
+		$exported_ids = wp_list_pluck( $rows, 0 );
+		sort( $post_ids );
+		sort( $exported_ids );
+		$this->assertSame( $post_ids, $exported_ids );
+		$this->assertLessThan( 20, $query_count );
+	}
+
+	/**
+	 * Export iterator preserves exact IDs for a ten-thousand-row dataset.
+	 *
+	 * @since 1.1.1
+	 * @access public
+	 *
+	 * @return void
+	 */
+	public function test_export_query_iterates_ten_thousand_rows_with_bounded_queries() {
+		global $wpdb;
+
+		$post_ids = array();
+		for ( $index = 0; $index < 10000; $index++ ) {
+			$post_ids[] = (int) $this->factory->post->create(
+				array(
+					'post_type'   => 'cleanlinks',
+					'post_status' => 'publish',
+					'post_title'  => 'Ten thousand row ' . $index,
+				)
+			);
+		}
+
+		foreach ( array_slice( $post_ids, 0, ExportQuery::PAGE_SIZE ) as $post_id ) {
+			update_post_meta( $post_id, 'cleanlink_redirect_url', 'https://example.test/' . $post_id );
+		}
+
+		$queries_before = $wpdb->num_queries;
+		sort( $post_ids );
+		$iterator = ( new ExportQuery() )->iterate_rows();
+		$index    = 0;
+		foreach ( $iterator as $row ) {
+			$this->assertSame( $post_ids[ $index ], $row[0] );
+			$index++;
+
+			if ( ExportQuery::PAGE_SIZE + 1 === $index ) {
+				$this->assertFalse( wp_cache_get( $post_ids[0], 'posts' ) );
+				$this->assertFalse( wp_cache_get( $post_ids[0], 'post_meta' ) );
+			}
+		}
+
+		$this->assertSame( 10000, $index );
+		$this->assertLessThan( 250, $wpdb->num_queries - $queries_before );
+	}
+
+	/**
+	 * Early iterator destruction clears the active page cache.
+	 *
+	 * @since 1.1.1
+	 * @access public
+	 *
+	 * @return void
+	 */
+	public function test_export_query_clears_cache_when_iterator_is_destroyed_early() {
+		$post_id = (int) $this->factory->post->create(
+			array(
+				'post_type'   => 'cleanlinks',
+				'post_status' => 'publish',
+			)
+		);
+		update_post_meta( $post_id, 'cleanlink_redirect_url', 'https://example.test/' . $post_id );
+
+		$iterator = ( new ExportQuery() )->iterate_rows();
+		$iterator->rewind();
+		$this->assertSame( $post_id, $iterator->current()[0] );
+		$this->assertNotFalse( wp_cache_get( $post_id, 'post_meta' ) );
+
+		unset( $iterator );
+
+		$this->assertFalse( wp_cache_get( $post_id, 'post_meta' ) );
+	}
 }
