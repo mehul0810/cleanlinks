@@ -66,8 +66,9 @@ class AccessCounter {
 	 * Initialize the counter.
 	 *
 	 * The callbacks are intentionally optional. Production requests use the
-	 * database advisory lock with a portable local fallback; tests can inject a
-	 * bounded lock failure without depending on a particular database driver.
+	 * database advisory lock, while SQLite uses the portable local fallback;
+	 * tests can inject a bounded lock failure without depending on a database
+	 * driver. An injected integer zero represents GET_LOCK() contention.
 	 *
 	 * @since 1.1.1
 	 *
@@ -141,9 +142,20 @@ class AccessCounter {
 		}
 
 		/*
-		 * A lock timeout or unsupported lock driver must not suppress the click.
-		 * Apply the short-circuit filter once, then use the database-side atomic
-		 * path and its action mirror as the bounded fallback.
+		 * A metadata short-circuit cannot be evaluated safely from a stale
+		 * snapshot after the lock was unavailable. Leave the value untouched
+		 * rather than approving one value and persisting another.
+		 */
+		if ( $lock_failed && false !== has_filter( 'update_post_metadata' ) ) {
+			$this->invalidate_count_caches( $post_id );
+
+			return (int) get_post_meta( $post_id, self::COUNT_META_KEY, true );
+		}
+
+		/*
+		 * A lock timeout or unsupported lock driver must not suppress the click
+		 * unless a metadata filter requires the unavailable API contract. The
+		 * action mirror and database-side atomic path remain the bounded fallback.
 		 */
 		if ( null !== $this->apply_update_metadata_filter( $post_id ) ) {
 			return (int) get_post_meta( $post_id, self::COUNT_META_KEY, true );
@@ -358,9 +370,9 @@ class AccessCounter {
 	/**
 	 * Acquire a bounded per-link lock.
 	 *
-	 * MySQL and MariaDB use database advisory locks. SQLite and other drivers
-	 * fall back to a local file lock, while a failure of both mechanisms falls
-	 * through to the atomic/optimistic write path instead of dropping a click.
+	 * MySQL and MariaDB use database advisory locks. SQLite deliberately uses a
+	 * local file lock; a database contention or adapter error never switches
+	 * lock domains and falls through to the atomic/optimistic write path.
 	 *
 	 * @since 1.1.1
 	 *
@@ -369,31 +381,45 @@ class AccessCounter {
 	 */
 	private function acquire_count_lock( $post_id ) {
 		if ( null !== $this->lock_acquirer ) {
-			return ( $this->lock_acquirer )( $post_id, self::LOCK_TIMEOUT_SECONDS );
+			$acquired = ( $this->lock_acquirer )( $post_id, self::LOCK_TIMEOUT_SECONDS );
+
+			// Integer zero models a valid GET_LOCK() contention result.
+			if ( 0 === $acquired || '0' === $acquired || false === $acquired || null === $acquired ) {
+				return false;
+			}
+
+			return $acquired;
 		}
 
 		global $wpdb;
 
 		$lock_name = $this->get_lock_name( $post_id );
 
-		if ( ! $this->is_sqlite_database() ) {
-			$acquired = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Per-link advisory lock.
-				$wpdb->prepare(
-					'SELECT GET_LOCK(%s, %d)',
-					$lock_name,
-					self::LOCK_TIMEOUT_SECONDS
-				)
-			);
-
-			if ( 1 === (int) $acquired ) {
-				return array(
-					'type' => 'database',
-					'name' => $lock_name,
-				);
-			}
+		if ( $this->is_sqlite_database() ) {
+			return $this->acquire_file_lock( $lock_name );
 		}
 
-		return $this->acquire_file_lock( $lock_name );
+		$acquired = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Per-link advisory lock.
+			$wpdb->prepare(
+				'SELECT GET_LOCK(%s, %d)',
+				$lock_name,
+				self::LOCK_TIMEOUT_SECONDS
+			)
+		);
+
+		if ( 1 === (int) $acquired ) {
+			return array(
+				'type' => 'database',
+				'name' => $lock_name,
+			);
+		}
+
+		/*
+		 * A MySQL/MariaDB zero means another request owns this lock. A NULL or
+		 * false result indicates an adapter error. Neither result may switch to
+		 * an independent flock domain after the database lock was selected.
+		 */
+		return false;
 	}
 
 	/**

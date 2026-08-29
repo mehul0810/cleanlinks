@@ -97,6 +97,101 @@ class Test_Collaborators extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A database lock contender does not switch to the independent file lock.
+	 *
+	 * An integer zero is the documented GET_LOCK() contention result. The
+	 * external action forces the metadata-contract branch so the test proves
+	 * that contention reaches the atomic fallback instead of the API path.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @return void
+	 */
+	public function test_access_counter_does_not_use_api_after_database_lock_contention() {
+		$post_id = $this->factory->post->create(
+			array(
+				'post_type'   => 'cleanlinks',
+				'post_status' => 'publish',
+			)
+		);
+
+		update_post_meta( $post_id, 'cleanlink_redirect_count', 2 );
+
+		$atomic_update = false;
+		$observe_query = static function ( $query ) use ( &$atomic_update ) {
+			if ( false !== stripos( $query, 'CAST(meta_value AS SIGNED)' ) ) {
+				$atomic_update = true;
+			}
+
+			return $query;
+		};
+		$metadata_action = static function () {};
+
+		add_action( 'update_post_meta', $metadata_action, 10, 4 );
+		add_filter( 'query', $observe_query );
+
+		try {
+			$count = ( new AccessCounter(
+				static function () {
+					return 0;
+				}
+			) )->increment( $post_id );
+		} finally {
+			remove_action( 'update_post_meta', $metadata_action, 10 );
+			remove_filter( 'query', $observe_query );
+		}
+
+		$this->assertTrue( $atomic_update );
+		$this->assertSame( 3, $count );
+		$this->assertSame( '3', get_post_meta( $post_id, 'cleanlink_redirect_count', true ) );
+	}
+
+	/**
+	 * A metadata short-circuit is not evaluated after lock acquisition fails.
+	 *
+	 * Without the lock, the proposed value could be stale by the time an atomic
+	 * fallback write runs. Failing closed keeps the filter contract from
+	 * approving one value while persisting a different one.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @return void
+	 */
+	public function test_access_counter_fails_closed_when_metadata_filter_lock_fails() {
+		$post_id = $this->factory->post->create(
+			array(
+				'post_type'   => 'cleanlinks',
+				'post_status' => 'publish',
+			)
+		);
+
+		update_post_meta( $post_id, 'cleanlink_redirect_count', 2 );
+
+		$filter_calls = 0;
+		$filter       = static function () use ( &$filter_calls ) {
+			++$filter_calls;
+
+			return null;
+		};
+
+		add_filter( 'update_post_metadata', $filter, 10, 5 );
+
+		try {
+			$count = ( new AccessCounter(
+				static function () {
+					return false;
+				}
+			) )->increment( $post_id );
+		} finally {
+			remove_filter( 'update_post_metadata', $filter, 10 );
+		}
+
+		$this->assertSame( 0, $filter_calls );
+		$this->assertSame( 2, $count );
+		$this->assertSame( '2', get_post_meta( $post_id, 'cleanlink_redirect_count', true ) );
+	}
+
+	/**
 	 * The metadata short-circuit receives the same arguments as update_post_meta().
 	 *
 	 * @since 1.1.1
