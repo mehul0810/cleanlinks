@@ -66,29 +66,36 @@ class ExportQuery {
 					'orderby'                => 'post__in',
 					'fields'                 => 'all',
 					'no_found_rows'          => true,
-					'update_post_meta_cache' => true,
+					'cache_results'         => false,
+					'update_post_meta_cache' => false,
 					'update_post_term_cache' => false,
 				)
 			);
 
 			$posts_by_id = array();
-			foreach ( $posts->posts as $post ) {
-				$posts_by_id[ (int) $post->ID ] = $post;
-			}
-
-			foreach ( $ids as $post_id ) {
-				$post_id = (int) $post_id;
-				if ( ! isset( $posts_by_id[ $post_id ] ) ) {
-					continue;
+			try {
+				foreach ( $posts->posts as $post ) {
+					$posts_by_id[ (int) $post->ID ] = $post;
 				}
 
-				$post = $posts_by_id[ $post_id ];
-				yield array(
-					$post_id,
-					$post->post_title,
-					get_permalink( $post_id ),
-					get_post_meta( $post_id, 'cleanlink_redirect_url', true ),
-				);
+				update_meta_cache( 'post', $ids );
+				foreach ( $ids as $post_id ) {
+					$post_id = (int) $post_id;
+					if ( ! isset( $posts_by_id[ $post_id ] ) ) {
+						continue;
+					}
+
+					$post = $posts_by_id[ $post_id ];
+					yield array(
+						$post_id,
+						$post->post_title,
+						get_permalink( $post ),
+						get_post_meta( $post_id, 'cleanlink_redirect_url', true ),
+					);
+				}
+			} finally {
+				$this->clear_batch_cache( $ids );
+				unset( $posts_by_id, $posts );
 			}
 
 			$last_id = (int) end( $ids );
@@ -139,5 +146,18 @@ class ExportQuery {
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared -- Keyset pagination requires a bounded prepared ID query not available in WP_Query.
 		return array_map( 'intval', $wpdb->get_col( $sql ) );
+	}
+
+	/**
+	 * Clear cache entries populated while processing one export page.
+	 *
+	 * @param array $ids Post IDs in the completed page.
+	 * @return void
+	 */
+	private function clear_batch_cache( array $ids ) {
+		foreach ( $ids as $post_id ) {
+			wp_cache_delete( (int) $post_id, 'posts' );
+			wp_cache_delete( (int) $post_id, 'post_meta' );
+		}
 	}
 }

@@ -144,15 +144,25 @@ class Test_Export extends WP_UnitTestCase {
 			);
 		}
 
-		$queries_before = $wpdb->num_queries;
-		$rows           = iterator_to_array( ( new ExportQuery() )->iterate_rows() );
-		$query_count    = $wpdb->num_queries - $queries_before;
+		foreach ( array_slice( $post_ids, 0, ExportQuery::PAGE_SIZE ) as $post_id ) {
+			update_post_meta( $post_id, 'cleanlink_redirect_url', 'https://example.test/' . $post_id );
+		}
 
-		$this->assertCount( 10000, $rows );
-		$exported_ids = wp_list_pluck( $rows, 0 );
+		$queries_before = $wpdb->num_queries;
 		sort( $post_ids );
-		sort( $exported_ids );
-		$this->assertSame( $post_ids, $exported_ids );
-		$this->assertLessThan( 250, $query_count );
+		$iterator = ( new ExportQuery() )->iterate_rows();
+		$index    = 0;
+		foreach ( $iterator as $row ) {
+			$this->assertSame( $post_ids[ $index ], $row[0] );
+			$index++;
+
+			if ( ExportQuery::PAGE_SIZE === $index ) {
+				$this->assertFalse( wp_cache_get( $post_ids[0], 'posts' ) );
+				$this->assertFalse( wp_cache_get( $post_ids[0], 'post_meta' ) );
+			}
+		}
+
+		$this->assertSame( 10000, $index );
+		$this->assertLessThan( 250, $wpdb->num_queries - $queries_before );
 	}
 }
