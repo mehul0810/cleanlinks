@@ -50,10 +50,15 @@ class LinkMetaSaver {
 			return;
 		}
 
-		if (
-			! isset( $_POST['cleanlink_redirect_nonce'] ) // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified below
-			|| ! $this->verify_nonce( sanitize_text_field( wp_unslash( $_POST['cleanlink_redirect_nonce'] ) ), 'cleanlink-save-redirect-meta' ) // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified here
-		) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified below.
+		$raw_nonce = isset( $_POST['cleanlink_redirect_nonce'] ) ? $_POST['cleanlink_redirect_nonce'] : '';
+
+		// Reject malformed nonce input before unslashing or sanitizing it.
+		if ( ! is_string( $raw_nonce ) ) {
+			return;
+		}
+
+		if ( ! $this->verify_nonce( sanitize_text_field( wp_unslash( $raw_nonce ) ), 'cleanlink-save-redirect-meta' ) ) {
 			return;
 		}
 

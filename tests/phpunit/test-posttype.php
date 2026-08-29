@@ -162,6 +162,13 @@ class Test_PostType extends WP_UnitTestCase {
 
 				self::$class_instance->save_link_meta( $post_id, $post );
 			}
+
+			$_POST = array(
+				'cleanlink_redirect_nonce' => array( 'malformed' ),
+				'cleanlink_redirect_url'   => 'https://example.com/new-destination',
+			);
+
+			self::$class_instance->save_link_meta( $post_id, $post );
 		} finally {
 			$_POST = $old_post;
 			wp_set_current_user( 0 );
