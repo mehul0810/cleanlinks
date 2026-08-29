@@ -84,8 +84,8 @@ class Test_PostType extends WP_UnitTestCase {
 	 * @since 1.1.1
 	 */
 	public function test_save_link_meta_persists_valid_metadata() {
-		$user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
-		$post_id = self::factory()->post->create( array( 'post_type' => 'cleanlinks' ) );
+		$user_id  = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$post_id  = self::factory()->post->create( array( 'post_type' => 'cleanlinks' ) );
 		$post     = get_post( $post_id );
 		$old_post = $_POST;
 
@@ -113,8 +113,8 @@ class Test_PostType extends WP_UnitTestCase {
 	 * @since 1.1.1
 	 */
 	public function test_save_link_meta_removes_invalid_metadata() {
-		$user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
-		$post_id = self::factory()->post->create( array( 'post_type' => 'cleanlinks' ) );
+		$user_id  = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$post_id  = self::factory()->post->create( array( 'post_type' => 'cleanlinks' ) );
 		$post     = get_post( $post_id );
 		$old_post = $_POST;
 
@@ -136,5 +136,45 @@ class Test_PostType extends WP_UnitTestCase {
 
 		$this->assertSame( '', get_post_meta( $post_id, 'cleanlink_redirect_url', true ) );
 		$this->assertSame( '', get_post_meta( $post_id, 'cleanlink_redirect_nofollow', true ) );
+	}
+
+	/**
+	 * Malformed URL shapes fail closed without throwing or changing stored metadata.
+	 *
+	 * @since 1.1.1
+	 */
+	public function test_save_link_meta_rejects_malformed_url_shapes() {
+		$user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$post_id = self::factory()->post->create( array( 'post_type' => 'cleanlinks' ) );
+		$post     = get_post( $post_id );
+		$old_post = $_POST;
+
+		update_post_meta( $post_id, 'cleanlink_redirect_url', 'https://example.com/old-destination' );
+		update_post_meta( $post_id, 'cleanlink_redirect_nofollow', '1' );
+		wp_set_current_user( $user_id );
+
+		try {
+			foreach ( array( array( 'x' ), array( 'nested' => array( 'x' ) ), (object) array( 'url' => 'x' ), 123 ) as $malformed_url ) {
+				$_POST = array(
+					'cleanlink_redirect_nonce' => wp_create_nonce( 'cleanlink-save-redirect-meta' ),
+					'cleanlink_redirect_url'   => $malformed_url,
+				);
+
+				self::$class_instance->save_link_meta( $post_id, $post );
+			}
+
+			$_POST = array(
+				'cleanlink_redirect_nonce' => array( 'malformed' ),
+				'cleanlink_redirect_url'   => 'https://example.com/new-destination',
+			);
+
+			self::$class_instance->save_link_meta( $post_id, $post );
+		} finally {
+			$_POST = $old_post;
+			wp_set_current_user( 0 );
+		}
+
+		$this->assertSame( 'https://example.com/old-destination', get_post_meta( $post_id, 'cleanlink_redirect_url', true ) );
+		$this->assertSame( '1', get_post_meta( $post_id, 'cleanlink_redirect_nofollow', true ) );
 	}
 }

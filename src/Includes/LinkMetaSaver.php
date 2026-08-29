@@ -50,10 +50,15 @@ class LinkMetaSaver {
 			return;
 		}
 
-		if (
-			! isset( $_POST['cleanlink_redirect_nonce'] ) // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified below
-			|| ! $this->verify_nonce( sanitize_text_field( wp_unslash( $_POST['cleanlink_redirect_nonce'] ) ), 'cleanlink-save-redirect-meta' ) // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified here
-		) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Type guard precedes unslash/sanitization; nonce is verified below.
+		$raw_nonce = isset( $_POST['cleanlink_redirect_nonce'] ) ? $_POST['cleanlink_redirect_nonce'] : '';
+
+		// Reject malformed nonce input before unslashing or sanitizing it.
+		if ( ! is_string( $raw_nonce ) ) {
+			return;
+		}
+
+		if ( ! $this->verify_nonce( sanitize_text_field( wp_unslash( $raw_nonce ) ), 'cleanlink-save-redirect-meta' ) ) {
 			return;
 		}
 
@@ -82,19 +87,22 @@ class LinkMetaSaver {
 	 * @return void
 	 */
 	private function save_redirect_url( $post_id ) {
-		// Nonce is already verified in save().
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified in save
-		$post_data = Helpers::clean( $_POST );
+		// Nonce is already verified in save(). Read only the fields owned by this form.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce is verified in save; type guard precedes unslash/sanitization.
+		$raw_url = isset( $_POST['cleanlink_redirect_url'] ) ? $_POST['cleanlink_redirect_url'] : '';
 
-		if ( empty( $post_data['cleanlink_redirect_url'] ) ) {
+		// Reject malformed list/object input before it reaches URL validation.
+		if ( ! is_string( $raw_url ) || '' === $raw_url ) {
 			return;
 		}
 
-		$valid_url = Helpers::validate_url( $post_data['cleanlink_redirect_url'] );
+		$raw_url   = wp_unslash( $raw_url );
+		$valid_url = Helpers::validate_url( sanitize_text_field( $raw_url ) );
 
 		if ( $valid_url ) {
 			update_post_meta( $post_id, 'cleanlink_redirect_url', $valid_url );
-			$nofollow = isset( $post_data['cleanlink_redirect_nofollow'] ) ? '1' : '0';
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified in save().
+			$nofollow = isset( $_POST['cleanlink_redirect_nofollow'] ) ? '1' : '0';
 			update_post_meta( $post_id, 'cleanlink_redirect_nofollow', $nofollow );
 			return;
 		}
