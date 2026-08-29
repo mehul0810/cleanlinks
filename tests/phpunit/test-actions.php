@@ -10,8 +10,9 @@
 namespace MG\CleanLinks\Tests;
 
 use MG\CleanLinks\Includes\Actions;
+use MG\CleanLinks\Includes\AccessCounter;
 use MG\CleanLinks\Includes\Helpers;
-use ReflectionMethod;
+use MG\CleanLinks\Includes\Redirector;
 use WP_UnitTestCase;
 
 class Test_Actions extends WP_UnitTestCase {
@@ -147,7 +148,7 @@ class Test_Actions extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Invoke the private update count method.
+	 * Increment a count through the focused access-count collaborator.
 	 *
 	 * @since 1.1.0
 	 *
@@ -155,10 +156,7 @@ class Test_Actions extends WP_UnitTestCase {
 	 * @return int The redirect count.
 	 */
 	private function invoke_update_access_count( $post_id ) {
-		$method = new ReflectionMethod( Actions::class, 'update_access_count' );
-		$method->setAccessible( true );
-
-		return $method->invoke( new Actions(), $post_id );
+		return ( new AccessCounter() )->increment( $post_id );
 	}
 
 	/**
@@ -184,9 +182,7 @@ class Test_Actions extends WP_UnitTestCase {
 		ob_start();
 
 		try {
-			$method = new ReflectionMethod( Actions::class, 'perform_redirect' );
-			$method->setAccessible( true );
-			$method->invoke( new Actions(), $destination, $post_id );
+			( new Redirector() )->perform_redirect( $destination, $post_id );
 			$output = ob_get_clean();
 		} finally {
 			remove_filter( 'wp_redirect', $filter, 10 );

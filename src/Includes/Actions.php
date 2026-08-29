@@ -16,14 +16,34 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Actions {
 	/**
+	 * Access-count collaborator.
+	 *
+	 * @var AccessCounter
+	 */
+	private $access_counter;
+
+	/**
+	 * Redirect-response collaborator.
+	 *
+	 * @var Redirector
+	 */
+	private $redirector;
+
+	/**
 	 * Initialize the class.
 	 *
 	 * @since  1.0.0
 	 * @access public
 	 *
+	 * @param AccessCounter|null $access_counter Access-count collaborator.
+	 * @param Redirector|null    $redirector     Redirect-response collaborator.
+	 *
 	 * @return void
 	 */
-	public function __construct() {
+	public function __construct( $access_counter = null, $redirector = null ) {
+		$this->access_counter = null === $access_counter ? new AccessCounter() : $access_counter;
+		$this->redirector     = null === $redirector ? new Redirector() : $redirector;
+
 		add_action( 'template_redirect', array( $this, 'cleanlink_redirect_and_count' ) );
 	}
 
@@ -50,38 +70,15 @@ class Actions {
 			return;
 		}
 
-		// Update the access count
-		$this->update_access_count( $post_id );
+		// Update the access count.
+		$count = $this->access_counter->increment( $post_id );
 
-		// Get the redirect URL
-		$redirect = $this->get_redirect_url( $post_id );
+		// Get the redirect URL.
+		$redirect = $this->redirector->get_redirect_url( $post_id, $count );
 
-		// Perform the redirect
-		$this->perform_redirect( $redirect, $post_id );
+		// Perform the redirect.
+		$this->redirector->perform_redirect( $redirect, $post_id );
 		exit;
-	}
-
-	/**
-	 * Update the access count for a clean link
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @param int $post_id The post ID
-	 * @return int The new count value
-	 */
-	private function update_access_count( $post_id ) {
-		if ( ! $this->is_published_cleanlink( $post_id ) ) {
-			return (int) get_post_meta( $post_id, 'cleanlink_redirect_count', true );
-		}
-
-		$count = (int) get_post_meta( $post_id, 'cleanlink_redirect_count', true );
-		$new_count = $count + 1;
-
-		update_post_meta( $post_id, 'cleanlink_redirect_count', $new_count );
-		wp_cache_delete( 'cleanlink_count_' . $post_id );
-
-		return $new_count;
 	}
 
 	/**
@@ -97,64 +94,4 @@ class Actions {
 		return 'cleanlinks' === get_post_type( $post_id ) && 'publish' === get_post_status( $post_id );
 	}
 
-	/**
-	 * Get the redirect URL for a clean link
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @param int $post_id The post ID
-	 * @return string The redirect URL
-	 */
-	private function get_redirect_url( $post_id ) {
-		$redirect = get_post_meta( $post_id, 'cleanlink_redirect_url', true );
-		$count = (int) get_post_meta( $post_id, 'cleanlink_redirect_count', true );
-
-		/**
-		 * Filter the redirect URL.
-		 *
-		 * @since 1.0.0
-		 *
-		 * @param string $redirect The URL to redirect to.
-		 * @param int    $count    The current click count.
-		 */
-		$redirect = apply_filters( 'cleanlinks_urls_redirect_url', $redirect, $count );
-
-		/**
-		 * Action hook that fires before the redirect.
-		 *
-		 * @since 1.0.0
-		 *
-		 * @param string $redirect The URL to redirect to.
-		 * @param int    $count    The current click count.
-		 */
-		do_action( 'cleanlinks_urls_redirect', $redirect, $count );
-
-		return $redirect;
-	}
-
-	/**
-	 * Perform the redirect to the specified URL
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @param string $redirect The URL to redirect to
-	 * @param int    $post_id  The post ID
-	 * @return void
-	 */
-	private function perform_redirect( $redirect, $post_id ) {
-		if ( ! empty( $redirect ) ) {
-			$nofollow = get_post_meta( $post_id, 'cleanlink_redirect_nofollow', true );
-
-			$redirected = wp_redirect( esc_url_raw( $redirect ), 301 ); // phpcs:ignore WordPressVIPMinimum.Security.ExitAfterRedirect.NoExit -- The caller exits immediately after this method returns.
-
-			if ( $redirected && '1' === $nofollow ) {
-				// Preserve the crawl directive without sending a response body before redirect headers.
-				header( 'X-Robots-Tag: nofollow', true );
-			}
-		} else {
-			wp_safe_redirect( home_url(), 302 ); // phpcs:ignore WordPressVIPMinimum.Security.ExitAfterRedirect.NoExit -- The caller exits immediately after this method returns.
-		}
-	}
 }
