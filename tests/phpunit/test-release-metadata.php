@@ -23,6 +23,7 @@ class Test_Release_Metadata extends WP_UnitTestCase {
 		$plugin_file   = $this->read_metadata_file( 'cleanlinks.php' );
 		$constants     = $this->read_metadata_file( 'config/constants.php' );
 		$readme        = $this->read_metadata_file( 'readme.txt' );
+		$public_readme = $this->read_metadata_file( 'README.md' );
 		$composer      = json_decode( $this->read_metadata_file( 'composer.json' ), true, 512, JSON_THROW_ON_ERROR );
 		$package       = json_decode( $this->read_metadata_file( 'package.json' ), true, 512, JSON_THROW_ON_ERROR );
 		$package_lock  = json_decode( $this->read_metadata_file( 'package-lock.json' ), true, 512, JSON_THROW_ON_ERROR );
@@ -33,6 +34,9 @@ class Test_Release_Metadata extends WP_UnitTestCase {
 		$this->assertSame( '1.1.1', CLEANLINKS_VERSION );
 		$this->assertMatchesRegularExpression( '/^Stable tag:\s+1\.1\.1$/m', $readme );
 		$this->assertMatchesRegularExpression( '/^Tested up to:\s+7\.1$/m', $readme );
+		$this->assertMatchesRegularExpression( '/^Stable tag:\s+1\.1\.1$/m', $public_readme );
+		$this->assertMatchesRegularExpression( '/^Tested up to:\s+7\.1$/m', $public_readme );
+		$this->assertStringContainsString( '= 1.1.1 =', $public_readme );
 		$this->assertSame( '1.1.1', $composer['version'] );
 		$this->assertSame( '1.1.1', $package['version'] );
 		$this->assertSame( '1.1.1', $package_lock['version'] );
