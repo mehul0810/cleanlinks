@@ -50,6 +50,14 @@ class ExportCsvSerializer {
 	 * @return string
 	 */
 	private function escape_value( $value ) {
-		return '"' . str_replace( '"', '""', (string) $value ) . '"';
+		$value = (string) $value;
+
+		// Prevent spreadsheet applications from evaluating formula-like values,
+		// including values preceded by control whitespace.
+		if ( preg_match( '/^[\x09-\x0D\x20]*[=+\-@]/', $value ) ) {
+			$value = "'" . $value;
+		}
+
+		return '"' . str_replace( '"', '""', $value ) . '"';
 	}
 }
