@@ -25,10 +25,14 @@ class UrlValidator {
 	 *
 	 * @since 1.1.1
 	 *
-	 * @param string $url The URL to sanitize and validate.
+	 * @param mixed $url The URL to sanitize and validate.
 	 * @return string|bool The sanitized URL if valid, false otherwise.
 	 */
 	public static function validate( $url ) {
+		if ( ! is_string( $url ) ) {
+			return false;
+		}
+
 		$url           = trim( $url );
 		$validated_url = wp_http_validate_url( $url );
 
