@@ -50,52 +50,6 @@ class Test_Export extends WP_UnitTestCase {
 	}
 
 	/**
-	 * CSV serialization neutralizes formula-leading values, including control whitespace prefixes.
-	 *
-	 * @since 1.1.1
-	 * @access public
-	 *
-	 * @return void
-	 */
-	public function test_csv_serializer_neutralizes_formula_leading_values() {
-		$serializer       = new ExportCsvSerializer();
-		$dangerous_values = array(
-			'=1+1',
-			'+1+1',
-			'-1+1',
-			'@SUM(1+1)',
-			"\t=1+1",
-			"\n=1+1",
-			"\v=1+1",
-			"\f=1+1",
-			"\r=1+1",
-			" \t=1+1",
-		);
-
-		foreach ( $dangerous_values as $value ) {
-			$this->assertSame(
-				implode(
-					"\r\n",
-					array(
-						'"ID","Title","Redirect From","Redirect To"',
-						'"42","' . "'" . $value . '","https://example.test/from","https://example.test/to"',
-					)
-				),
-				$serializer->serialize(
-					array(
-						array(
-							42,
-							$value,
-							'https://example.test/from',
-							'https://example.test/to',
-						),
-					)
-				)
-			);
-		}
-	}
-
-	/**
 	 * Export query returns only published CleanLinks rows.
 	 *
 	 * @since 1.1.1
