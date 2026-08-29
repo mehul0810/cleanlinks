@@ -41,6 +41,72 @@ class Test_Collaborators extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The count collaborator initializes links that have no count metadata.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @return void
+	 */
+	public function test_access_counter_initializes_missing_count_metadata() {
+		$post_id = $this->factory->post->create(
+			array(
+				'post_type'   => 'cleanlinks',
+				'post_status' => 'publish',
+			)
+		);
+
+		$counter = new AccessCounter();
+
+		$this->assertSame( 1, $counter->increment( $post_id ) );
+		$this->assertSame( '1', get_post_meta( $post_id, 'cleanlink_redirect_count', true ) );
+	}
+
+	/**
+	 * An interleaved writer is not overwritten by a stale count read.
+	 *
+	 * The query filter places a second persisted value immediately before the
+	 * counter's UPDATE executes. This models the race that a read-modify-write
+	 * implementation loses while asserting the database-side increment uses the
+	 * latest value.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @return void
+	 */
+	public function test_access_counter_preserves_interleaved_count_update() {
+		$post_id = $this->factory->post->create(
+			array(
+				'post_type'   => 'cleanlinks',
+				'post_status' => 'publish',
+			)
+		);
+
+		update_post_meta( $post_id, 'cleanlink_redirect_count', 2 );
+
+		$interleaved = false;
+		$simulate_concurrent_update = static function ( $query ) use ( &$interleaved, $post_id ) {
+			if ( ! $interleaved && false !== stripos( $query, 'CAST(meta_value AS UNSIGNED)' ) ) {
+				$interleaved = true;
+				update_post_meta( $post_id, 'cleanlink_redirect_count', 5 );
+			}
+
+			return $query;
+		};
+
+		add_filter( 'query', $simulate_concurrent_update );
+
+		try {
+			$count = ( new AccessCounter() )->increment( $post_id );
+		} finally {
+			remove_filter( 'query', $simulate_concurrent_update );
+		}
+
+		$this->assertTrue( $interleaved );
+		$this->assertSame( 6, $count );
+		$this->assertSame( '6', get_post_meta( $post_id, 'cleanlink_redirect_count', true ) );
+	}
+
+	/**
 	 * The count collaborator does not change unpublished cleanlinks.
 	 *
 	 * @since 1.1.1
