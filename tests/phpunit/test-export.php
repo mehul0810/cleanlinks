@@ -156,7 +156,7 @@ class Test_Export extends WP_UnitTestCase {
 			$this->assertSame( $post_ids[ $index ], $row[0] );
 			$index++;
 
-			if ( ExportQuery::PAGE_SIZE === $index ) {
+			if ( ExportQuery::PAGE_SIZE + 1 === $index ) {
 				$this->assertFalse( wp_cache_get( $post_ids[0], 'posts' ) );
 				$this->assertFalse( wp_cache_get( $post_ids[0], 'post_meta' ) );
 			}
@@ -164,5 +164,32 @@ class Test_Export extends WP_UnitTestCase {
 
 		$this->assertSame( 10000, $index );
 		$this->assertLessThan( 250, $wpdb->num_queries - $queries_before );
+	}
+
+	/**
+	 * Early iterator destruction clears the active page cache.
+	 *
+	 * @since 1.1.1
+	 * @access public
+	 *
+	 * @return void
+	 */
+	public function test_export_query_clears_cache_when_iterator_is_destroyed_early() {
+		$post_id = (int) $this->factory->post->create(
+			array(
+				'post_type'   => 'cleanlinks',
+				'post_status' => 'publish',
+			)
+		);
+		update_post_meta( $post_id, 'cleanlink_redirect_url', 'https://example.test/' . $post_id );
+
+		$iterator = ( new ExportQuery() )->iterate_rows();
+		$iterator->rewind();
+		$this->assertSame( $post_id, $iterator->current()[0] );
+		$this->assertNotFalse( wp_cache_get( $post_id, 'post_meta' ) );
+
+		unset( $iterator );
+
+		$this->assertFalse( wp_cache_get( $post_id, 'post_meta' ) );
 	}
 }
