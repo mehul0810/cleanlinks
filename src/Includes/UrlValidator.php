@@ -29,6 +29,10 @@ class UrlValidator {
 	 * @return string|bool The sanitized URL if valid, false otherwise.
 	 */
 	public static function validate( $url ) {
+		if ( ! is_string( $url ) ) {
+			return false;
+		}
+
 		$url           = trim( $url );
 		$validated_url = wp_http_validate_url( $url );
 
