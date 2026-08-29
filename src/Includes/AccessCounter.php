@@ -306,7 +306,53 @@ class AccessCounter {
 	 * @return bool True when the WordPress metadata API path is required.
 	 */
 	private function requires_metadata_contract() {
-		return false !== has_filter( 'update_post_metadata' ) || $this->has_count_meta_actions();
+		return false !== has_filter( 'update_post_metadata' ) || $this->has_external_count_meta_actions();
+	}
+
+	/**
+	 * Check whether a non-core listener requires the metadata API path.
+	 *
+	 * WordPress always registers wp_cache_set_posts_last_changed on
+	 * updated_post_meta. The atomic path mirrors that action and invalidates the
+	 * same metadata cache, so the core cache callback alone must not force every
+	 * increment through a serialized read-modify-write update.
+	 *
+	 * @since 1.1.1
+	 *
+	 * @return bool True when an extension metadata action is registered.
+	 */
+	private function has_external_count_meta_actions() {
+		$hooks = array(
+			'update_post_meta',
+			'update_postmeta',
+			'updated_post_meta',
+			'updated_postmeta',
+		);
+
+		if ( ! isset( $GLOBALS['wp_filter'] ) ) {
+			return false;
+		}
+
+		foreach ( $hooks as $hook ) {
+			if ( ! isset( $GLOBALS['wp_filter'][ $hook ]->callbacks ) ) {
+				continue;
+			}
+
+			foreach ( $GLOBALS['wp_filter'][ $hook ]->callbacks as $callbacks ) {
+				foreach ( $callbacks as $callback ) {
+					if ( 'updated_post_meta' === $hook
+						&& isset( $callback['function'] )
+						&& 'wp_cache_set_posts_last_changed' === $callback['function']
+					) {
+						continue;
+					}
+
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	/**
