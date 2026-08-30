@@ -70,9 +70,11 @@ Yes, CleanLinks is fully compatible with popular caching and SEO plugins.
 == Changelog ==
 
 = 1.1.1 =
+* **Security Improvements:** Neutralize spreadsheet formula-leading values in CSV exports and remediate Composer development-tool security advisories.
+* **Improved URL Handling:** Reject malformed redirect URL values without fatal errors or unintended metadata changes.
+* **Bounded Export Cache Cleanup:** Stream large CSV exports in bounded batches, clean page caches as they are processed, and remove temporary files on completion or failure.
+* **Click Counter Reliability:** Update redirect click counters atomically and invalidate cached counts after clicks are recorded.
 * Confirm compatibility through WordPress 7.1.
-* Invalidate cached click counts after redirect clicks are recorded.
-* Remediate Composer development-tool security advisories.
 
 = 1.1.0 =
 * Count redirect clicks only for published CleanLinks to avoid analytics changes for drafts and non-public links.
