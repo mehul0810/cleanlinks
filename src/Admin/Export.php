@@ -21,14 +21,43 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Export {
 	/**
-	 * Initiate export.
+	 * Query used to retrieve export rows.
+	 *
+	 * @var ExportQuery
+	 */
+	private $query;
+
+	/**
+	 * Serializer used to build CSV output.
+	 *
+	 * @var ExportCsvSerializer
+	 */
+	private $serializer;
+
+	/**
+	 * Initialize export dependencies.
 	 *
 	 * @since  1.0.0
 	 * @access public
 	 *
+	 * @param ExportQuery         $query      Query used to retrieve export rows.
+	 * @param ExportCsvSerializer $serializer Serializer used to build CSV output.
 	 * @return void
 	 */
-	public function __construct() {
+	public function __construct( ?ExportQuery $query = null, ?ExportCsvSerializer $serializer = null ) {
+		$this->query      = $query ? $query : new ExportQuery();
+		$this->serializer = $serializer ? $serializer : new ExportCsvSerializer();
+	}
+
+	/**
+	 * Register export hooks.
+	 *
+	 * @since 1.1.1
+	 * @access public
+	 *
+	 * @return void
+	 */
+	public function register_hooks() {
 		add_action( 'admin_post_cleanlinks_export', array( $this, 'export_csv' ) );
 	}
 
@@ -60,70 +89,141 @@ class Export {
 			wp_die( esc_html__( 'Filesystem API not available.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 500 ) );
 		}
 
-		// Build CSV content manually
-		$csv_lines = array();
-		$csv_lines[] = '"ID","Title","Redirect From","Redirect To"';
-
-		$args = array(
-			'post_type'              => 'cleanlinks',
-			'post_status'            => 'publish',
-			'posts_per_page'         => 200,
-			'fields'                 => 'ids',
-			'no_found_rows'          => true,
-			'update_post_meta_cache' => false,
-			'update_post_term_cache' => false,
-		);
-
-		$query = new \WP_Query( $args );
-
-		foreach ( $query->posts as $post_id ) {
-			$post      = get_post( $post_id );
-			$permalink = get_permalink( $post_id );
-
-			$row = array(
-				$post_id,
-				$post->post_title,
-				$permalink,
-				get_post_meta( $post_id, 'cleanlink_redirect_url', true ),
-			);
-
-			$escaped = array_map(
-				function ( $value ) {
-					return '"' . str_replace( '"', '""', $value ) . '"';
-				},
-				$row
-			);
-
-			$csv_lines[] = implode( ',', $escaped );
-		}
-
-		$csv_data = implode( "\r\n", $csv_lines );
-
 		// Write to temp file
 		$tmp_file = wp_tempnam( 'export_cleanlink.csv' );
 		if ( ! $tmp_file ) {
 			wp_die( esc_html__( 'Could not create a temp file.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 500 ) );
 		}
 
-		if ( ! $wp_filesystem->put_contents( $tmp_file, $csv_data, FS_CHMOD_FILE ) ) {
+		// Preserve compatibility with injected legacy query/serializer doubles.
+		if ( ! method_exists( $this->query, 'iterate_rows' ) || ! method_exists( $this->serializer, 'serialize_header' ) || ! method_exists( $this->serializer, 'serialize_chunk' ) ) {
+			$csv_data = $this->serializer->serialize( $this->query->get_rows() );
+			if ( ! $wp_filesystem->put_contents( $tmp_file, $csv_data, FS_CHMOD_FILE ) ) {
+				$this->cleanup_temp_file( $tmp_file, $wp_filesystem );
+				wp_die( esc_html__( 'Could not write CSV file.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 500 ) );
+			}
+
+			$file_contents = $wp_filesystem->get_contents( $tmp_file );
+			if ( false === $file_contents ) {
+				$this->cleanup_temp_file( $tmp_file, $wp_filesystem );
+				wp_die( esc_html__( 'Could not read CSV file.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 500 ) );
+			}
+
+			header( 'Content-Type: text/csv; charset=utf-8' );
+			header( 'Content-Disposition: attachment; filename=export_cleanlink.csv' );
+
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Outputting raw CSV data for file download
+			echo $file_contents;
+
+			$this->cleanup_temp_file( $tmp_file, $wp_filesystem );
+			exit;
+		}
+
+		// Use a native stream so the complete export is not held in memory.
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations -- wp_tempnam() provides a local temporary path.
+		$file_handle = fopen( $tmp_file, 'wb' );
+		if ( false === $file_handle ) {
+			$this->cleanup_temp_file( $tmp_file, $wp_filesystem );
 			wp_die( esc_html__( 'Could not write CSV file.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 500 ) );
 		}
 
-		// Read and download
-		$file_contents = $wp_filesystem->get_contents( $tmp_file );
-		if ( false === $file_contents ) {
-			wp_die( esc_html__( 'Could not read CSV file.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 500 ) );
+		$write_succeeded = true;
+		$stream_complete = false;
+		try {
+			$write_succeeded = $this->write_file_contents( $file_handle, $this->serializer->serialize_header() );
+			$rows            = $this->query->iterate_rows();
+			$chunk           = array();
+			foreach ( $rows as $row ) {
+				if ( ! $write_succeeded ) {
+					break;
+				}
+
+				$chunk[] = $row;
+				if ( count( $chunk ) < ExportQuery::PAGE_SIZE ) {
+					continue;
+				}
+
+				$write_succeeded = $this->write_file_contents( $file_handle, "\r\n" . $this->serializer->serialize_chunk( $chunk ) );
+				$chunk           = array();
+			}
+
+			if ( $write_succeeded && ! empty( $chunk ) ) {
+				$write_succeeded = $this->write_file_contents( $file_handle, "\r\n" . $this->serializer->serialize_chunk( $chunk ) );
+			}
+
+			$stream_complete = true;
+		} finally {
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations -- Close the local temporary stream opened above.
+			fclose( $file_handle );
+			if ( ! $stream_complete || ! $write_succeeded ) {
+				$this->cleanup_temp_file( $tmp_file, $wp_filesystem );
+			}
+		}
+
+		if ( ! $write_succeeded ) {
+			wp_die( esc_html__( 'Could not write CSV file.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 500 ) );
 		}
 
 		header( 'Content-Type: text/csv; charset=utf-8' );
 		header( 'Content-Disposition: attachment; filename=export_cleanlink.csv' );
 
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Outputting raw CSV data for file download
-		echo $file_contents;
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations -- Stream the local temporary file without duplicating it in memory.
+		if ( false === readfile( $tmp_file ) ) {
+			$this->cleanup_temp_file( $tmp_file, $wp_filesystem );
+			wp_die( esc_html__( 'Could not read CSV file.', 'cleanlinks' ), esc_html__( 'Error', 'cleanlinks' ), array( 'response' => 500 ) );
+		}
 
-		$wp_filesystem->delete( $tmp_file );
+		$this->cleanup_temp_file( $tmp_file, $wp_filesystem );
 
 		exit;
+	}
+
+	/**
+	 * Write all content to an open temporary file stream.
+	 *
+	 * @since 1.1.1
+	 * @access private
+	 *
+	 * @param resource $handle  Open file handle.
+	 * @param string   $contents Content to write.
+	 * @return bool
+	 */
+	private function write_file_contents( $handle, $contents ) {
+		$length = strlen( $contents );
+		$offset = 0;
+
+		while ( $offset < $length ) {
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations -- Write to the local temporary stream.
+			$written = fwrite( $handle, substr( $contents, $offset ) );
+			if ( false === $written || 0 === $written ) {
+				return false;
+			}
+
+			$offset += $written;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Delete a temporary export file through the configured filesystem.
+	 *
+	 * @since 1.1.1
+	 * @access private
+	 *
+	 * @param string $tmp_file       Temporary file path.
+	 * @param object $wp_filesystem Configured WordPress filesystem.
+	 * @return void
+	 */
+	private function cleanup_temp_file( $tmp_file, $wp_filesystem ) {
+		$wp_filesystem->delete( $tmp_file );
+
+		// wp_tempnam() creates a local file even when the configured filesystem is remote.
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations -- Fallback cleanup for the local temporary file.
+		if ( is_file( $tmp_file ) ) {
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations -- Fallback cleanup for the local temporary file.
+			unlink( $tmp_file );
+		}
 	}
 
 	public function render_ui() {
