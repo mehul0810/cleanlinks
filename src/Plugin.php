@@ -56,8 +56,9 @@ final class Plugin {
 
 		if ( is_admin() ) {
 			new Admin\Filters();
-			new Admin\Actions();
-			new Admin\Export();
+			$export = new Admin\Export();
+			$export->register_hooks();
+			new Admin\Actions( $export );
 		}
 	}
 

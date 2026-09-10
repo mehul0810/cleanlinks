@@ -19,6 +19,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class Actions {
+	/**
+	 * Export service used by the export admin page.
+	 *
+	 * @var Export
+	 */
+	private $export;
 
 	/**
 	 * Initialize the class.
@@ -28,7 +34,8 @@ class Actions {
 	 *
 	 * @return void
 	 */
-	public function __construct() {
+	public function __construct( Export $export ) {
+		$this->export = $export;
 		add_action( 'admin_enqueue_scripts', array( $this, 'register_assets' ) );
 		add_filter( 'script_loader_tag', array( $this, 'add_module_type_to_script' ), 10, 3 );
 		add_action( 'admin_menu', array( $this, 'register_admin_pages' ) );
@@ -78,7 +85,7 @@ class Actions {
 
 			<?php
 			// Render Export UI.
-			( new Export() )->render_ui();
+			$this->export->render_ui();
 			?>
 
 		</div>

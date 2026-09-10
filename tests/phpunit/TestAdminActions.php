@@ -34,7 +34,7 @@ class TestAdminActions extends WP_UnitTestCase {
 	 */
 	public static function set_up_before_class() {
 		parent::set_up_before_class();
-		self::$class_instance = new Admin\Actions();
+		self::$class_instance = new Admin\Actions( new Admin\Export() );
 	}
 
 	/**
