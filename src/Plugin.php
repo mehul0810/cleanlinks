@@ -53,11 +53,11 @@ final class Plugin {
 		new Includes\TaxoNomy();
 		new Includes\Filters();
 		new Includes\Actions();
+		$export = new Admin\Export();
+		$export->register_hooks();
 
 		if ( is_admin() ) {
 			new Admin\Filters();
-			$export = new Admin\Export();
-			$export->register_hooks();
 			new Admin\Actions( $export );
 		}
 	}

@@ -23,7 +23,7 @@ Whether you’re tracking affiliate conversions, simplifying URLs for social sha
 
 - **Branded Link Shortener:** Create memorable, clean short links under your own domain.
 - **Affiliate Link Cloaking:** Cloak affiliate and referral links for higher trust and better CTR.
-- **CSV Export:** Download link ID, title, short URL, and destination URL in a CSV file. Click counts are not included.
+- **CSV Export:** Download published link IDs, titles, short URLs, and destination URLs in a CSV file. Click counts are not included.
 - **Organize with Groups:** Group and search your links for effortless management.
 - **Nofollow Options:** Easily add `nofollow`.
 - **SEO & Performance Optimized:** Fast, lightweight, and compatible with top SEO/caching plugins.
@@ -54,7 +54,7 @@ Whether you’re tracking affiliate conversions, simplifying URLs for social sha
 == Frequently Asked Questions ==
 
 = Can I export my links? =
-Yes. The CSV includes each link's ID, title, short URL, and destination URL. It does not include click counts.
+Yes. The CSV includes each published link's ID, title, short URL, and destination URL. It does not include click counts.
 
 = Does CleanLinks support affiliate links? =
 Absolutely. CleanLinks is built for affiliate marketers, letting you cloak and track affiliate URLs with ease.

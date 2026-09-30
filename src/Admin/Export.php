@@ -59,23 +59,11 @@ class Export {
 	 */
 	public function register_hooks() {
 		add_action( 'admin_post_cleanlinks_export', array( $this, 'export_csv' ) );
-		add_action( 'export_wp', array( $this, 'exclude_group_terms_from_wxr' ) );
+		add_filter( 'get_terms', array( $this, 'filter_wxr_terms' ), 10, 2 );
 	}
 
 	/**
-	 * Exclude private CleanLinks groups from the general WordPress export.
-	 *
-	 * @param array $args Export arguments.
-	 * @return void
-	 */
-	public function exclude_group_terms_from_wxr( $args ) {
-		if ( 'all' === $args['content'] ) {
-			add_filter( 'get_terms', array( $this, 'filter_wxr_terms' ), 10, 2 );
-		}
-	}
-
-	/**
-	 * Filter the one custom-taxonomy query performed by the WXR exporter.
+	 * Hide CleanLinks groups only while the core WXR exporter is running.
 	 *
 	 * @param array $terms      Terms returned by WordPress.
 	 * @param array $taxonomies Queried taxonomies.
@@ -86,7 +74,17 @@ class Export {
 			return $terms;
 		}
 
-		remove_filter( 'get_terms', array( $this, 'filter_wxr_terms' ), 10 );
+		$in_wxr_export = false;
+		foreach ( debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS ) as $frame ) {
+			if ( 'export_wp' === $frame['function'] && empty( $frame['class'] ) ) {
+				$in_wxr_export = true;
+				break;
+			}
+		}
+		if ( ! $in_wxr_export ) {
+			return $terms;
+		}
+
 		return array_values(
 			array_filter(
 				$terms,

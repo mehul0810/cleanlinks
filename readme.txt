@@ -20,7 +20,7 @@ Designed to be lightweight, CleanLinks creates 301 redirects for links with a de
 = Key Features =
 
 - **Branded Short Links** – Cloak long URLs under your own domain.
-- **CSV Export Tool** – Download link ID, title, short URL, and destination URL in a CSV file. Click counts are not included.
+- **CSV Export Tool** – Download published link IDs, titles, short URLs, and destination URLs in a CSV file. Click counts are not included.
 - **Click Tracking** – View total clicks for published links.
 - **Organize Your Links** – Group links with tags for easy management.
 - **SEO-Friendly** – Compatible with SEO and caching plugins.
@@ -48,8 +48,8 @@ Designed to be lightweight, CleanLinks creates 301 redirects for links with a de
 
 == Frequently Asked Questions ==
 
-= Can I export all my links? =
-Yes. The Export tool downloads a CSV with each link's ID, title, short URL, and destination URL. It does not include click counts.
+= Can I export my published links? =
+Yes. The Export tool downloads a CSV with each published link's ID, title, short URL, and destination URL. It does not include click counts.
 
 = Does CleanLinks support affiliate links? =
 Yes. You can create short links for affiliate destinations. Links with a destination use a 301 redirect, and you can organize them into groups.
