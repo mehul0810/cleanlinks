@@ -9,6 +9,7 @@
 
 namespace MG\CleanLinks\Tests;
 
+use MG\CleanLinks\Admin\Export;
 use MG\CleanLinks\Admin\ExportCsvSerializer;
 use MG\CleanLinks\Admin\ExportQuery;
 use WP_UnitTestCase;
@@ -17,6 +18,71 @@ use WP_UnitTestCase;
  * Tests for export composition seams.
  */
 class Test_Export extends WP_UnitTestCase {
+	/**
+	 * WXR omits CleanLinks group names without hiding unrelated terms or CSV rows.
+	 *
+	 * @return void
+	 */
+	public function test_wxr_group_filter_is_scoped_to_custom_terms_query() {
+		register_taxonomy( 'proof_export_groups', 'post' );
+		$group = wp_insert_term( 'Private client group', 'cleanlinks_groups' );
+		$other = wp_insert_term( 'Public proof group', 'proof_export_groups' );
+		$this->assertNotWPError( $group );
+		$this->assertNotWPError( $other );
+
+		$link_id = $this->factory->post->create(
+			array(
+				'post_type'   => 'cleanlinks',
+				'post_status' => 'publish',
+			)
+		);
+		$export  = new Export();
+		$export->exclude_group_terms_from_wxr( array( 'content' => 'all' ) );
+
+		$taxonomies = array( 'cleanlinks_groups', 'proof_export_groups' );
+		$terms      = get_terms( array( 'taxonomy' => $taxonomies, 'hide_empty' => false ) );
+		$this->assertSame( array( 'proof_export_groups' ), wp_list_pluck( $terms, 'taxonomy' ) );
+		$this->assertFalse( has_filter( 'get_terms', array( $export, 'filter_wxr_terms' ) ) );
+		$this->assertCount( 2, get_terms( array( 'taxonomy' => $taxonomies, 'hide_empty' => false ) ) );
+		$this->assertContains( $link_id, wp_list_pluck( ( new ExportQuery() )->get_rows(), 0 ) );
+	}
+
+	/**
+	 * The generated WXR omits CleanLinks data but retains unrelated taxonomy terms.
+	 *
+	 * @return void
+	 */
+	public function test_wordpress_all_content_wxr_omits_cleanlinks_groups() {
+		require_once ABSPATH . 'wp-admin/includes/export.php';
+
+		register_taxonomy( 'proof_export_groups', 'post' );
+		wp_insert_term( 'Private client group', 'cleanlinks_groups' );
+		wp_insert_term( 'Public proof group', 'proof_export_groups' );
+		$this->factory->post->create(
+			array(
+				'post_type'   => 'cleanlinks',
+				'post_status' => 'publish',
+				'post_title'  => 'Private link title',
+			)
+		);
+
+		$export = new Export();
+		$export->register_hooks();
+		ob_start();
+		try {
+			// The WordPress test bootstrap prints before export_wp() sends headers.
+			@export_wp( array( 'content' => 'all' ) );
+			$wxr = ob_get_contents();
+		} finally {
+			ob_end_clean();
+			remove_action( 'export_wp', array( $export, 'exclude_group_terms_from_wxr' ) );
+			remove_filter( 'get_terms', array( $export, 'filter_wxr_terms' ), 10 );
+		}
+
+		$this->assertStringNotContainsString( 'Private client group', $wxr );
+		$this->assertStringNotContainsString( 'Private link title', $wxr );
+		$this->assertStringContainsString( 'Public proof group', $wxr );
+	}
 	/**
 	 * CSV serialization preserves the public export schema and escaping.
 	 *

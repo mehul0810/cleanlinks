@@ -4,20 +4,25 @@ on:
   release:
     types: [ prereleased ]
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name:    Build Plugin Artifact
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Install composer dependencies
-        uses: php-actions/composer@v2
+        uses: php-actions/composer@0d7cc41da99de7aea95f83045dcfa24ade1e00d8 # v2
         with:
           dev: no
 
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@f1f314fca9dfce2769ece7d933488f076716723e # v1
         with:
           node-version: '20'
 
@@ -28,7 +33,7 @@ jobs:
         run: |
           npm run package:release -- "${GITHUB_WORKSPACE}/cleanlinks.zip"
       - name: Upload release asset
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

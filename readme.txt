@@ -15,13 +15,13 @@ Create branded short links, manage redirects, cloak affiliate URLs, and export l
 
 **CleanLinks** is your all-in-one solution for creating branded, customizable short links directly within WordPress. Whether you’re managing affiliate campaigns, simplifying external URLs, or just looking for a professional way to share links, CleanLinks makes it easy.
 
-Designed to be lightweight yet powerful, CleanLinks lets you create 301 and 302 redirects, track clicks, categorize links, and export all your links to CSV – with a single click.
+Designed to be lightweight, CleanLinks creates 301 redirects for links with a destination URL. It records link clicks, organizes links into groups, and exports link details to CSV. If a link has no destination URL, it redirects to the site home page with a 302 response.
 
 = Key Features =
 
 - **Branded Short Links** – Cloak long URLs under your own domain.
-- **CSV Export Tool** – Export all your links in CSV format with one click for backup or reporting.
-- **Click Tracking** – Optional built-in analytics to track link clicks.
+- **CSV Export Tool** – Download link ID, title, short URL, and destination URL in a CSV file. Click counts are not included.
+- **Click Tracking** – View total clicks for published links.
 - **Organize Your Links** – Group links with tags for easy management.
 - **SEO-Friendly** – Compatible with SEO and caching plugins.
 - **Developer Friendly** – Built using WordPress standards with hooks/filters.
@@ -29,7 +29,7 @@ Designed to be lightweight yet powerful, CleanLinks lets you create 301 and 302 
 = Minimum Requirements =
 
 - WordPress 5.5 or higher
-- PHP 8.0 or higher
+- PHP 8.1 or higher
 - MySQL 5.5 or higher
 
 = Automatic Installation =
@@ -49,10 +49,10 @@ Designed to be lightweight yet powerful, CleanLinks lets you create 301 and 302 
 == Frequently Asked Questions ==
 
 = Can I export all my links? =
-Yes! CleanLinks includes a simple Export tool that lets you download all your links in CSV format with a single click.
+Yes. The Export tool downloads a CSV with each link's ID, title, short URL, and destination URL. It does not include click counts.
 
 = Does CleanLinks support affiliate links? =
-Absolutely. You can cloak affiliate links using 301 or 302 redirects and group them with tags for easy management.
+Yes. You can create short links for affiliate destinations. Links with a destination use a 301 redirect, and you can organize them into groups.
 
 = Can I track clicks on my links? =
 Yes. Click tracking is available per link.
@@ -63,9 +63,9 @@ Yes, CleanLinks is fully compatible with popular caching and SEO plugins.
 == Screenshots ==
 
 1. Admin interface showing branded link management.
-2. Redirect settings with 301/302 options.
+2. Link settings with a destination URL and nofollow option.
 3. Export tool with one-click CSV export.
-4. Analytics and click tracking interface.
+4. Total click counts in the links list.
 
 == Changelog ==
 

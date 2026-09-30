@@ -76,6 +76,7 @@ class Test_PostType extends WP_UnitTestCase {
 		$this->assertEquals( 'Link', $wp_post_types['cleanlinks']->labels->name_admin_bar );
 		$this->assertEquals( 1, $wp_post_types['cleanlinks']->publicly_queryable );
 		$this->assertEquals( 'post', $wp_post_types['cleanlinks']->capability_type );
+		$this->assertFalse( $wp_post_types['cleanlinks']->can_export );
 	}
 
 	/**
@@ -92,7 +93,7 @@ class Test_PostType extends WP_UnitTestCase {
 		wp_set_current_user( $user_id );
 		$_POST = array(
 			'cleanlink_redirect_nonce'    => wp_create_nonce( 'cleanlink-save-redirect-meta' ),
-			'cleanlink_redirect_url'      => 'https://example.com/destination',
+			'cleanlink_redirect_url'      => 'https://1.1.1.1/destination',
 			'cleanlink_redirect_nofollow' => '1',
 		);
 
@@ -103,7 +104,7 @@ class Test_PostType extends WP_UnitTestCase {
 			wp_set_current_user( 0 );
 		}
 
-		$this->assertSame( 'https://example.com/destination', get_post_meta( $post_id, 'cleanlink_redirect_url', true ) );
+		$this->assertSame( 'https://1.1.1.1/destination', get_post_meta( $post_id, 'cleanlink_redirect_url', true ) );
 		$this->assertSame( '1', get_post_meta( $post_id, 'cleanlink_redirect_nofollow', true ) );
 	}
 

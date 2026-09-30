@@ -1,43 +1,65 @@
-export function setupCopyUrlButtons() {
-    const copyUrlButtons = document.querySelectorAll('.cleanlinks--copy-button');
+export async function copyTextToClipboard( text ) {
+	if ( navigator.clipboard && window.isSecureContext ) {
+		await navigator.clipboard.writeText( text );
+		return;
+	}
 
-	const copyTextToClipboard = ( text ) => {
-		const textarea = document.createElement( 'textarea' );
-		textarea.value = text;
-		textarea.setAttribute( 'readonly', '' );
-		textarea.style.position = 'absolute';
-		textarea.style.left = '-9999px';
-		document.body.appendChild( textarea );
+	const textarea = document.createElement( 'textarea' );
+	const previousFocus = textarea.ownerDocument.activeElement;
+	textarea.value = text;
+	textarea.setAttribute( 'readonly', '' );
+	textarea.style.position = 'absolute';
+	textarea.style.left = '-9999px';
+	document.body.appendChild( textarea );
+	let copied;
+	try {
 		textarea.select();
-		document.execCommand( 'copy' );
-		document.body.removeChild( textarea );
-	};
+		copied = document.execCommand( 'copy' );
+	} finally {
+		textarea.remove();
+		if ( previousFocus && typeof previousFocus.focus === 'function' ) {
+			previousFocus.focus();
+		}
+	}
+	if ( !copied ) {
+		throw new Error( 'Clipboard copy failed' );
+	}
+}
 
-    Array.from(copyUrlButtons).forEach((button) => {
-        button.addEventListener('click', ( event ) => {
-            const url         = event.currentTarget.getAttribute('data-url');
-			const copiedText  = event.currentTarget.getAttribute('data-copied-text');
-            const iconElement = event.currentTarget.querySelector('.dashicons');
-			const textElement = event.currentTarget.querySelector('.cleanlinks--copy-button-text');
+export function setupCopyUrlButtons() {
+	const copyUrlButtons = document.querySelectorAll( '.cleanlinks--copy-button' );
 
-			iconElement.classList.add('dashicons-yes');
-			iconElement.classList.remove('dashicons-admin-page');
+	Array.from( copyUrlButtons ).forEach( ( button ) => {
+		button.addEventListener( 'click', async ( event ) => {
+			const currentButton = event.currentTarget;
+			const url = currentButton.getAttribute( 'data-url' );
+			const textElement = currentButton.querySelector( '.cleanlinks--copy-button-text' );
+			if ( !url || !textElement ) {
+				return;
+			}
+			const iconElement = currentButton.querySelector( '.dashicons' );
 
-			textElement.textContent = iconElement.textContent + copiedText;
+			try {
+				await copyTextToClipboard( url );
+				textElement.textContent = currentButton.getAttribute( 'data-copied-text' ) || 'Copied';
+				if ( iconElement ) {
+					iconElement.classList.replace( 'dashicons-admin-page', 'dashicons-yes' );
+				}
+			} catch ( e ) {
+				textElement.textContent = currentButton.getAttribute( 'data-copy-failed-text' ) || 'Copy failed';
+			}
+		} );
 
-			// Copy URL to clipboard.
-			copyTextToClipboard( url );
-		});
-
-        button.addEventListener('mouseleave', (event) => {
-			const defaultText = event.currentTarget.getAttribute('data-default-text');
-            const iconElement = event.currentTarget.querySelector('span.dashicons');
-			const textElement = event.currentTarget.querySelector('.cleanlinks--copy-button-text');
-
-			iconElement.classList.remove( 'dashicons-yes' );
-			iconElement.classList.add( 'dashicons-admin-page' );
-
-			textElement.textContent = iconElement.textContent + defaultText;
-		});
-	});
+		button.addEventListener( 'mouseleave', ( event ) => {
+			const currentButton = event.currentTarget;
+			const textElement = currentButton.querySelector( '.cleanlinks--copy-button-text' );
+			const iconElement = currentButton.querySelector( '.dashicons' );
+			if ( textElement ) {
+				textElement.textContent = currentButton.getAttribute( 'data-default-text' ) || '';
+			}
+			if ( iconElement ) {
+				iconElement.classList.replace( 'dashicons-yes', 'dashicons-admin-page' );
+			}
+		} );
+	} );
 }

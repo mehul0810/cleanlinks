@@ -21,6 +21,9 @@ on:
     # Allow manually triggering the workflow.
     workflow_dispatch:
 
+permissions:
+    contents: read
+
 # Cancels all previous workflow runs for the same branch that have not yet completed.
 concurrency:
     # The concurrency group contains the workflow name and the branch name.
@@ -34,10 +37,10 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@v3
+              uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3
 
             - name: Install PHP
-              uses: shivammathur/setup-php@v2
+              uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
               with:
                   php-version: '8.1'
                   coverage: none
@@ -51,7 +54,7 @@ jobs:
             # Install dependencies and handle caching in one go.
             # @link https://github.com/marketplace/actions/install-composer-dependencies
             - name: Install Composer dependencies
-              uses: ramsey/composer-install@v2
+              uses: ramsey/composer-install@1919f6c305aea6ab10e6181a8ddf72317ad77e0e # v2 branch
               with:
                   # Bust the cache at least once a month - output format: YYYY-MM.
                   custom-cache-suffix: $(date -u "+%Y-%m")
@@ -69,7 +72,7 @@ jobs:
 
             - name: Upload PHPCS report artifact
               if: always()
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
               with:
                 name: phpcs-report
                 path: ./phpcs-report.xml

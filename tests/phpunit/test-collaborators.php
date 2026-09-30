@@ -522,7 +522,7 @@ class Test_Collaborators extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_url_validator_accepts_valid_urls_and_rejects_invalid_values() {
-		$this->assertSame( 'https://example.com/destination', UrlValidator::validate( ' https://example.com/destination ' ) );
+		$this->assertSame( 'https://1.1.1.1/destination', UrlValidator::validate( ' https://1.1.1.1/destination ' ) );
 		$this->assertFalse( UrlValidator::validate( 'not a URL' ) );
 	}
 }
