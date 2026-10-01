@@ -5,7 +5,7 @@ Donate link: https://www.buymeacoffee.com/mehulgohil
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 1.1.1
+Stable tag: 1.1.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -69,6 +69,12 @@ Yes, CleanLinks is fully compatible with popular caching and SEO plugins.
 
 == Changelog ==
 
+= 1.1.2 =
+* Show a saved-link overview and validate destination URLs in the Add/Edit Link editor.
+* Exclude CleanLinks links and group names from WordPress general exports while retaining the dedicated published-links CSV export.
+* Pin GitHub Actions to verified commits, restrict workflow token permissions, and check new high or critical npm advisory changes.
+* Correct descriptions of redirect and CSV behavior.
+
 = 1.1.1 =
 * **Security Improvements:** Neutralize spreadsheet formula-leading values in CSV exports and remediate Composer development-tool security advisories.
 * **Improved URL Handling:** Reject malformed redirect URL values without fatal errors or unintended metadata changes.
@@ -98,6 +104,9 @@ Yes, CleanLinks is fully compatible with popular caching and SEO plugins.
 * Lightweight and SEO-friendly.
 
 == Upgrade Notice ==
+
+= 1.1.2 =
+WordPress Tools > Export no longer includes CleanLinks links or groups. Use the CleanLinks Export tool for a CSV of published links.
 
 = 1.1.0 =
 Click tracking now records redirects only for published CleanLinks; draft and non-public links continue to avoid analytics side effects.
