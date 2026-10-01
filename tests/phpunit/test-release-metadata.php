@@ -36,7 +36,7 @@ class Test_Release_Metadata extends WP_UnitTestCase {
 		$this->assertMatchesRegularExpression( '/^Tested up to:\s+7\.1$/m', $readme );
 		$this->assertMatchesRegularExpression( '/^Stable tag:\s+1\.1\.2$/m', $public_readme );
 		$this->assertMatchesRegularExpression( '/^Tested up to:\s+7\.1$/m', $public_readme );
-		$this->assertStringContainsString( '= 1.1.2 =', $public_readme );
+		$this->assertStringContainsString( '### 1.1.2', $public_readme );
 		$this->assertSame( '1.1.2', $composer['version'] );
 		$this->assertSame( '1.1.2', $package['version'] );
 		$this->assertSame( '1.1.2', $package_lock['version'] );
