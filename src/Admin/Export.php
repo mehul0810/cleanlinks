@@ -85,13 +85,11 @@ class Export {
 			return $terms;
 		}
 
-		return array_values(
-			array_filter(
-				$terms,
-				static function ( $term ) {
-					return ! $term instanceof \WP_Term || 'cleanlinks_groups' !== $term->taxonomy;
-				}
-			)
+		return array_filter(
+			$terms,
+			static function ( $term ) {
+				return ! $term instanceof \WP_Term || 'cleanlinks_groups' !== $term->taxonomy;
+			}
 		);
 	}
 

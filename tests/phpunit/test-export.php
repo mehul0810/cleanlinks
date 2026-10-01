@@ -61,9 +61,13 @@ class Test_Export extends WP_UnitTestCase {
 		);
 
 		$this->assertFalse( is_admin() );
-		$intervening_query = static function ( $filename ) {
+		$id_name_args = array( 'taxonomy' => 'cleanlinks_groups', 'hide_empty' => false, 'fields' => 'id=>name' );
+		$expected_names = get_terms( $id_name_args );
+		$names_in_export = null;
+		$intervening_query = static function ( $filename ) use ( $id_name_args, &$names_in_export ) {
 			get_terms( array( 'taxonomy' => 'cleanlinks_groups', 'hide_empty' => false ) );
 			get_terms( array( 'taxonomy' => 'cleanlinks_groups', 'hide_empty' => false, 'fields' => 'ids' ) );
+			$names_in_export = get_terms( $id_name_args );
 			return $filename;
 		};
 		add_filter( 'export_wp_filename', $intervening_query );
@@ -80,6 +84,7 @@ class Test_Export extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'Private client group', $wxr );
 		$this->assertStringNotContainsString( 'Private link title', $wxr );
 		$this->assertStringContainsString( 'Public proof group', $wxr );
+		$this->assertSame( $expected_names, $names_in_export );
 		$this->assertCount( 1, get_terms( array( 'taxonomy' => 'cleanlinks_groups', 'hide_empty' => false ) ) );
 	}
 
