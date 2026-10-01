@@ -37,7 +37,7 @@ jobs:
             # This action checks the `composer.lock` file against known security vulnerabilities in the dependencies.
             # https://github.com/marketplace/actions/the-php-security-checker
             - name: Run Security Check
-              uses: symfonycorp/security-checker-action@d937c95522250456aca191a17f6b6950e73e1f02 # v4
+              uses: symfonycorp/security-checker-action@bb5092fdb50d4b92d301885fb6d0b0a41cea7bcd # v4
 
             - name: Set up Node.js
               uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4

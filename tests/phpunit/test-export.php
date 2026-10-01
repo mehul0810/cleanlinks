@@ -63,6 +63,7 @@ class Test_Export extends WP_UnitTestCase {
 		$this->assertFalse( is_admin() );
 		$intervening_query = static function ( $filename ) {
 			get_terms( array( 'taxonomy' => 'cleanlinks_groups', 'hide_empty' => false ) );
+			get_terms( array( 'taxonomy' => 'cleanlinks_groups', 'hide_empty' => false, 'fields' => 'ids' ) );
 			return $filename;
 		};
 		add_filter( 'export_wp_filename', $intervening_query );

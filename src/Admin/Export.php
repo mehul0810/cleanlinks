@@ -89,7 +89,7 @@ class Export {
 			array_filter(
 				$terms,
 				static function ( $term ) {
-					return 'cleanlinks_groups' !== $term->taxonomy;
+					return ! $term instanceof \WP_Term || 'cleanlinks_groups' !== $term->taxonomy;
 				}
 			)
 		);

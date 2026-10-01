@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Install composer dependencies
-        uses: php-actions/composer@0d7cc41da99de7aea95f83045dcfa24ade1e00d8 # v2
+        uses: php-actions/composer@c3a242874c6e7bb78d28e8d26476b7aa53f7a304 # v2
         with:
           dev: no
 
