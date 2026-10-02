@@ -52,4 +52,18 @@ class Test_Link_Metadata_Command extends WP_UnitTestCase {
 		$this->assertSame( 'invalid_id', $command->execute( $other, $input )->get_error_code() );
 		$this->assertSame( 'invalid_id', $command->execute( (string) $id, $input )->get_error_code() );
 	}
+	public function test_direct_metadata_save_rolls_back_partial_failure() {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$id = self::factory()->post->create( array( 'post_type' => 'cleanlinks' ) );
+		update_post_meta( $id, 'cleanlink_redirect_url', 'https://example.org/working' );
+		update_post_meta( $id, 'cleanlink_redirect_nofollow', '1' );
+		$fail = static function ( $value, $id, $key ) { return 'cleanlink_redirect_nofollow' === $key ? true : $value; };
+		add_filter( 'update_post_metadata', $fail, 10, 3 );
+		$result = ( new LinkMetadataCommand() )->execute( $id, array( 'destination' => 'https://example.org/rejected', 'nofollow' => false ) );
+		remove_filter( 'update_post_metadata', $fail, 10 );
+		$this->assertWPError( $result );
+		$this->assertSame( 'https://example.org/working', get_post_meta( $id, 'cleanlink_redirect_url', true ) );
+		$this->assertSame( '1', get_post_meta( $id, 'cleanlink_redirect_nofollow', true ) );
+	}
+
 }

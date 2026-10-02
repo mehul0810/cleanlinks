@@ -55,6 +55,8 @@ final class Plugin {
 		new Includes\Actions();
 		$export = new Admin\Export();
 		$export->register_hooks();
+		$commands = new Admin\LinkCommandController();
+		$commands->register_hooks();
 
 		if ( is_admin() ) {
 			new Admin\Filters();

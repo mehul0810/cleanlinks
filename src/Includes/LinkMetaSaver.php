@@ -30,6 +30,10 @@ class LinkMetaSaver {
 	 * @return void
 	 */
 	public function save( $post_id, $post ) {
+		if ( \MG\CleanLinks\Application\LinkCommands::is_running() ) {
+			return;
+		}
+
 		if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) ) {
 			return;
 		}

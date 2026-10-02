@@ -53,19 +53,36 @@ class LinkMetadataCommand {
 			'cleanlink_redirect_url'      => $destination,
 			'cleanlink_redirect_nofollow' => $input['nofollow'] ? '1' : '0',
 		);
-		foreach ( $values as $key => $value ) {
-			// wp_slash compensates for WordPress metadata's internal unslashing.
-			update_post_meta( $post_id, $key, wp_slash( $value ) );
-			// update_post_meta also returns false for an unchanged value: read back.
-			if ( $value !== get_post_meta( $post_id, $key, true ) ) {
-				return $this->error( 'persistence_failed', $key );
+		$transaction = null;
+		if ( ! \MG\CleanLinks\Application\LinkCommands::is_running() ) {
+			$transaction = new \MG\CleanLinks\Application\CommandTransaction();
+			if ( ! $transaction->begin() ) {
+				return $this->error( 'storage_unavailable', 'input' );
 			}
 		}
-		return array(
-			'id'          => $post_id,
-			'destination' => $destination,
-			'nofollow'    => $input['nofollow'],
-		);
+		$result = array( 'id' => $post_id, 'destination' => $destination, 'nofollow' => $input['nofollow'] );
+		try {
+			foreach ( $values as $key => $value ) {
+				// wp_slash compensates for WordPress metadata's internal unslashing.
+				update_post_meta( $post_id, $key, wp_slash( $value ) );
+				// update_post_meta also returns false for unchanged values: read back.
+				if ( $value !== get_post_meta( $post_id, $key, true ) ) {
+					$result = $this->error( 'persistence_failed', $key );
+					break;
+				}
+			}
+		} catch ( \Throwable $exception ) {
+			$result = $this->error( 'persistence_failed', 'input' );
+		} finally {
+			if ( $transaction ) {
+				$finished = $transaction->finish( ! is_wp_error( $result ) );
+				clean_post_cache( $post_id );
+				if ( ! $finished ) {
+					$result = $this->error( 'commit_failed', 'input' );
+				}
+			}
+		}
+		return $result;
 	}
 
 	/**
