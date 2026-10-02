@@ -107,7 +107,7 @@ class LinkMetaBox {
 		<p>
 			<label for="cleanlink_redirect_url"><strong><?php esc_html_e( 'Destination URL', 'cleanlinks' ); ?></strong></label>
 			<input placeholder="https://example.com" class="widefat" type="url" inputmode="url" name="cleanlink_redirect_url" id="cleanlink_redirect_url" aria-describedby="cleanlink_redirect_url_help cleanlink_redirect_url_error" value="<?php echo esc_attr( $url ); ?>" />
-			<span id="cleanlink_redirect_url_help" class="description"><?php esc_html_e( 'Enter a full http:// or https:// URL. A published link without a destination redirects to the site home page.', 'cleanlinks' ); ?></span>
+			<span id="cleanlink_redirect_url_help" class="description"><?php esc_html_e( 'Enter a full http:// or https:// URL. If WordPress rejects a change, the saved destination stays unchanged. A published link without a destination redirects to the site home page.', 'cleanlinks' ); ?></span>
 			<span id="cleanlink_redirect_url_error" class="cleanlinks-link-error" role="alert" hidden><?php esc_html_e( 'Enter a full URL starting with https:// or http://.', 'cleanlinks' ); ?></span>
 		</p>
 

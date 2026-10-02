@@ -31,6 +31,7 @@ class Test_LinkMetaBox extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'Saved link overview', $html );
 		$this->assertStringContainsString( 'data-url="' . esc_url( get_permalink( $post_id ) ) . '"', $html );
 		$this->assertStringContainsString( 'https://example.com/destination', $html );
+		$this->assertStringContainsString( 'If WordPress rejects a change, the saved destination stays unchanged.', $html );
 		$this->assertStringContainsString( '301 permanent', $html );
 		$this->assertStringContainsString( '<dd>7</dd>', $html );
 	}

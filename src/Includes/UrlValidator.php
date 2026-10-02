@@ -37,7 +37,7 @@ class UrlValidator {
 		$validated_url = wp_http_validate_url( $url );
 
 		if ( $validated_url ) {
-			return esc_url( $validated_url );
+			return esc_url_raw( $validated_url );
 		}
 
 		return false;

@@ -170,7 +170,7 @@ msgid "Destination URL"
 msgstr ""
 
 #: src/Includes/LinkMetaBox.php:110
-msgid "Enter a full http:// or https:// URL. A published link without a destination redirects to the site home page."
+msgid "Enter a full http:// or https:// URL. If WordPress rejects a change, the saved destination stays unchanged. A published link without a destination redirects to the site home page."
 msgstr ""
 
 #: src/Includes/LinkMetaBox.php:111

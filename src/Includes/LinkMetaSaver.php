@@ -107,7 +107,6 @@ class LinkMetaSaver {
 			return;
 		}
 
-		delete_post_meta( $post_id, 'cleanlink_redirect_url' );
-		delete_post_meta( $post_id, 'cleanlink_redirect_nofollow' );
+		// A rejected edit must not replace a working redirect with the home-page fallback.
 	}
 }

@@ -493,6 +493,34 @@ class Test_Collaborators extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A stored campaign URL reaches WordPress's redirect hook unchanged.
+	 */
+	public function test_redirector_preserves_multi_query_destination() {
+		$post_id  = $this->factory->post->create( array( 'post_type' => 'cleanlinks' ) );
+		$url      = 'https://1.1.1.1/?source=email&campaign=october';
+		$location = null;
+		$status   = null;
+		$stop     = static function ( $redirect, $code ) use ( &$location, &$status ) {
+			$location = $redirect;
+			$status   = $code;
+			return false;
+		};
+
+		update_post_meta( $post_id, 'cleanlink_redirect_url', $url );
+		add_filter( 'wp_redirect', $stop, 10, 2 );
+		try {
+			$redirector = new Redirector();
+			$redirector->perform_redirect( $redirector->get_redirect_url( $post_id ), $post_id );
+		} finally {
+			remove_filter( 'wp_redirect', $stop, 10 );
+		}
+
+		$this->assertSame( $url, $location );
+		$this->assertSame( $url, wp_sanitize_redirect( $location ) );
+		$this->assertSame( 301, $status );
+	}
+
+	/**
 	 * The input collaborator sanitizes nested scalar input.
 	 *
 	 * @since 1.1.1
@@ -524,5 +552,14 @@ class Test_Collaborators extends WP_UnitTestCase {
 	public function test_url_validator_accepts_valid_urls_and_rejects_invalid_values() {
 		$this->assertSame( 'https://1.1.1.1/destination', UrlValidator::validate( ' https://1.1.1.1/destination ' ) );
 		$this->assertFalse( UrlValidator::validate( 'not a URL' ) );
+	}
+
+	/**
+	 * URL storage must retain raw query separators, not HTML display entities.
+	 */
+	public function test_url_validator_preserves_query_string_bytes() {
+		$this->assertSame( 'https://1.1.1.1/?source=email&campaign=october', UrlValidator::validate( 'https://1.1.1.1/?source=email&campaign=october' ) );
+		$this->assertSame( 'https://1.1.1.1/?source=fish%26chips&campaign=october', UrlValidator::validate( 'https://1.1.1.1/?source=fish%26chips&campaign=october' ) );
+		$this->assertSame( 'https://1.1.1.1/?source=fish&amp;chips&campaign=october', UrlValidator::validate( 'https://1.1.1.1/?source=fish&amp;chips&campaign=october' ) );
 	}
 }
