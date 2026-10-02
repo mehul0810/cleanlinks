@@ -71,6 +71,7 @@ Yes, CleanLinks is fully compatible with popular caching and SEO plugins.
 
 = 1.1.2 =
 * Show a saved-link overview and validate destination URLs in the Add/Edit Link editor.
+* Keep an existing destination when an edited URL is rejected, and preserve multiple query parameters in saved redirects.
 * Exclude CleanLinks links and group names from WordPress general exports while retaining the dedicated published-links CSV export.
 * Pin GitHub Actions to verified commits, restrict workflow token permissions, and check new high or critical npm advisory changes.
 * Correct descriptions of redirect and CSV behavior.
