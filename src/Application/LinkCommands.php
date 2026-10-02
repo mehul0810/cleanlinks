@@ -14,6 +14,12 @@ class LinkCommands {
 	/** @var array Term IDs whose cached counts may need rollback invalidation. */
 	private $touched_groups = array();
 
+	/** @var array Post IDs whose speculative caches need invalidation. */
+	private $touched_ids = array();
+
+	/** @var array Final inserted row candidates, captured before core writes. */
+	private $insert_candidates = array();
+
 	/**
 	 * Whether an explicit command owns the current save.
 	 *
@@ -30,41 +36,83 @@ class LinkCommands {
 	 * @return array|\WP_Error Persisted identity/state or a structured rejection.
 	 */
 	public function execute( $raw_input ) {
-		if ( self::$running ) {
+		if ( self::$running || \MG\CleanLinks\Includes\LinkMetadataCommand::is_running() ) {
 			return LinkInput::error( 'command_busy', 'input' );
 		}
-		$input = ( new LinkInput() )->validate( $raw_input );
-		if ( is_wp_error( $input ) ) {
-			return $input;
-		}
-		$permission = $this->authorize( $input );
-		if ( is_wp_error( $permission ) ) {
-			return $permission;
-		}
-		$transaction = new CommandTransaction();
-		if ( ! $transaction->begin() ) {
-			return LinkInput::error( 'storage_unavailable', 'input', 503 );
-		}
-		self::$running        = true;
-		$this->touched_groups = array();
-		$id            = isset( $input['id'] ) ? $input['id'] : 0;
-		$result        = null;
+		self::$running           = true;
+		$this->touched_groups    = array();
+		$this->touched_ids       = array();
+		$this->insert_candidates = array();
+		$transaction             = null;
+		$begun                   = false;
+		$id                      = 0;
+		$result                  = LinkInput::error( 'persistence_failed', 'input', 500 );
+		// Capture IDs before metadata/save hooks can throw, not only after wp_insert_post returns.
+		$observe_id = function ( $check, $post_id ) {
+			$this->touched_ids[] = (int) $post_id;
+			return $check;
+		};
+		$observe_row = function ( $data ) {
+			$this->insert_candidates[] = array( 'type' => $data['post_type'], 'slug' => wp_unslash( $data['post_name'] ), 'author' => (int) $data['post_author'] );
+			return $data;
+		};
+		add_filter( 'add_post_metadata', $observe_id, PHP_INT_MIN, 2 );
+		add_filter( 'update_post_metadata', $observe_id, PHP_INT_MIN, 2 );
+		add_filter( 'wp_insert_post_data', $observe_row, PHP_INT_MAX );
 		try {
+			$input = ( new LinkInput() )->validate( $raw_input );
+			if ( is_wp_error( $input ) ) {
+				return $input;
+			}
+			$permission = $this->authorize( $input );
+			if ( is_wp_error( $permission ) ) {
+				return $permission;
+			}
+			$transaction = new CommandTransaction();
+			if ( ! $transaction->begin() ) {
+				return LinkInput::error( 'storage_unavailable', 'input', 503 );
+			}
+			$begun  = true;
+			$id     = isset( $input['id'] ) ? $input['id'] : 0;
 			$result = $this->persist( $input, $id );
 		} catch ( \Throwable $exception ) {
-			// Do not expose hook exceptions, SQL or rejected inputs in the response.
 			$result = LinkInput::error( 'persistence_failed', 'input', 500 );
+			if ( $begun ) {
+				// Recovery covers exceptions in term/meta hooks before save_post is reached.
+				$this->recover_cache_ids();
+			}
 		} finally {
-			$finished      = $transaction->finish( ! is_wp_error( $result ) );
+			remove_filter( 'add_post_metadata', $observe_id, PHP_INT_MIN );
+			remove_filter( 'update_post_metadata', $observe_id, PHP_INT_MIN );
+			remove_filter( 'wp_insert_post_data', $observe_row, PHP_INT_MAX );
+			if ( $begun && ! $transaction->finish( ! is_wp_error( $result ) ) ) {
+				$result = LinkInput::error( 'commit_failed', 'input', 500 );
+			}
 			self::$running = false;
 			clean_term_cache( $this->touched_groups, 'cleanlinks_groups' );
-			if ( $id ) {
-				// A rollback must not leave speculative post/meta/term values in cache.
-				clean_post_cache( $id );
-				clean_object_term_cache( $id, 'cleanlinks' );
+			foreach ( array_unique( array_merge( $this->touched_ids, array( $id ) ) ) as $touched_id ) {
+				if ( $touched_id ) {
+					clean_post_cache( $touched_id );
+					clean_object_term_cache( $touched_id, 'cleanlinks' );
+				}
 			}
 		}
-		return $finished ? $result : LinkInput::error( 'commit_failed', 'input', 500 );
+		return $result;
+	}
+
+	/** Recover allocated IDs while rolled-back rows are still visible to this connection. */
+	private function recover_cache_ids() {
+		global $wpdb;
+		foreach ( $this->insert_candidates as $candidate ) {
+			try {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Uncached lookup strictly for post-rollback cache invalidation.
+				$ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_name = %s AND post_author = %d FOR UPDATE", $candidate['type'], $candidate['slug'], $candidate['author'] ) );
+				$this->touched_ids = array_merge( $this->touched_ids, array_map( 'intval', $ids ) );
+			} catch ( \Throwable $ignored ) {
+				// An uncooperative SQL hook must not prevent rollback/known-ID cleanup.
+				continue;
+			}
+		}
 	}
 
 	/**
@@ -74,30 +122,48 @@ class LinkCommands {
 	 * @return array|\WP_Error
 	 */
 	public function read( $id ) {
-		if ( ! is_int( $id ) || $id < 1 || 'cleanlinks' !== get_post_type( $id ) ) {
+		global $wpdb;
+		if ( ! is_int( $id ) || $id < 1 ) {
 			return LinkInput::error( 'invalid_id', 'id', 404 );
 		}
+		clean_post_cache( $id );
+		$lock = self::$running ? ' FOR UPDATE' : '';
+		// Current/locking reads avoid a caller's older MySQL repeatable-read snapshot.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared -- Fixed lock clause and prepared object ID.
+		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->posts} WHERE ID = %d", $id ) . $lock );
+		if ( ! $row || 'cleanlinks' !== $row->post_type ) {
+			return LinkInput::error( 'invalid_id', 'id', 404 );
+		}
+		$post = new \WP_Post( $row );
+		wp_cache_set( $id, $post, 'posts' );
 		if ( ! current_user_can( 'edit_post', $id ) ) {
 			return LinkInput::error( 'forbidden', 'id', 403 );
 		}
-		clean_post_cache( $id );
-		$post   = get_post( $id );
-		$groups = wp_get_object_terms( $id, 'cleanlinks_groups', array( 'fields' => 'ids' ) );
-		if ( is_wp_error( $groups ) ) {
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared -- Lock authoritative metadata rows within the same transaction.
+		$meta_rows = $wpdb->get_results( $wpdb->prepare( "SELECT meta_key, meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key IN ('cleanlink_redirect_url', 'cleanlink_redirect_nofollow') ORDER BY meta_id", $id ) . $lock );
+		if ( $wpdb->last_error ) {
+			return LinkInput::error( 'storage_unavailable', 'destination', 503 );
+		}
+		$metadata = array();
+		foreach ( $meta_rows as $meta ) {
+			if ( ! isset( $metadata[ $meta->meta_key ] ) ) {
+				$metadata[ $meta->meta_key ] = $meta->meta_value;
+			}
+		}
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared -- Read actual membership rather than a stale snapshot/term cache.
+		$groups = $wpdb->get_col( $wpdb->prepare( "SELECT t.term_id FROM {$wpdb->term_relationships} r INNER JOIN {$wpdb->term_taxonomy} t ON r.term_taxonomy_id = t.term_taxonomy_id WHERE r.object_id = %d AND t.taxonomy = 'cleanlinks_groups' ORDER BY t.term_id", $id ) . $lock );
+		if ( $wpdb->last_error ) {
 			return LinkInput::error( 'storage_unavailable', 'groups', 503 );
 		}
-		$groups = array_map( 'intval', $groups );
-		sort( $groups );
 		$state = array(
 			'id'          => $id,
 			'title'       => $post->post_title,
 			'slug'        => $post->post_name,
 			'status'      => $post->post_status,
-			'destination' => get_post_meta( $id, 'cleanlink_redirect_url', true ),
-			'nofollow'    => '1' === get_post_meta( $id, 'cleanlink_redirect_nofollow', true ),
-			'groups'      => $groups,
+			'destination' => isset( $metadata['cleanlink_redirect_url'] ) ? $metadata['cleanlink_redirect_url'] : '',
+			'nofollow'    => isset( $metadata['cleanlink_redirect_nofollow'] ) && '1' === $metadata['cleanlink_redirect_nofollow'],
+			'groups'      => array_map( 'intval', $groups ),
 		);
-		// Lifetime clicks are deliberately excluded; a click must not invalidate edits.
 		$state['version'] = hash( 'sha256', wp_json_encode( array( $state, $post->post_author, $post->post_modified_gmt ) ) );
 		$state['url']     = get_permalink( $id );
 		return $state;
@@ -164,10 +230,15 @@ class LinkCommands {
 	 */
 	private function persist( $input, &$id ) {
 		global $wpdb;
-		$key         = 'cleanlinks_command_' . get_current_user_id() . '_' . hash( 'sha256', $input['request_key'] );
+		$valid_key = ( new CommandReceipts() )->issued_at( $input['request_key'] );
+		if ( is_wp_error( $valid_key ) ) {
+			return $valid_key;
+		}
+		$receipts    = new CommandReceipts();
+		$key         = $receipts->option_name( $input['request_key'], get_current_user_id() );
 		$fingerprint = hash( 'sha256', wp_json_encode( $input ) );
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Durable receipts must bypass speculative option caches.
-		$stored = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", $key ) );
+		$stored = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s FOR UPDATE", $key ) );
 		if ( $wpdb->last_error ) {
 			return LinkInput::error( 'storage_unavailable', 'request_key', 503 );
 		}
@@ -176,10 +247,17 @@ class LinkCommands {
 			if ( ! is_array( $receipt ) || ! isset( $receipt['fingerprint'], $receipt['saved'] ) || ! hash_equals( $receipt['fingerprint'], $fingerprint ) ) {
 				return LinkInput::error( 'request_key_conflict', 'request_key' );
 			}
-			if ( 'cleanlinks' !== get_post_type( $receipt['saved']['id'] ) || ! current_user_can( 'edit_post', $receipt['saved']['id'] ) ) {
+			$current = $this->read( $receipt['saved']['id'] );
+			if ( is_wp_error( $current ) || ! current_user_can( 'edit_post', $receipt['saved']['id'] ) ) {
 				return LinkInput::error( 'replay_unavailable', 'id', 403 );
 			}
 			return $receipt['saved'];
+		}
+		if ( false === $receipts->prune() ) {
+			return LinkInput::error( 'storage_unavailable', 'request_key', 503 );
+		}
+		if ( ! $receipts->has_capacity( get_current_user_id() ) ) {
+			return LinkInput::error( 'receipt_capacity', 'request_key', 429 );
 		}
 		if ( $id ) {
 			// Prevent core post updates from changing this row during the stale-token check and save.

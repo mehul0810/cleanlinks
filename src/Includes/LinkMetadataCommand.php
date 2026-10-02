@@ -15,6 +15,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Owns only destination and nofollow; callers cannot mutate arbitrary metadata.
  */
 class LinkMetadataCommand {
+	/** @var bool Reject command calls made recursively by save hooks. */
+	private static $running = false;
+
+	/** @return bool Whether metadata persistence is active. */
+	public static function is_running() { return self::$running; }
 	/**
 	 * Save validated metadata without reading request globals.
 	 *
@@ -26,6 +31,9 @@ class LinkMetadataCommand {
 	 * @return array|\WP_Error Saved values or field-specific error data.
 	 */
 	public function execute( $post_id, $input ) {
+		if ( self::$running || \MG\CleanLinks\Application\LinkCommands::is_running() ) {
+			return $this->error( 'command_busy', 'input' );
+		}
 		if ( ! is_int( $post_id ) || $post_id < 1 ) {
 			return $this->error( 'invalid_id', 'id' );
 		}
@@ -53,10 +61,12 @@ class LinkMetadataCommand {
 			'cleanlink_redirect_url'      => $destination,
 			'cleanlink_redirect_nofollow' => $input['nofollow'] ? '1' : '0',
 		);
+		self::$running = true;
 		$transaction = null;
 		if ( ! \MG\CleanLinks\Application\LinkCommands::is_running() ) {
 			$transaction = new \MG\CleanLinks\Application\CommandTransaction();
 			if ( ! $transaction->begin() ) {
+				self::$running = false;
 				return $this->error( 'storage_unavailable', 'input' );
 			}
 		}
@@ -74,6 +84,7 @@ class LinkMetadataCommand {
 		} catch ( \Throwable $exception ) {
 			$result = $this->error( 'persistence_failed', 'input' );
 		} finally {
+			self::$running = false;
 			if ( $transaction ) {
 				$finished = $transaction->finish( ! is_wp_error( $result ) );
 				clean_post_cache( $post_id );

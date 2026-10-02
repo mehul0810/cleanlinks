@@ -33,3 +33,8 @@ foreach ($terms as $cleanlinks_group) {
 
 // Delete plugin options
 delete_option('cleanlinks_settings');
+
+// Remove the bounded 1.2 receipt lifecycle without deleting unrelated options.
+require_once __DIR__ . '/src/Application/CommandReceipts.php';
+$cleanlinks_receipts = new \MG\CleanLinks\Application\CommandReceipts();
+$cleanlinks_receipts->uninstall();

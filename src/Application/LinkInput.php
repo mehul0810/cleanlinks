@@ -34,8 +34,9 @@ class LinkInput {
 				return self::error( 'invalid_type', $field, 400 );
 			}
 		}
-		if ( ! isset( $input['request_key'] ) || ! preg_match( '/^[A-Za-z0-9_-]{16,64}$/D', $input['request_key'] ) ) {
-			return self::error( 'invalid_request_key', 'request_key', 400 );
+		$issued = ( new CommandReceipts() )->issued_at( isset( $input['request_key'] ) ? $input['request_key'] : null );
+		if ( is_wp_error( $issued ) ) {
+			return $issued;
 		}
 		if ( ! isset( $input['id'] ) && ! isset( $input['destination'] ) ) {
 			return self::error( 'required', 'destination', 400 );

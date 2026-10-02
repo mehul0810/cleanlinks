@@ -66,4 +66,27 @@ class Test_Link_Metadata_Command extends WP_UnitTestCase {
 		$this->assertSame( '1', get_post_meta( $id, 'cleanlink_redirect_nofollow', true ) );
 	}
 
+	public function test_recursive_metadata_hook_is_rejected_without_losing_outer_rollback() {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$id = self::factory()->post->create( array( 'post_type' => 'cleanlinks' ) );
+		update_post_meta( $id, 'cleanlink_redirect_url', 'https://example.org/working' );
+		update_post_meta( $id, 'cleanlink_redirect_nofollow', '1' );
+		$nested = null;
+		$attempted = false;
+		$hook = static function ( $check, $post_id, $key ) use ( $id, &$nested, &$attempted ) {
+			if ( 'cleanlink_redirect_url' === $key && ! $attempted ) {
+				$attempted = true;
+				$nested = ( new LinkMetadataCommand() )->execute( $id, array( 'destination' => 'https://example.org/nested', 'nofollow' => false ) );
+			}
+			return 'cleanlink_redirect_nofollow' === $key ? true : $check;
+		};
+		add_filter( 'update_post_metadata', $hook, 10, 3 );
+		$result = ( new LinkMetadataCommand() )->execute( $id, array( 'destination' => 'https://example.org/rejected', 'nofollow' => false ) );
+		remove_filter( 'update_post_metadata', $hook, 10 );
+		$this->assertWPError( $result );
+		$this->assertSame( 'command_busy', $nested->get_error_code() );
+		$this->assertSame( 'https://example.org/working', get_post_meta( $id, 'cleanlink_redirect_url', true ) );
+		$this->assertSame( '1', get_post_meta( $id, 'cleanlink_redirect_nofollow', true ) );
+	}
+
 }

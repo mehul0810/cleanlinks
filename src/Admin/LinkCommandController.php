@@ -45,6 +45,10 @@ class LinkCommandController {
 		if ( isset( $id['id'] ) ) {
 			return is_wp_error( ( new LinkCommands() )->read( (int) $id['id'] ) ) ? LinkInput::error( 'forbidden', 'id', 403 ) : true;
 		}
+		if ( '/cleanlinks/v1/link-commands' === $request->get_route() ) {
+			// Each row enforces its own create/object/status/group authority.
+			return true;
+		}
 		$type = get_post_type_object( 'cleanlinks' );
 		return $type && current_user_can( $type->cap->create_posts ) ? true : LinkInput::error( 'forbidden', 'id', 403 );
 	}

@@ -57,6 +57,8 @@ final class Plugin {
 		$export->register_hooks();
 		$commands = new Admin\LinkCommandController();
 		$commands->register_hooks();
+		$receipts = new Application\CommandReceipts();
+		$receipts->register_hooks();
 
 		if ( is_admin() ) {
 			new Admin\Filters();
