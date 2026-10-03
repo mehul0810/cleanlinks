@@ -8,6 +8,7 @@
 
 /tests
 /scripts
+/docs
 /assets
 /node_modules
 /vendor/bin
@@ -49,6 +50,7 @@ phpunit.xml
 phpunit.xml.dist
 CHANGELOG.md
 AGENTS.md
+DESIGN.md
 RELEASE.md
 README.md
 readme.md
