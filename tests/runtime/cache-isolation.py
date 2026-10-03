@@ -120,7 +120,7 @@ if suffix == "redis" and mode == "fixed":
         assert durable["slug_count"] == (1 if operation == "update" else 0), durable
         if operation == "update":
             assert durable["row"]["post_title"] == base["title"] and durable["destination"] == initial_url, durable
-            assert durable["groups"] == [seeded["groups"]["committed"]], durable
+            assert durable["groups"] == [group_ids["committed"]], durable
         print(json.dumps({"case": "redis guard " + operation, "pass": True, "response": result,
                           "reader_before": before, "reader_after": after, "database": durable}, sort_keys=True))
     legacy_url = f"https://example.org/legacy-helper-{RUN}?a=1&b=%2F"
