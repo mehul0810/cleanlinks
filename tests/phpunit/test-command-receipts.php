@@ -6,6 +6,42 @@ use MG\CleanLinks\Application\LinkCommands;
 use WP_UnitTestCase;
 
 class Test_Command_Receipts extends WP_UnitTestCase {
+	/** Deactivation stops cleanup without deleting data; registration resumes it once. */
+	public function test_deactivation_clears_cleanup_and_registration_restores_one_event() {
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		$hook   = 'cleanlinks_expire_command_receipts';
+		$store  = new CommandReceipts();
+		$plugin = plugin_basename( CLEANLINKS_PLUGIN_FILE );
+		wp_clear_scheduled_hook( $hook );
+		$store->register_hooks();
+		$this->assertNotFalse( wp_next_scheduled( $hook ) );
+		wp_schedule_event( time() + HOUR_IN_SECONDS, 'hourly', 'proof_unrelated_cron' );
+		$key = $store->option_name( time() . '_lifecycle_receipt_suffix', 1 );
+		add_option( $key, '{"saved":{"id":123}}', '', false );
+		add_option( 'cleanlinks_command_mutex', '1', '', false );
+		$id = self::factory()->post->create( array( 'post_type' => 'cleanlinks', 'post_status' => 'publish' ) );
+		update_post_meta( $id, 'cleanlink_redirect_count', '41' );
+		update_option( 'active_plugins', array( $plugin ) );
+
+		deactivate_plugins( $plugin, false, false );
+
+		$this->assertFalse( is_plugin_active( $plugin ) );
+		$this->assertFalse( wp_next_scheduled( $hook ) );
+		$this->assertNotFalse( wp_next_scheduled( 'proof_unrelated_cron' ) );
+		$this->assertSame( '{"saved":{"id":123}}', get_option( $key ) );
+		$this->assertSame( '1', get_option( 'cleanlinks_command_mutex' ) );
+		$this->assertSame( '41', get_post_meta( $id, 'cleanlink_redirect_count', true ) );
+
+		$store->register_hooks();
+		$store->register_hooks();
+		$this->assertNotFalse( wp_next_scheduled( $hook ) );
+		$events = 0;
+		foreach ( _get_cron_array() as $hooks ) {
+			$events += isset( $hooks[ $hook ] ) ? count( $hooks[ $hook ] ) : 0;
+		}
+		$this->assertSame( 1, $events );
+	}
+
 	public function test_issuance_expiry_and_future_boundaries() {
 		$store = new CommandReceipts();
 		$now = 1800000000;

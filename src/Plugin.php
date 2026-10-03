@@ -96,5 +96,7 @@ final class Plugin {
 	 *
 	 * @return void
 	 */
-	public function deactivate() {}
+	public function deactivate() {
+		wp_clear_scheduled_hook( 'cleanlinks_expire_command_receipts' );
+	}
 }
