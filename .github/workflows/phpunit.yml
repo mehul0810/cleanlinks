@@ -90,6 +90,11 @@ jobs:
               env:
                   CLEANLINKS_RUNTIME_CONFIG: /tmp/wordpress-tests-lib/wp-tests-config.php
 
+            - name: Run receipt lifecycle tests - multisite
+              run: vendor/bin/phpunit --filter Test_Command_Receipts
+              env:
+                  WP_MULTISITE: 1
+
             - name: Run unit tests - multisite
               if: ${{ matrix.multisite == true }}
               run: composer test

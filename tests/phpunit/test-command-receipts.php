@@ -6,6 +6,138 @@ use MG\CleanLinks\Application\LinkCommands;
 use WP_UnitTestCase;
 
 class Test_Command_Receipts extends WP_UnitTestCase {
+	private static $site;
+	private static $other_site;
+
+	/** Site initialization uses DDL; create fixtures before test transactions. */
+	public static function wpSetUpBeforeClass( $factory ) {
+		if ( ! is_multisite() ) {
+			return;
+		}
+		self::$site = $factory->blog->create( array( 'user_id' => 1 ) );
+		$network = $factory->network->create( array( 'domain' => 'other.example.org' ) );
+		update_network_option( $network, 'ms_files_rewriting', 0 );
+		self::$other_site = $factory->blog->create( array( 'user_id' => 1, 'network_id' => $network, 'domain' => 'other.example.org' ) );
+	}
+
+	/** A site-only deactivation must leave another site's event alone. */
+	public function test_multisite_per_site_deactivation_preserves_other_site_event() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Requires the existing multisite test runtime.' );
+		}
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		$plugin = plugin_basename( CLEANLINKS_PLUGIN_FILE );
+		$site = self::$site;
+		( new CommandReceipts() )->register_hooks();
+		update_option( 'active_plugins', array( $plugin ) );
+		switch_to_blog( $site );
+		try {
+			( new CommandReceipts() )->register_hooks();
+			update_option( 'active_plugins', array( $plugin ) );
+		} finally {
+			restore_current_blog();
+		}
+		deactivate_plugins( $plugin, false, false );
+		$this->assertFalse( wp_next_scheduled( 'cleanlinks_expire_command_receipts' ) );
+		switch_to_blog( $site );
+		try {
+			$this->assertTrue( is_plugin_active( $plugin ) );
+			$this->assertNotFalse( wp_next_scheduled( 'cleanlinks_expire_command_receipts' ) );
+		} finally {
+			restore_current_blog();
+		}
+	}
+
+	/** Network deactivation must clear every site in the affected network. */
+	public function test_multisite_network_deactivation_clears_each_site_event() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Requires the existing multisite test runtime.' );
+		}
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		$plugin = plugin_basename( CLEANLINKS_PLUGIN_FILE );
+		$current = get_current_blog_id();
+		$site = self::$site;
+		$this->assertNotNull( get_site( $site ) );
+		$other_site = self::$other_site;
+		switch_to_blog( $other_site );
+		try {
+			( new CommandReceipts() )->register_hooks();
+		} finally {
+			restore_current_blog();
+		}
+		update_site_option( 'active_sitewide_plugins', array( $plugin => time() ) );
+		foreach ( array( $current, $site ) as $id ) {
+			switch_to_blog( $id );
+			try {
+				( new CommandReceipts() )->register_hooks();
+				wp_schedule_event( time() + HOUR_IN_SECONDS, 'hourly', 'proof_unrelated_cron' );
+				update_option( 'cleanlinks_command_mutex', '1', false );
+			} finally {
+				restore_current_blog();
+			}
+		}
+		deactivate_plugins( $plugin, false, true );
+		$this->assertFalse( is_plugin_active_for_network( $plugin ) );
+		$this->assertSame( $current, get_current_blog_id() );
+		foreach ( array( $current, $site ) as $id ) {
+			switch_to_blog( $id );
+			try {
+				$this->assertFalse( wp_next_scheduled( 'cleanlinks_expire_command_receipts' ), 'Site ' . $id );
+				$this->assertNotFalse( wp_next_scheduled( 'proof_unrelated_cron' ) );
+				$this->assertSame( '1', get_option( 'cleanlinks_command_mutex' ) );
+			} finally {
+				restore_current_blog();
+			}
+		}
+		switch_to_blog( $other_site );
+		try {
+			$this->assertNotFalse( wp_next_scheduled( 'cleanlinks_expire_command_receipts' ) );
+		} finally {
+			restore_current_blog();
+		}
+	}
+
+	/** Exercise the page boundary without provisioning one hundred test sites. */
+	public function test_multisite_network_cleanup_pages_ids_and_restores_context() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Requires the existing multisite test runtime.' );
+		}
+		$current = get_current_blog_id();
+		$site = self::$site;
+		foreach ( array( $current, $site ) as $id ) {
+			switch_to_blog( $id );
+			try {
+				( new CommandReceipts() )->register_hooks();
+			} finally {
+				restore_current_blog();
+			}
+		}
+		$offsets = array();
+		$network = get_current_network_id();
+		$pages = function ( $pre, $query ) use ( $current, $site, $network, &$offsets ) {
+			$this->assertSame( $network, $query->query_vars['network_id'] );
+			$this->assertSame( 100, $query->query_vars['number'] );
+			$offsets[] = $query->query_vars['offset'];
+			return 0 === $query->query_vars['offset'] ? array_fill( 0, 100, $current ) : array( $site );
+		};
+		add_filter( 'sites_pre_query', $pages, 10, 2 );
+		try {
+			( new \MG\CleanLinks\Plugin() )->deactivate( true );
+		} finally {
+			remove_filter( 'sites_pre_query', $pages, 10 );
+		}
+		$this->assertSame( array( 0, 100 ), $offsets );
+		$this->assertSame( $current, get_current_blog_id() );
+		foreach ( array( $current, $site ) as $id ) {
+			switch_to_blog( $id );
+			try {
+				$this->assertFalse( wp_next_scheduled( 'cleanlinks_expire_command_receipts' ) );
+			} finally {
+				restore_current_blog();
+			}
+		}
+	}
+
 	/** Deactivation stops cleanup without deleting data; registration resumes it once. */
 	public function test_deactivation_clears_cleanup_and_registration_restores_one_event() {
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
