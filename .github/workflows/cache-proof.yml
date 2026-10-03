@@ -1,0 +1,89 @@
+name: Persistent cache isolation proof
+
+on:
+    pull_request:
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    cache-proof:
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                wp_version: ['6.4', '7.1']
+                backend: [nonpersistent, redis]
+        services:
+            mysql:
+                image: mysql:8.0
+                env:
+                    MYSQL_ROOT_PASSWORD: root
+                ports: ['3306:3306']
+                options: --health-cmd="mysqladmin ping -h 127.0.0.1 -proot" --health-interval=10s --health-timeout=10s --health-retries=10
+            redis:
+                image: redis:7.4
+                ports: ['6379:6379']
+                options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=10
+        steps:
+            - name: Checkout plugin
+              uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+            - name: Install PHP with PhpRedis
+              uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+              with:
+                  php-version: '8.1'
+                  extensions: redis
+                  coverage: none
+            - name: Install WordPress test dependencies
+              run: |
+                  composer config --unset platform.php
+                  composer install --no-interaction --prefer-dist
+                  sudo apt-get update
+                  sudo apt-get install -y subversion
+            - name: Install disposable WordPress and MySQL fixture
+              run: bash tests/bin/install-wp-tests.sh wordpress_tests root root 127.0.0.1:3306 '${{ matrix.wp_version }}'
+            - name: Install WordPress test fixtures
+              run: composer test
+            - name: Install pinned upstream Redis Object Cache drop-in
+              if: ${{ matrix.backend == 'redis' }}
+              run: |
+                  git init /tmp/redis-cache-upstream
+                  git -C /tmp/redis-cache-upstream fetch --depth=1 https://github.com/rhubarbgroup/redis-cache.git 9b498638aac5789b9a339d98360904e67f7290e1
+                  git -C /tmp/redis-cache-upstream checkout --detach FETCH_HEAD
+                  test "$(git -C /tmp/redis-cache-upstream rev-parse HEAD)" = 9b498638aac5789b9a339d98360904e67f7290e1
+                  cp /tmp/redis-cache-upstream/includes/object-cache.php /tmp/wordpress/wp-content/object-cache.php
+                  php -l /tmp/wordpress/wp-content/object-cache.php
+            - name: Verify cache backend and execute regression scenarios
+              env:
+                  CLEANLINKS_RUNTIME_CONFIG: /tmp/wordpress-tests-lib/wp-tests-config.php
+                  CLEANLINKS_CACHE_BACKEND: ${{ matrix.backend }}
+                  CLEANLINKS_CACHE_MODE: fixed
+                  CLEANLINKS_REDIS_CACHE: ${{ matrix.backend == 'redis' && '1' || '0' }}
+                  CLEANLINKS_REDIS_PREFIX: clproof_${{ github.run_id }}_${{ github.run_attempt }}_${{ matrix.wp_version }}
+              run: |
+                  if [ '${{ matrix.backend }}' = redis ]; then php -r 'if (!class_exists("Redis")) { fwrite(STDERR, "PhpRedis is required\n"); exit(1); }'
+                  fi
+                  {
+                    printf 'plugin_revision=%s\n' "$(git rev-parse HEAD)"
+                    printf 'wp_target=%s\n' '${{ matrix.wp_version }}'
+                    printf 'wp_version=%s\n' "$(php -r 'include "/tmp/wordpress/wp-includes/version.php"; echo $wp_version;')"
+                    printf 'php_version=%s\n' "$(php -r 'echo PHP_VERSION;')"
+                    printf 'cache_backend=%s\n' '${{ matrix.backend }}'
+                    printf 'redis_cache_commit=%s\n' '9b498638aac5789b9a339d98360904e67f7290e1'
+                    if [ '${{ matrix.backend }}' = redis ]; then redis-cli INFO server | grep '^redis_version:'; fi
+                  } | tee cache-proof.log
+                  set -o pipefail
+                  python3 tests/runtime/cache-isolation.py 2>&1 | tee -a cache-proof.log
+            - name: Preserve bounded proof log
+              if: always()
+              uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+              with:
+                  name: cache-proof-wp-${{ matrix.wp_version }}-${{ matrix.backend }}
+                  path: cache-proof.log
+                  if-no-files-found: ignore
+                  retention-days: 3

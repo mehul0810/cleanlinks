@@ -55,6 +55,10 @@ final class Plugin {
 		new Includes\Actions();
 		$export = new Admin\Export();
 		$export->register_hooks();
+		$commands = new Admin\LinkCommandController();
+		$commands->register_hooks();
+		$receipts = new Application\CommandReceipts();
+		$receipts->register_hooks();
 
 		if ( is_admin() ) {
 			new Admin\Filters();
@@ -90,7 +94,29 @@ final class Plugin {
 	 * @since  1.0.0
 	 * @access public
 	 *
+	 * @param bool $network_wide Whether the plugin is being disabled for the network.
+	 *
 	 * @return void
 	 */
-	public function deactivate() {}
+	public function deactivate( $network_wide = false ) {
+		if ( ! $network_wide || ! is_multisite() ) {
+			wp_clear_scheduled_hook( 'cleanlinks_expire_command_receipts' );
+			return;
+		}
+
+		$network = get_current_network_id();
+		$offset  = 0;
+		do {
+			$sites = get_sites( array( 'network_id' => $network, 'fields' => 'ids', 'number' => 100, 'offset' => $offset, 'orderby' => 'id', 'order' => 'ASC' ) );
+			foreach ( $sites as $site ) {
+				switch_to_blog( $site );
+				try {
+					wp_clear_scheduled_hook( 'cleanlinks_expire_command_receipts' );
+				} finally {
+					restore_current_blog();
+				}
+			}
+			$offset += 100;
+		} while ( count( $sites ) === 100 );
+	}
 }

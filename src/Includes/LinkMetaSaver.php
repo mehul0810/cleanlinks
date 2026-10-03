@@ -30,6 +30,10 @@ class LinkMetaSaver {
 	 * @return void
 	 */
 	public function save( $post_id, $post ) {
+		if ( \MG\CleanLinks\Application\LinkCommands::is_running() ) {
+			return;
+		}
+
 		if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) ) {
 			return;
 		}
@@ -96,17 +100,14 @@ class LinkMetaSaver {
 			return;
 		}
 
-		$raw_url   = wp_unslash( $raw_url );
-		$valid_url = Helpers::validate_url( sanitize_text_field( $raw_url ) );
-
-		if ( $valid_url ) {
-			update_post_meta( $post_id, 'cleanlink_redirect_url', $valid_url );
-			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified in save().
-			$nofollow = isset( $_POST['cleanlink_redirect_nofollow'] ) ? '1' : '0';
-			update_post_meta( $post_id, 'cleanlink_redirect_nofollow', $nofollow );
-			return;
-		}
-
-		// A rejected edit must not replace a working redirect with the home-page fallback.
+		$command = new LinkMetadataCommand();
+		$command->execute(
+			(int) $post_id,
+			array(
+				'destination' => wp_unslash( $raw_url ),
+				// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified in save().
+				'nofollow'    => isset( $_POST['cleanlink_redirect_nofollow'] ),
+			)
+		);
 	}
 }
