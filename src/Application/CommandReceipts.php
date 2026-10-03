@@ -114,7 +114,28 @@ class CommandReceipts {
 		$this->prune( 2000 );
 	}
 
-	/** Clear only owned command options on uninstall. */
+	/** Plugin-file removal clears owned command state across the installation. */
+	public function uninstall_all_sites() {
+		if ( ! is_multisite() ) {
+			$this->uninstall();
+			return;
+		}
+		$offset = 0;
+		do {
+			$sites = get_sites( array( 'fields' => 'ids', 'number' => 100, 'offset' => $offset, 'orderby' => 'id', 'order' => 'ASC' ) );
+			foreach ( $sites as $site ) {
+				switch_to_blog( $site );
+				try {
+					$this->uninstall();
+				} finally {
+					restore_current_blog();
+				}
+			}
+			$offset += 100;
+		} while ( count( $sites ) === 100 );
+	}
+
+	/** Clear only owned command options on the current site. */
 	public function uninstall() {
 		global $wpdb;
 		wp_clear_scheduled_hook( 'cleanlinks_expire_command_receipts' );

@@ -20,6 +20,91 @@ class Test_Command_Receipts extends WP_UnitTestCase {
 		self::$other_site = $factory->blog->create( array( 'user_id' => 1, 'network_id' => $network, 'domain' => 'other.example.org' ) );
 	}
 
+	/** Shared plugin-file removal clears receipts on all blogs without expanding legacy data deletion. */
+	public function test_multisite_uninstall_entry_clears_receipts_only_on_all_sites() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Requires the existing multisite test runtime.' );
+		}
+		$current = get_current_blog_id();
+		$store = new CommandReceipts();
+		$key = $store->option_name( time() . '_multisite_uninstall_receipt', 1 );
+		foreach ( array( $current, self::$site, self::$other_site ) as $site ) {
+			switch_to_blog( $site );
+			try {
+				add_option( $key, '{"saved":{"id":123}}', '', false );
+				update_option( 'cleanlinks_command_mutex', '1', false );
+				add_option( 'proof_unrelated_option', 'keep' );
+				update_option( 'cleanlinks_settings', array( 'proof' => 'keep' ) );
+				$store->register_hooks();
+				wp_schedule_event( time() + HOUR_IN_SECONDS, 'hourly', 'proof_unrelated_cron' );
+			} finally {
+				restore_current_blog();
+			}
+		}
+		$unrelated_post = self::factory()->post->create( array( 'post_type' => 'post', 'post_status' => 'publish' ) );
+		switch_to_blog( self::$site );
+		try {
+			$link = self::factory()->post->create( array( 'post_type' => 'cleanlinks', 'post_status' => 'publish' ) );
+			update_post_meta( $link, 'cleanlink_redirect_count', '41' );
+		} finally {
+			restore_current_blog();
+		}
+		if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
+			define( 'WP_UNINSTALL_PLUGIN', plugin_basename( CLEANLINKS_PLUGIN_FILE ) );
+		}
+		require dirname( __DIR__, 2 ) . '/uninstall.php';
+
+		$this->assertSame( $current, get_current_blog_id() );
+		$this->assertNotNull( get_post( $unrelated_post ) );
+		$this->assertNotFalse( get_userdata( 1 ) );
+		foreach ( array( $current, self::$site, self::$other_site ) as $site ) {
+			switch_to_blog( $site );
+			try {
+				$this->assertFalse( get_option( $key ), 'Receipt on site ' . $site );
+				$this->assertFalse( get_option( 'cleanlinks_command_mutex' ), 'Mutex on site ' . $site );
+				$this->assertFalse( wp_next_scheduled( 'cleanlinks_expire_command_receipts' ) );
+				$this->assertNotFalse( wp_next_scheduled( 'proof_unrelated_cron' ) );
+				$this->assertSame( 'keep', get_option( 'proof_unrelated_option' ) );
+				if ( $site !== $current ) {
+					$this->assertSame( array( 'proof' => 'keep' ), get_option( 'cleanlinks_settings' ) );
+				}
+			} finally {
+				restore_current_blog();
+			}
+		}
+		switch_to_blog( self::$site );
+		try {
+			$this->assertNotNull( get_post( $link ) );
+			$this->assertSame( '41', get_post_meta( $link, 'cleanlink_redirect_count', true ) );
+		} finally {
+			restore_current_blog();
+		}
+	}
+
+	/** All-site uninstall pages IDs without restricting cleanup to one network. */
+	public function test_multisite_uninstall_pages_all_sites_and_restores_context() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Requires the existing multisite test runtime.' );
+		}
+		$current = get_current_blog_id();
+		$offsets = array();
+		$pages = function ( $pre, $query ) use ( $current, &$offsets ) {
+			$this->assertEmpty( $query->query_vars['network_id'] );
+			$this->assertSame( 100, $query->query_vars['number'] );
+			$this->assertSame( 'ids', $query->query_vars['fields'] );
+			$offsets[] = $query->query_vars['offset'];
+			return 0 === $query->query_vars['offset'] ? array_fill( 0, 100, $current ) : array( self::$other_site );
+		};
+		add_filter( 'sites_pre_query', $pages, 10, 2 );
+		try {
+			( new CommandReceipts() )->uninstall_all_sites();
+		} finally {
+			remove_filter( 'sites_pre_query', $pages, 10 );
+		}
+		$this->assertSame( array( 0, 100 ), $offsets );
+		$this->assertSame( $current, get_current_blog_id() );
+	}
+
 	/** A site-only deactivation must leave another site's event alone. */
 	public function test_multisite_per_site_deactivation_preserves_other_site_event() {
 		if ( ! is_multisite() ) {
