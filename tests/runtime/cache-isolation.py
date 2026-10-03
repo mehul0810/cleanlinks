@@ -91,9 +91,10 @@ if suffix == "redis" and mode == "fixed":
                       "write": write_canary, "read": read_canary}, sort_keys=True))
     read_rejected = invoke({"mode": "guard", "method": "GET", "route": f"/cleanlinks/v1/links/{post_id}"})
     assert read_rejected["status"] == 503 and read_rejected["data"]["code"] == "storage_unavailable", read_rejected
+    assert read_rejected["save_hooks"] == 0, read_rejected
     print(json.dumps({"case": "redis guard read", "pass": True, "response": read_rejected}, sort_keys=True))
     read_state = invoke({"mode": "inspect", "id": post_id, "slug": base["slug"], "request_key": base["request_key"]})
-    assert read_state["mutex"] is None, read_state
+    assert read_state["mutex"] is None and read_state["receipt"] is None, read_state
     for operation in ("create", "update"):
         body = command("Speculative " + operation, f"cache-{operation}-guard-{RUN}", changed_url,
                        f"cache_guard_{operation}")
@@ -138,6 +139,7 @@ if suffix == "redis" and mode == "fixed":
     batched = invoke({"mode": "guard", "method": "POST", "route": "/cleanlinks/v1/link-commands",
                       "body": {"rows": [batch]}})
     assert batched["status"] == 200 and batched["data"][0]["error"]["code"] == "storage_unavailable", batched
+    assert batched["save_hooks"] == 0, batched
     batch_state = invoke({"mode": "inspect", "slug": batch["slug"], "request_key": batch["request_key"]})
     assert batch_state["slug_count"] == 0 and batch_state["receipt"] is None and batch_state["mutex"] is None, batch_state
     print(json.dumps({"case": "redis guard execute_rows", "pass": True, "response": batched}, sort_keys=True))
@@ -173,6 +175,7 @@ create_body["groups"] = [group_ids["speculative"]]
 create_own, create_during, create_result = write(create_body)
 assert create_own["title"] == create_body["title"] and create_own["destination"] == changed_url, create_own
 assert create_own["hook_count"] == 1
+assert create_own["groups"] == [group_ids["speculative"]], create_own
 expect_committed(create_during, {"exists": False, "title": None, "destination": "", "groups": []})
 assert create_result["status"] == 200
 new_id = int(create_result["data"]["id"])
@@ -208,6 +211,7 @@ for name, title, destination, key, rollback in (
     own, during, result = write(body, "PATCH", f"/cleanlinks/v1/links/{post_id}", rollback)
     assert own["title"] == body["title"] and own["destination"] == destination, own
     assert own["hook_count"] == 1
+    assert own["groups"] == [group_ids["speculative"]], own
     expect_committed(during, expected)
     if rollback:
         expect_committed(read(post_id), expected)
