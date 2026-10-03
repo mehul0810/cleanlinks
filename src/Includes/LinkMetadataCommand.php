@@ -62,17 +62,6 @@ class LinkMetadataCommand {
 			'cleanlink_redirect_nofollow' => $input['nofollow'] ? '1' : '0',
 		);
 		self::$running = true;
-		$transaction = null;
-		$owns_transaction = ! \MG\CleanLinks\Application\LinkCommands::is_running() && \MG\CleanLinks\Application\CommandTransaction::has_request_local_cache();
-		// Preserve the legacy editor's ordinary metadata-save behavior when atomic rollback
-		// cannot be guaranteed by the configured object cache.
-		if ( $owns_transaction ) {
-			$transaction = new \MG\CleanLinks\Application\CommandTransaction();
-			if ( ! $transaction->begin() ) {
-				self::$running = false;
-				return $this->error( 'storage_unavailable', 'input' );
-			}
-		}
 		$result = array( 'id' => $post_id, 'destination' => $destination, 'nofollow' => $input['nofollow'] );
 		try {
 			foreach ( $values as $key => $value ) {
@@ -88,13 +77,6 @@ class LinkMetadataCommand {
 			$result = $this->error( 'persistence_failed', 'input' );
 		} finally {
 			self::$running = false;
-			if ( $transaction ) {
-				$finished = $transaction->finish( ! is_wp_error( $result ) );
-				clean_post_cache( $post_id );
-				if ( ! $finished ) {
-					$result = $this->error( 'commit_failed', 'input' );
-				}
-			}
 		}
 		return $result;
 	}
