@@ -17,6 +17,40 @@ class CommandTransaction {
 	/** @var bool Whether the command savepoint has been established. */
 	private $scope_ready = false;
 
+	/**
+	 * Whether rollback cache invalidation is limited to this PHP request.
+	 *
+	 * @return bool
+	 */
+	public static function has_request_local_cache() {
+		if ( ! function_exists( 'wp_using_ext_object_cache' ) || wp_using_ext_object_cache() || ! isset( $GLOBALS['wp_object_cache'] ) || ! is_object( $GLOBALS['wp_object_cache'] ) || ! class_exists( 'WP_Object_Cache', false ) || 'WP_Object_Cache' !== get_class( $GLOBALS['wp_object_cache'] ) ) {
+			return false;
+		}
+		$core = realpath( ABSPATH . WPINC );
+		if ( false === $core ) {
+			return false;
+		}
+		$class_file = realpath( $core . '/class-wp-object-cache.php' );
+		$cache_file = realpath( $core . '/cache.php' );
+		if ( false === $class_file || false === $cache_file ) {
+			return false;
+		}
+		try {
+			$class = new \ReflectionClass( 'WP_Object_Cache' );
+			if ( $class_file !== realpath( $class->getFileName() ) ) {
+				return false;
+			}
+			foreach ( array( 'wp_cache_get', 'wp_cache_set', 'wp_cache_add', 'wp_cache_delete' ) as $function ) {
+				if ( ! function_exists( $function ) || $cache_file !== realpath( ( new \ReflectionFunction( $function ) )->getFileName() ) ) {
+					return false;
+				}
+			}
+		} catch ( \ReflectionException $exception ) {
+			return false;
+		}
+		return true;
+	}
+
 	/** Allocate a scope distinct from nested caller transactions. */
 	public function __construct() {
 		$this->scope = wp_unique_id( 'cleanlinks_command_' );

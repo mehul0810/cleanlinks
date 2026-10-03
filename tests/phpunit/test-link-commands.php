@@ -16,6 +16,43 @@ class Test_Link_Commands extends WP_UnitTestCase {
 	private function input( $key = 'request_key_for_test_01', $slug = 'command-test' ) {
 		return array( 'request_key' => $this->key( $key ), 'destination' => 'https://example.org/a?one=1&two=%2F&two=hello+world', 'title' => 'Command test', 'slug' => $slug, 'status' => 'publish', 'nofollow' => true );
 	}
+	public function test_unqualified_cache_rejects_commands_before_hooks_or_writes_even_if_flag_is_clear() {
+		global $wpdb;
+		$id = self::factory()->post->create( array( 'post_type' => 'cleanlinks' ) );
+		$before_posts = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'cleanlinks'" );
+		$before_options = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE 'cleanlinks_command_receipt_%'" );
+		$cache = $GLOBALS['wp_object_cache'];
+		$external_cache = wp_using_ext_object_cache();
+		$request = new \WP_REST_Request( 'GET', '/cleanlinks/v1/links/' . $id );
+		$request->set_url_params( array( 'id' => $id ) );
+		$request->set_header( 'X-WP-Nonce', wp_create_nonce( 'wp_rest' ) );
+		wp_using_ext_object_cache( true );
+		try {
+			$permission = ( new LinkCommandController() )->permission( $request );
+		} finally {
+			wp_using_ext_object_cache( $external_cache );
+		}
+		$this->assertSame( 'storage_unavailable', $permission->get_error_code() );
+		$this->assertSame( 503, $permission->get_error_data()['status'] );
+		$hook_calls = 0;
+		$hook = static function () use ( &$hook_calls ) { ++$hook_calls; };
+		add_action( 'save_post_cleanlinks', $hook );
+		wp_using_ext_object_cache( false );
+		$GLOBALS['wp_object_cache'] = new \stdClass();
+		try {
+			$result = $this->commands->execute( $this->input( 'unqualified_cache', 'unqualified-cache' ) );
+			$this->assertSame( 'storage_unavailable', $result->get_error_code() );
+			$this->assertSame( 503, $result->get_error_data()['status'] );
+			$this->assertSame( 'storage_unavailable', $this->commands->read( 1 )->get_error_code() );
+		} finally {
+			$GLOBALS['wp_object_cache'] = $cache;
+			wp_using_ext_object_cache( $external_cache );
+			remove_action( 'save_post_cleanlinks', $hook );
+		}
+		$this->assertSame( 0, $hook_calls );
+		$this->assertSame( $before_posts, (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'cleanlinks'" ) );
+		$this->assertSame( $before_options, (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE 'cleanlinks_command_receipt_%'" ) );
+	}
 	public function test_create_retry_and_request_key_reuse() {
 		$input = $this->input();
 		$result = $this->commands->execute( $input );

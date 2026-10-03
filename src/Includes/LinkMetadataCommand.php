@@ -63,7 +63,10 @@ class LinkMetadataCommand {
 		);
 		self::$running = true;
 		$transaction = null;
-		if ( ! \MG\CleanLinks\Application\LinkCommands::is_running() ) {
+		$owns_transaction = ! \MG\CleanLinks\Application\LinkCommands::is_running() && \MG\CleanLinks\Application\CommandTransaction::has_request_local_cache();
+		// Preserve the legacy editor's ordinary metadata-save behavior when atomic rollback
+		// cannot be guaranteed by the configured object cache.
+		if ( $owns_transaction ) {
 			$transaction = new \MG\CleanLinks\Application\CommandTransaction();
 			if ( ! $transaction->begin() ) {
 				self::$running = false;

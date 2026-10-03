@@ -39,6 +39,9 @@ class LinkCommands {
 		if ( self::$running || \MG\CleanLinks\Includes\LinkMetadataCommand::is_running() ) {
 			return LinkInput::error( 'command_busy', 'input' );
 		}
+		if ( ! CommandTransaction::has_request_local_cache() ) {
+			return LinkInput::error( 'storage_unavailable', 'input', 503 );
+		}
 		self::$running           = true;
 		$this->touched_groups    = array();
 		$this->touched_ids       = array();
@@ -125,6 +128,9 @@ class LinkCommands {
 		global $wpdb;
 		if ( ! is_int( $id ) || $id < 1 ) {
 			return LinkInput::error( 'invalid_id', 'id', 404 );
+		}
+		if ( ! CommandTransaction::has_request_local_cache() ) {
+			return LinkInput::error( 'storage_unavailable', 'input', 503 );
 		}
 		clean_post_cache( $id );
 		$lock = self::$running ? ' FOR UPDATE' : '';

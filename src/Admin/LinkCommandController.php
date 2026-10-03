@@ -43,7 +43,11 @@ class LinkCommandController {
 		}
 		$id = $request->get_url_params();
 		if ( isset( $id['id'] ) ) {
-			return is_wp_error( ( new LinkCommands() )->read( (int) $id['id'] ) ) ? LinkInput::error( 'forbidden', 'id', 403 ) : true;
+			$read = ( new LinkCommands() )->read( (int) $id['id'] );
+			if ( is_wp_error( $read ) ) {
+				return 'storage_unavailable' === $read->get_error_code() ? $read : LinkInput::error( 'forbidden', 'id', 403 );
+			}
+			return true;
 		}
 		if ( '/cleanlinks/v1/link-commands' === $request->get_route() ) {
 			// Each row enforces its own create/object/status/group authority.

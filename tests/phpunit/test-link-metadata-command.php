@@ -17,6 +17,21 @@ class Test_Link_Metadata_Command extends WP_UnitTestCase {
 		$this->assertSame( '1', get_post_meta( $id, 'cleanlink_redirect_nofollow', true ) );
 	}
 
+	public function test_legacy_metadata_save_remains_available_with_external_cache_flag() {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$id = self::factory()->post->create( array( 'post_type' => 'cleanlinks' ) );
+		$external = wp_using_ext_object_cache();
+		wp_using_ext_object_cache( true );
+		try {
+			$result = ( new LinkMetadataCommand() )->execute( $id, array( 'destination' => 'https://example.org/legacy', 'nofollow' => true ) );
+		} finally {
+			wp_using_ext_object_cache( $external );
+		}
+		$this->assertFalse( is_wp_error( $result ) );
+		$this->assertSame( 'https://example.org/legacy', get_post_meta( $id, 'cleanlink_redirect_url', true ) );
+		$this->assertSame( '1', get_post_meta( $id, 'cleanlink_redirect_nofollow', true ) );
+	}
+
 	public function test_rejections_do_not_mutate_working_metadata() {
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 		$id = self::factory()->post->create( array( 'post_type' => 'cleanlinks' ) );
