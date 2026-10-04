@@ -167,6 +167,7 @@ class Actions {
 					aria-label="<?php echo esc_attr($permalink); ?>"
 					data-default-text="<?php echo esc_attr( $default_text ); ?>"
 					data-copied-text="<?php echo esc_attr__( 'Copied!', 'cleanlinks' ); ?>"
+					data-copy-failed-text="<?php echo esc_attr__( 'Copy failed', 'cleanlinks' ); ?>"
 					data-url="<?php echo esc_url($permalink); ?>"
 				>
 					<span class="dashicons dashicons-admin-page"></span>

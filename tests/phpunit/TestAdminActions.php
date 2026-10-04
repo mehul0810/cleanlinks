@@ -68,6 +68,29 @@ class TestAdminActions extends WP_UnitTestCase {
 		$this->assertTrue( wp_script_is( 'cleanlink-admin', 'enqueued' ) );
 	}
 
+	/**
+	 * List copy buttons expose the translated failure message to the click handler.
+	 */
+	public function test_copy_column_has_translated_failure_text() {
+		$post_id = self::factory()->post->create( array( 'post_type' => 'cleanlinks' ) );
+		$translate_failure = static function ( $translation, $text, $domain ) {
+			if ( 'cleanlinks' === $domain && 'Copy failed' === $text ) {
+				return 'Localized failure';
+			}
+			return $translation;
+		};
+		add_filter( 'gettext', $translate_failure, 10, 3 );
+		ob_start();
+		try {
+			self::$class_instance->register_custom_columns( 'cleanlink_permalink', $post_id );
+			$output = ob_get_clean();
+		} finally {
+			remove_filter( 'gettext', $translate_failure, 10 );
+		}
+
+		$this->assertStringContainsString( 'data-copy-failed-text="Localized failure"', $output );
+	}
+
 	 /**
      * Test adding admin pages.
      */
