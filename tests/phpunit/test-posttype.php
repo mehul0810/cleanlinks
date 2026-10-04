@@ -194,6 +194,32 @@ class Test_PostType extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Saving an encoded destination must preserve its path, query, plus, and fragment.
+	 */
+	public function test_save_link_meta_preserves_encoded_destination_components() {
+		$user_id  = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$post_id  = self::factory()->post->create( array( 'post_type' => 'cleanlinks' ) );
+		$post     = get_post( $post_id );
+		$old_post = $_POST;
+		$url      = 'https://example.com/path%2F%2B?keep=one&keep=two&encoded=%2F%2B&plus=a+b#section';
+
+		wp_set_current_user( $user_id );
+		$_POST = array(
+			'cleanlink_redirect_nonce' => wp_create_nonce( 'cleanlink-save-redirect-meta' ),
+			'cleanlink_redirect_url'   => $url,
+		);
+
+		try {
+			self::$class_instance->save_link_meta( $post_id, $post );
+		} finally {
+			$_POST = $old_post;
+			wp_set_current_user( 0 );
+		}
+
+		$this->assertSame( $url, get_post_meta( $post_id, 'cleanlink_redirect_url', true ) );
+	}
+
+	/**
 	 * Malformed URL shapes fail closed without throwing or changing stored metadata.
 	 *
 	 * @since 1.1.1

@@ -97,7 +97,7 @@ class LinkMetaSaver {
 		}
 
 		$raw_url   = wp_unslash( $raw_url );
-		$valid_url = Helpers::validate_url( sanitize_text_field( $raw_url ) );
+		$valid_url = Helpers::validate_url( $raw_url );
 
 		if ( $valid_url ) {
 			update_post_meta( $post_id, 'cleanlink_redirect_url', $valid_url );
