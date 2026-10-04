@@ -201,7 +201,7 @@ class Test_PostType extends WP_UnitTestCase {
 		$post_id  = self::factory()->post->create( array( 'post_type' => 'cleanlinks' ) );
 		$post     = get_post( $post_id );
 		$old_post = $_POST;
-		$url      = 'https://example.com/path%2F%2B?keep=one&keep=two&encoded=%2F%2B&plus=a+b#section';
+		$url      = 'https://1.1.1.1/path%2F%2B?keep=one&keep=two&encoded=%2F%2B&plus=a+b#section';
 
 		wp_set_current_user( $user_id );
 		$_POST = array(
