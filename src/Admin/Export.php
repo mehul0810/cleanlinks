@@ -59,6 +59,38 @@ class Export {
 	 */
 	public function register_hooks() {
 		add_action( 'admin_post_cleanlinks_export', array( $this, 'export_csv' ) );
+		add_filter( 'get_terms', array( $this, 'filter_wxr_terms' ), 10, 2 );
+	}
+
+	/**
+	 * Hide CleanLinks groups only while the core WXR exporter is running.
+	 *
+	 * @param array $terms      Terms returned by WordPress.
+	 * @param array $taxonomies Queried taxonomies.
+	 * @return array
+	 */
+	public function filter_wxr_terms( $terms, $taxonomies ) {
+		if ( ! in_array( 'cleanlinks_groups', (array) $taxonomies, true ) ) {
+			return $terms;
+		}
+
+		$in_wxr_export = false;
+		foreach ( debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS ) as $frame ) {
+			if ( 'export_wp' === $frame['function'] && empty( $frame['class'] ) ) {
+				$in_wxr_export = true;
+				break;
+			}
+		}
+		if ( ! $in_wxr_export ) {
+			return $terms;
+		}
+
+		return array_filter(
+			$terms,
+			static function ( $term ) {
+				return ! $term instanceof \WP_Term || 'cleanlinks_groups' !== $term->taxonomy;
+			}
+		);
 	}
 
 	/**

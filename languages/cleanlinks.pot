@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Mehul Gohil <hello@mehulgohil.com>\n"
-"POT-Creation-Date: 2026-07-14 10:38+0000\n"
+"POT-Creation-Date: 2026-09-30 18:01+0000\n"
 "Report-Msgid-Bugs-To: https://github.com/mehul0810/cleanlinks/issues/new\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -16,51 +16,51 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/Admin/Actions.php:52, src/Admin/Actions.php:53, src/Admin/Export.php:137, src/Admin/Export.php:145
+#: src/Admin/Actions.php:59, src/Admin/Actions.php:60, src/Admin/Export.php:273, src/Admin/Export.php:281
 msgid "Export"
 msgstr ""
 
-#: src/Admin/Actions.php:154
+#: src/Admin/Actions.php:161
 msgid "Copy URL"
 msgstr ""
 
-#: src/Admin/Actions.php:162
+#: src/Admin/Actions.php:169
 msgid "Copied!"
 msgstr ""
 
-#: src/Admin/Actions.php:215
+#: src/Admin/Actions.php:222
 msgid "Viewed:"
 msgstr ""
 
-#: src/Admin/Export.php:44
+#: src/Admin/Export.php:109
 msgid "Security check failed."
 msgstr ""
 
-#: src/Admin/Export.php:44, src/Admin/Export.php:49, src/Admin/Export.php:60, src/Admin/Export.php:105, src/Admin/Export.php:109, src/Admin/Export.php:115
+#: src/Admin/Export.php:109, src/Admin/Export.php:114, src/Admin/Export.php:125, src/Admin/Export.php:131, src/Admin/Export.php:139, src/Admin/Export.php:145, src/Admin/Export.php:163, src/Admin/Export.php:200, src/Admin/Export.php:209
 msgid "Error"
 msgstr ""
 
-#: src/Admin/Export.php:49
+#: src/Admin/Export.php:114
 msgid "You do not have permission."
 msgstr ""
 
-#: src/Admin/Export.php:60
+#: src/Admin/Export.php:125
 msgid "Filesystem API not available."
 msgstr ""
 
-#: src/Admin/Export.php:105
+#: src/Admin/Export.php:131
 msgid "Could not create a temp file."
 msgstr ""
 
-#: src/Admin/Export.php:109
+#: src/Admin/Export.php:139, src/Admin/Export.php:163, src/Admin/Export.php:200
 msgid "Could not write CSV file."
 msgstr ""
 
-#: src/Admin/Export.php:115
+#: src/Admin/Export.php:145, src/Admin/Export.php:209
 msgid "Could not read CSV file."
 msgstr ""
 
-#: src/Admin/Export.php:141
+#: src/Admin/Export.php:277
 msgid "Using this tool, you can have a seamless experience to export your links to a CSV (Comma Separated Values) file with just a single click."
 msgstr ""
 
@@ -97,122 +97,178 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
-#: src/Includes/PostType.php:43
+#: src/Includes/LinkMetaBox.php:36
+msgid "Redirect Link Settings"
+msgstr ""
+
+#: src/Includes/LinkMetaBox.php:69
+msgid "Draft"
+msgstr ""
+
+#: src/Includes/LinkMetaBox.php:69
+msgid "Not published"
+msgstr ""
+
+#: src/Includes/LinkMetaBox.php:71
+msgid "Saved link overview"
+msgstr ""
+
+#: src/Includes/LinkMetaBox.php:73
+msgid "Short URL"
+msgstr ""
+
+#: src/Includes/LinkMetaBox.php:83
+msgid "The short URL is available after publishing."
+msgstr ""
+
+#: src/Includes/LinkMetaBox.php:77, src/Includes/LinkMetaBox.php:79
+msgid "Copy short URL"
+msgstr ""
+
+#: src/Includes/LinkMetaBox.php:77
+msgid "Copied"
+msgstr ""
+
+#: src/Includes/LinkMetaBox.php:77
+msgid "Copy failed"
+msgstr ""
+
+#: src/Includes/LinkMetaBox.php:87
+msgid "Status"
+msgstr ""
+
+#: src/Includes/LinkMetaBox.php:88
+msgid "Destination"
+msgstr ""
+
+#: src/Includes/LinkMetaBox.php:88
+msgid "Not set"
+msgstr ""
+
+#: src/Includes/LinkMetaBox.php:89
+msgid "Default redirect"
+msgstr ""
+
+#: src/Includes/LinkMetaBox.php:89
+msgid "301 permanent"
+msgstr ""
+
+#: src/Includes/LinkMetaBox.php:89
+msgid "302 to site home"
+msgstr ""
+
+#: src/Includes/LinkMetaBox.php:89
+msgid "Available after publishing"
+msgstr ""
+
+#: src/Includes/LinkMetaBox.php:90
+msgid "Total clicks"
+msgstr ""
+
+#: src/Includes/LinkMetaBox.php:108
+msgid "Destination URL"
+msgstr ""
+
+#: src/Includes/LinkMetaBox.php:110
+msgid "Enter a full http:// or https:// URL. If WordPress rejects a change, the saved destination stays unchanged. A published link without a destination redirects to the site home page."
+msgstr ""
+
+#: src/Includes/LinkMetaBox.php:111
+msgid "Enter a full URL starting with https:// or http://."
+msgstr ""
+
+#: src/Includes/LinkMetaBox.php:117
+msgid "Ask search engines not to follow this link"
+msgstr ""
+
+#: src/Includes/LinkMetaBox.php:119
+msgid "Sends an X-Robots-Tag: nofollow header with the redirect."
+msgstr ""
+
+#: src/Includes/PostTypeRegistrar.php:50
 msgctxt "Post type general name"
 msgid "CleanLinks"
 msgstr ""
 
-#: src/Includes/PostType.php:44
+#: src/Includes/PostTypeRegistrar.php:51
 msgctxt "Post type singular name"
 msgid "CleanLink"
 msgstr ""
 
-#: src/Includes/PostType.php:45
+#: src/Includes/PostTypeRegistrar.php:52
 msgctxt "Admin Menu text"
 msgid "CleanLinks"
 msgstr ""
 
-#: src/Includes/PostType.php:46
+#: src/Includes/PostTypeRegistrar.php:53
 msgctxt "Add New on Toolbar"
 msgid "Link"
 msgstr ""
 
-#: src/Includes/PostType.php:47, src/Includes/PostType.php:48
+#: src/Includes/PostTypeRegistrar.php:54, src/Includes/PostTypeRegistrar.php:55
 msgid "Add New Link"
 msgstr ""
 
-#: src/Includes/PostType.php:49
+#: src/Includes/PostTypeRegistrar.php:56
 msgid "New CleanLink"
 msgstr ""
 
-#: src/Includes/PostType.php:50
+#: src/Includes/PostTypeRegistrar.php:57
 msgid "Edit CleanLink"
 msgstr ""
 
-#: src/Includes/PostType.php:51
+#: src/Includes/PostTypeRegistrar.php:58
 msgid "View CleanLink"
 msgstr ""
 
-#: src/Includes/PostType.php:52
+#: src/Includes/PostTypeRegistrar.php:59
 msgid "All Links"
 msgstr ""
 
-#: src/Includes/PostType.php:53
+#: src/Includes/PostTypeRegistrar.php:60
 msgid "Search links"
 msgstr ""
 
-#: src/Includes/PostType.php:54
+#: src/Includes/PostTypeRegistrar.php:61
 msgid "Parent links:"
 msgstr ""
 
-#: src/Includes/PostType.php:55
+#: src/Includes/PostTypeRegistrar.php:62
 msgid "No link found."
 msgstr ""
 
-#: src/Includes/PostType.php:56
+#: src/Includes/PostTypeRegistrar.php:63
 msgid "No links found in Trash."
 msgstr ""
 
-#: src/Includes/PostType.php:57
+#: src/Includes/PostTypeRegistrar.php:64
 msgctxt "The post type archive label used in nav menus. Default “Post Archives”. Added in 4.4"
 msgid "CleanLink archives"
 msgstr ""
 
-#: src/Includes/PostType.php:58
+#: src/Includes/PostTypeRegistrar.php:65
 msgctxt "Overrides the “Insert into post”/”Insert into page” phrase (used when inserting media into a post). Added in 4.4"
 msgid "Insert into Link"
 msgstr ""
 
-#: src/Includes/PostType.php:59
+#: src/Includes/PostTypeRegistrar.php:66
 msgctxt "Overrides the “Uploaded to this post”/”Uploaded to this page” phrase (used when viewing media attached to a post). Added in 4.4"
 msgid "Uploaded to this Link"
 msgstr ""
 
-#: src/Includes/PostType.php:60
+#: src/Includes/PostTypeRegistrar.php:67
 msgctxt "Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4"
 msgid "Filter Links list"
 msgstr ""
 
-#: src/Includes/PostType.php:61
+#: src/Includes/PostTypeRegistrar.php:68
 msgctxt "Screen reader text for the pagination heading on the post type listing screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
 msgid "Links list navigation"
 msgstr ""
 
-#: src/Includes/PostType.php:62
+#: src/Includes/PostTypeRegistrar.php:69
 msgctxt "Screen reader text for the items list heading on the post type listing screen. Default “Posts list”/”Pages list”. Added in 4.4"
 msgid "Links list"
-msgstr ""
-
-#: src/Includes/PostType.php:216
-msgid "Redirect Link Settings"
-msgstr ""
-
-#: src/Includes/PostType.php:254
-msgid "Destination URL:"
-msgstr ""
-
-#: src/Includes/PostType.php:255
-msgid "Enter the full destination URL (e.g., https://example.com)"
-msgstr ""
-
-#: src/Includes/PostType.php:258
-msgid "Visitors will be redirected to this URL when they access your link."
-msgstr ""
-
-#: src/Includes/PostType.php:265
-msgid "Add nofollow to this redirect"
-msgstr ""
-
-#: src/Includes/PostType.php:267
-msgid "Check this option to prevent search engines from following this redirect."
-msgstr ""
-
-#: src/Includes/PostType.php:290
-msgid "This link has been visited"
-msgstr ""
-
-#: src/Includes/PostType.php:292
-msgid "times"
 msgstr ""
 
 #: src/Includes/TaxoNomy.php:40

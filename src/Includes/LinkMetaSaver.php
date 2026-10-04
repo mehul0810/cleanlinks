@@ -97,7 +97,7 @@ class LinkMetaSaver {
 		}
 
 		$raw_url   = wp_unslash( $raw_url );
-		$valid_url = Helpers::validate_url( sanitize_text_field( $raw_url ) );
+		$valid_url = Helpers::validate_url( $raw_url );
 
 		if ( $valid_url ) {
 			update_post_meta( $post_id, 'cleanlink_redirect_url', $valid_url );
@@ -107,7 +107,6 @@ class LinkMetaSaver {
 			return;
 		}
 
-		delete_post_meta( $post_id, 'cleanlink_redirect_url' );
-		delete_post_meta( $post_id, 'cleanlink_redirect_nofollow' );
+		// A rejected edit must not replace a working redirect with the home-page fallback.
 	}
 }
