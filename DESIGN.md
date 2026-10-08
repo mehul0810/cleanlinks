@@ -4,7 +4,7 @@ Proposed local candidate for review; no production publication or visual approva
 
 The desktop/narrow review packet is `../deliverables/120-design/index.html`, with original full-page screenshots at 1440 and 390 CSS pixels. It includes All Links, create/edit, CSV mapping, zero-write preview, persisted results, existing Groups and published-only Export. These are rendered candidate screens with disposable data, not imagined analytics or an approval receipt.
 
-Keep WordPress admin chrome, system typography, normal buttons/forms/tables, and existing Groups/Export semantics. Use a restrained teal header (#eaf5f2; ink #153c3a; small brand label #076f63) and blue WordPress primary actions. All Links is the landing page. Add link and Bulk add are task entries. Narrow tables become labeled cards; controls remain in reading order. No new analytics dashboard, time series, health feed, UTM builder or advanced settings is promised.
+Keep WordPress admin chrome, system typography, normal buttons/forms/tables, and existing Groups/Export semantics. Use a restrained teal header (#eaf5f2; ink #153c3a; navigation accent #076f63) and blue WordPress primary actions. All Links is the landing page. Add link and Bulk add are task entries. Narrow tables become labeled cards; controls remain in reading order. No new analytics dashboard, time series, health feed, UTM builder or advanced settings is promised.
 
 ## Controls and data
 
@@ -38,3 +38,9 @@ Workspace saves/imports require transactional mutable tables (InnoDB on MySQL) a
 Imports accept at most 10,000 rows / 5 MiB, 5 private jobs per actor and 100 per site. Access expires after 24 hours; cleanup requires the supported transactional/native-cache configuration. Switching to an unsupported configuration can defer physical cleanup; uninstall removes the owned staging/receipt footprint across sites without deleting links or settings.
 
 Automated browser/axe evidence is in `../deliverables/120-a11y-evidence.json`; functional, keyboard, no-JavaScript and 320/390/768/1280 reflow proof is in `../deliverables/120-browser-evidence.json`. Automated scans do not establish complete WCAG conformance. Source-aware independent review and actual process-race evidence are separate from owner design approval.
+
+## Owner-requested layout revision
+
+The owner reviewed the previews and requested better viewport use, clearer structure and a plugin header. This feedback authorizes the revision but is not final visual approval. The header now uses the existing WordPress.org CleanLinks icon and readable product name, with compact task navigation and an active-page indication. All Links retains prominent Add link/Bulk add actions. Create/edit uses the full admin content width: destination/title/slug on the left, existing publishing/group/nofollow controls on the right, and a consistent bottom action row. At the native WordPress 782px breakpoint the same DOM order becomes a single column. The promotional hero, fixed 760px editor limit and redundant form-page header actions were removed. Filters use the available list width. No additional product features or navigation tabs were introduced.
+
+Actual revised captures are in the existing review gallery; exact source/package identity and bounded regression evidence are in `../deliverables/120-layout-report.md`. Automated checks and independent review do not substitute for owner approval or the outstanding manual screen-reader validation.

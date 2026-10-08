@@ -115,8 +115,15 @@ class Workspace {
 		}
 		$page = isset( $_GET['page'] ) && is_string( $_GET['page'] ) ? sanitize_key( $_GET['page'] ) : self::SLUG; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$view = isset( $_GET['view'] ) && is_string( $_GET['view'] ) ? sanitize_key( $_GET['view'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		echo '<div class="wrap cl-workspace"><header class="cl-header"><div><p class="cl-eyebrow">CleanLinks</p><h1>' . esc_html__( 'Your links, under control.', 'cleanlinks' ) . '</h1><p>' . esc_html__( 'Branded short links. Clear destinations. Lifetime click counts.', 'cleanlinks' ) . '</p></div><div class="cl-header-actions"><a class="button" href="' . esc_url( self::url( array( 'page' => 'cleanlinks-bulk' ) ) ) . '">' . esc_html__( 'Bulk add', 'cleanlinks' ) . '</a> <a class="button button-primary" href="' . esc_url( self::url( array( 'page' => 'cleanlinks-add' ) ) ) . '">' . esc_html__( 'Add link', 'cleanlinks' ) . '</a></div></header>';
-		echo '<nav class="cl-nav" aria-label="' . esc_attr__( 'Link workspace', 'cleanlinks' ) . '"><a href="' . esc_url( self::url() ) . '">' . esc_html__( 'All links', 'cleanlinks' ) . '</a><a href="' . esc_url( self::url( array( 'page' => 'cleanlinks-add' ) ) ) . '">' . esc_html__( 'Add link', 'cleanlinks' ) . '</a><a href="' . esc_url( self::url( array( 'page' => 'cleanlinks-bulk' ) ) ) . '">' . esc_html__( 'Bulk add', 'cleanlinks' ) . '</a></nav>';
+		echo '<div class="wrap cl-workspace"><header class="cl-header"><div class="cl-brand"><img src="' . esc_url( CLEANLINKS_PLUGIN_URL . '.wordpress-org/icon-128x128.png' ) . '" width="44" height="44" alt=""><div><h1>CleanLinks</h1><p>' . esc_html__( 'Manage your branded links', 'cleanlinks' ) . '</p></div></div>';
+		if ( self::SLUG === $page && 'edit' !== $view ) {
+			echo '<div class="cl-header-actions"><a class="button" href="' . esc_url( self::url( array( 'page' => 'cleanlinks-bulk' ) ) ) . '">' . esc_html__( 'Bulk add', 'cleanlinks' ) . '</a><a class="button button-primary" href="' . esc_url( self::url( array( 'page' => 'cleanlinks-add' ) ) ) . '">' . esc_html__( 'Add link', 'cleanlinks' ) . '</a></div>';
+		}
+		echo '</header><nav class="cl-nav" aria-label="' . esc_attr__( 'Link workspace', 'cleanlinks' ) . '">';
+		foreach ( array( self::SLUG => __( 'All links', 'cleanlinks' ), 'cleanlinks-add' => __( 'Add link', 'cleanlinks' ), 'cleanlinks-bulk' => __( 'Bulk add', 'cleanlinks' ) ) as $target => $label ) {
+			echo '<a href="' . esc_url( self::url( array( 'page' => $target ) ) ) . '"' . ( $page === $target ? ' aria-current="page"' : '' ) . '>' . esc_html( $label ) . '</a>';
+		}
+		echo '</nav>';
 		$this->notice();
 		if ( ! CommandTransaction::has_request_local_cache() ) {
 			echo '<div class="notice notice-warning"><p>' . esc_html( self::error_text( 'storage_unavailable' ) ) . ' <a href="' . esc_url( admin_url( 'edit.php?post_type=cleanlinks&cleanlinks_classic=1' ) ) . '">' . esc_html__( 'Open classic editor', 'cleanlinks' ) . '</a></p></div>';
@@ -202,9 +209,10 @@ class Workspace {
 			echo '<p><a class="button" href="' . esc_url( remove_query_arg( 'notice' ) ) . '">' . esc_html__( 'Reload current saved values', 'cleanlinks' ) . '</a></p>';
 		}
 		$back = self::url( array( 's' => isset( $_GET['s'] ) && is_string( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '', 'status' => isset( $_GET['status'] ) && is_string( $_GET['status'] ) ? sanitize_key( $_GET['status'] ) : '', 'group' => isset( $_GET['group'] ) ? absint( $_GET['group'] ) : 0, 'paged' => isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1 ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		echo '<section class="cl-panel cl-editor"><a href="' . esc_url( $back ) . '">← ' . esc_html__( 'Back to links', 'cleanlinks' ) . '</a><h2>' . esc_html( $id ? __( 'Edit link', 'cleanlinks' ) : __( 'Add a link', 'cleanlinks' ) ) . '</h2><p>' . esc_html__( 'Choose a destination and a memorable short URL. Draft links do not redirect publicly.', 'cleanlinks' ) . '</p><form data-cl-editor data-cl-new="' . ( $id ? '0' : '1' ) . '" method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+		echo '<section class="cl-panel cl-editor"><a href="' . esc_url( $back ) . '">← ' . esc_html__( 'Back to links', 'cleanlinks' ) . '</a><h2>' . esc_html( $id ? __( 'Edit link', 'cleanlinks' ) : __( 'Add a link', 'cleanlinks' ) ) . '</h2><p>' . esc_html__( 'Choose a destination and a memorable short URL. Draft links do not redirect publicly.', 'cleanlinks' ) . '</p><form class="cl-editor-layout" data-cl-editor data-cl-new="' . ( $id ? '0' : '1' ) . '" method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		$this->fields( 'save' );
 		echo '<input type="hidden" name="id" value="' . esc_attr( $id ) . '"><input type="hidden" name="request_key" value="' . esc_attr( $input['request_key'] ) . '"><input type="hidden" name="expected_version" value="' . esc_attr( isset( $input['expected_version'] ) ? $input['expected_version'] : '' ) . '"><input type="hidden" name="return" value="' . esc_attr( add_query_arg( array( 'view' => 'edit', 'id' => $id ), $back ) ) . '">';
+		echo '<div class="cl-editor-main">';
 		foreach ( array( 'destination' => __( 'Destination URL', 'cleanlinks' ), 'title' => __( 'Link title', 'cleanlinks' ), 'slug' => __( 'Short URL slug', 'cleanlinks' ) ) as $name => $label ) {
 			echo '<div class="cl-field"><label for="cl-' . esc_attr( $name ) . '">' . esc_html( $label ) . '</label><input id="cl-' . esc_attr( $name ) . '" name="' . esc_attr( $name ) . '" type="' . ( 'destination' === $name ? 'url' : 'text' ) . '" value="' . esc_attr( $input[ $name ] ) . '" ' . ( 'destination' === $name ? 'required' : '' ) . ( is_array( $notice ) && ! empty( $notice['error'] ) && isset( $notice['field'] ) && $notice['field'] === $name ? ' aria-invalid="true"' : '' ) . ' aria-describedby="cl-' . esc_attr( $name ) . '-hint' . ( is_array( $notice ) && ! empty( $notice['error'] ) && isset( $notice['field'] ) && $notice['field'] === $name ? ' cl-error-summary' : '' ) . '"><small id="cl-' . esc_attr( $name ) . '-hint">' . esc_html( 'destination' === $name ? __( 'Public http:// or https:// URL. Query parameters are preserved.', 'cleanlinks' ) : ( 'slug' === $name ? __( 'Leave blank to generate from the title. Changing a saved slug changes its public URL.', 'cleanlinks' ) : __( 'A name that helps you recognize this link.', 'cleanlinks' ) ) ) . '</small></div>';
 		}
@@ -214,7 +222,7 @@ class Workspace {
 			$preview = $structure ? home_url( user_trailingslashit( str_replace( '%cleanlinks%', 'cl-slug-placeholder', $structure ) ) ) : add_query_arg( 'cleanlinks', 'cl-slug-placeholder', home_url( '/' ) );
 			echo '<p><strong>' . esc_html__( 'URL preview (confirmed when saved):', 'cleanlinks' ) . '</strong> <span data-cl-preview-pattern="' . esc_attr( $preview ) . '" id="cl-url-preview" role="status">' . esc_html__( 'Enter a destination or slug to preview.', 'cleanlinks' ) . '</span></p>';
 		}
-		echo '<div class="cl-field"><label for="cl-status">' . esc_html__( 'Publication status', 'cleanlinks' ) . '</label><select id="cl-status" name="link_status">';
+		echo '</div><div class="cl-editor-settings"><h3>' . esc_html__( 'Publishing settings', 'cleanlinks' ) . '</h3><div class="cl-field"><label for="cl-status">' . esc_html__( 'Publication status', 'cleanlinks' ) . '</label><select id="cl-status" name="link_status">';
 		foreach ( array( 'draft', 'pending', 'publish', 'private' ) as $status ) {
 			if ( in_array( $status, array( 'publish', 'private' ), true ) && ! current_user_can( 'publish_posts' ) ) {
 				continue;
@@ -233,7 +241,7 @@ class Workspace {
 		if ( $id ) {
 			echo '<label class="cl-check"><input type="checkbox" name="confirm_slug_change" value="1"> ' . esc_html__( 'I understand that changing the slug changes the public URL.', 'cleanlinks' ) . '</label><p>' . esc_html__( 'Current short URL:', 'cleanlinks' ) . ' ' . esc_html( get_permalink( $id ) ) . ' <button type="button" class="button-link" data-cl-copy="' . esc_attr( get_permalink( $id ) ) . '">' . esc_html__( 'Copy URL', 'cleanlinks' ) . '</button></p><p>' . esc_html( sprintf( __( 'Lifetime clicks: %s. Only published links redirect publicly.', 'cleanlinks' ), number_format_i18n( (int) get_post_meta( $id, 'cleanlink_redirect_count', true ) ) ) ) . '</p><p id="cl-live" role="status" aria-live="polite"></p>';
 		}
-		echo '<div class="cl-form-actions"><button class="button button-primary" ' . disabled( CommandTransaction::has_request_local_cache(), false, false ) . '>' . esc_html__( 'Save link', 'cleanlinks' ) . '</button><a href="' . esc_url( $back ) . '">' . esc_html__( 'Cancel', 'cleanlinks' ) . '</a></div></form></section>';
+		echo '</div><div class="cl-form-actions"><button class="button button-primary" ' . disabled( CommandTransaction::has_request_local_cache(), false, false ) . '>' . esc_html__( 'Save link', 'cleanlinks' ) . '</button><a href="' . esc_url( $back ) . '">' . esc_html__( 'Cancel', 'cleanlinks' ) . '</a></div></form></section>';
 	}
 
 	/** Bounded private preview/results and explicit publication confirmation. */
