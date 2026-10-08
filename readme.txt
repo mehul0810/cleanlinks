@@ -5,7 +5,7 @@ Donate link: https://www.buymeacoffee.com/mehulgohil
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 1.1.2
+Stable tag: 1.2.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -69,6 +69,13 @@ Yes, CleanLinks is fully compatible with popular caching and SEO plugins.
 
 == Changelog ==
 
+= 1.2.0 =
+* New: WordPress-native link workspace, destination-first add/edit, and private paste/CSV previews with resumable 50-row imports.
+* New: Shared permission-checked commands, stale-edit protection and actor-scoped retry receipts.
+* Compatibility: Transactional storage and the native request-local WordPress cache are required for workspace saves/imports. Persistent or custom object caches fail closed; the classic editor remains available with ordinary, non-atomic saves.
+* Preservation: Existing link IDs, URLs, groups, lifetime clicks and redirect hooks remain in the cleanlinks post type.
+* Fix: Preserve encoded query values and apostrophes in public redirects; recover clipboard feedback after a failed copy.
+
 = 1.1.2 =
 * Show a saved-link overview and validate destination URLs in the Add/Edit Link editor.
 * Keep an existing destination when an edited URL is rejected, and preserve multiple query parameters in saved redirects.
@@ -114,3 +121,5 @@ Click tracking now records redirects only for published CleanLinks; draft and no
 
 = 1.0.0 =
 Initial version of CleanLinks with CSV export, link tracking, and redirect features.
+
+Workspace compatibility: link saves and imports require transactional storage and the native WordPress request-local object cache. Sites using persistent/custom object caches can use the Classic editor, which keeps ordinary WordPress saves without atomic rollback. Import previews/results are private, retained for 24 hours, and limited to 10,000 rows / 5 MB, 5 jobs per account and 100 per site. Cancellation retains links committed by earlier batches.

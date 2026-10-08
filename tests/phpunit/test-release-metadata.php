@@ -28,19 +28,19 @@ class Test_Release_Metadata extends WP_UnitTestCase {
 		$package       = json_decode( $this->read_metadata_file( 'package.json' ), true, 512, JSON_THROW_ON_ERROR );
 		$package_lock  = json_decode( $this->read_metadata_file( 'package-lock.json' ), true, 512, JSON_THROW_ON_ERROR );
 
-		$this->assertStringContainsString( '* Version: 1.1.2', $plugin_file );
-		$this->assertStringContainsString( "define( 'CLEANLINKS_VERSION', '1.1.2' );", $constants );
+		$this->assertStringContainsString( '* Version: 1.2.0', $plugin_file );
+		$this->assertStringContainsString( "define( 'CLEANLINKS_VERSION', '1.2.0' );", $constants );
 		$this->assertTrue( defined( 'CLEANLINKS_VERSION' ) );
-		$this->assertSame( '1.1.2', CLEANLINKS_VERSION );
-		$this->assertMatchesRegularExpression( '/^Stable tag:\s+1\.1\.2$/m', $readme );
+		$this->assertSame( '1.2.0', CLEANLINKS_VERSION );
+		$this->assertMatchesRegularExpression( '/^Stable tag:\s+1\.2\.0$/m', $readme );
 		$this->assertMatchesRegularExpression( '/^Tested up to:\s+7\.1$/m', $readme );
-		$this->assertMatchesRegularExpression( '/^Stable tag:\s+1\.1\.2$/m', $public_readme );
+		$this->assertMatchesRegularExpression( '/^Stable tag:\s+1\.2\.0$/m', $public_readme );
 		$this->assertMatchesRegularExpression( '/^Tested up to:\s+7\.1$/m', $public_readme );
-		$this->assertStringContainsString( '### 1.1.2', $public_readme );
-		$this->assertSame( '1.1.2', $composer['version'] );
-		$this->assertSame( '1.1.2', $package['version'] );
-		$this->assertSame( '1.1.2', $package_lock['version'] );
-		$this->assertSame( '1.1.2', $package_lock['packages']['']['version'] );
+		$this->assertStringContainsString( '### 1.2.0', $public_readme );
+		$this->assertSame( '1.2.0', $composer['version'] );
+		$this->assertSame( '1.2.0', $package['version'] );
+		$this->assertSame( '1.2.0', $package_lock['version'] );
+		$this->assertSame( '1.2.0', $package_lock['packages']['']['version'] );
 	}
 
 	/**

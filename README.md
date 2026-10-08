@@ -6,7 +6,7 @@ Donate link: [Buy Me a Coffee](https://www.buymeacoffee.com/mehulgohil)
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 1.1.2
+Stable tag: 1.2.0
 License: GPLv3
 License URI: [GPLv3](http://www.gnu.org/licenses/gpl-3.0.html)
 
@@ -36,6 +36,9 @@ Whether you’re tracking affiliate conversions, simplifying URLs for social sha
 - Bloggers and content creators sharing branded, memorable URLs
 - Agencies managing multiple client links or campaigns
 - Anyone who wants full control over outbound links in WordPress
+
+
+Workspace compatibility: link saves and imports require transactional storage and the native WordPress request-local object cache. Sites using persistent/custom object caches can use the Classic editor, which keeps ordinary WordPress saves without atomic rollback. Import previews/results are private, retained for 24 hours, and limited to 10,000 rows / 5 MB, 5 jobs per account and 100 per site. Cancellation retains links committed by earlier batches.
 
 ## Installation
 
@@ -81,6 +84,13 @@ Yes, all links use your own site’s domain for maximum trust and branding.
 3. Export to CSV – Download link IDs, titles, short URLs, and destination URLs.
 
 ## Changelog
+
+### 1.2.0
+* New: WordPress-native link workspace, destination-first add/edit, and private paste/CSV previews with resumable 50-row imports.
+* New: Shared permission-checked commands, stale-edit protection and actor-scoped retry receipts.
+* Compatibility: Transactional storage and the native request-local WordPress cache are required for workspace saves/imports. Persistent or custom object caches fail closed; the classic editor remains available with ordinary, non-atomic saves.
+* Preservation: Existing link IDs, URLs, groups, lifetime clicks and redirect hooks remain in the cleanlinks post type.
+* Fix: Preserve encoded query values and apostrophes in public redirects; recover clipboard feedback after a failed copy.
 
 ### 1.1.2
 

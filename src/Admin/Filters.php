@@ -72,7 +72,7 @@ class Filters {
 			$manage_link = [
 				'manage_links' => sprintf(
 					'<a href="%s">%s</a>',
-					esc_url( admin_url( 'edit.php?post_type=cleanlinks' ) ),
+					esc_url( Workspace::url() ),
 					esc_html__( 'Manage Links', 'cleanlinks' )
 				),
 			];

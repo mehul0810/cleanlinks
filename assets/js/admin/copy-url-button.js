@@ -47,6 +47,9 @@ export function setupCopyUrlButtons() {
 				}
 			} catch ( e ) {
 				textElement.textContent = currentButton.getAttribute( 'data-copy-failed-text' ) || 'Copy failed';
+				if ( iconElement ) {
+					iconElement.classList.replace( 'dashicons-yes', 'dashicons-admin-page' );
+				}
 			}
 		} );
 

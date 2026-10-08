@@ -139,6 +139,7 @@ class CommandReceipts {
 	public function uninstall() {
 		global $wpdb;
 		wp_clear_scheduled_hook( 'cleanlinks_expire_command_receipts' );
+		if ( class_exists( __NAMESPACE__ . '\\ImportJobs' ) ) { ( new ImportJobs() )->uninstall(); }
 		do {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Bounded uninstall of the precise owned prefix, not unrelated options.
 			$names = $wpdb->get_col( $wpdb->prepare( "SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE %s LIMIT 200", $wpdb->esc_like( self::PREFIX ) . '%' ) );

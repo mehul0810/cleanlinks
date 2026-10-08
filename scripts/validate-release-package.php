@@ -54,6 +54,16 @@ $required_files = array(
 	'languages/cleanlinks.pot',
 	'readme.txt',
 	'src/Plugin.php',
+	'src/Admin/Workspace.php',
+	'src/Application/ImportJobs.php',
+	'src/Application/LinkCommands.php',
+	'src/Application/LinkInput.php',
+	'src/Application/CommandTransaction.php',
+	'src/Application/CommandReceipts.php',
+	'src/Admin/LinkCommandController.php',
+	'dist/workspace.asset.php',
+	'dist/workspace.css',
+	'dist/workspace.js',
 	'uninstall.php',
 	'vendor/autoload.php',
 	'vendor/composer/autoload_classmap.php',
@@ -115,8 +125,8 @@ if ( false !== $plugin_file && false !== $readme_file ) {
 }
 
 $forbidden_patterns = array(
-	'#^(?:\.git(?:/|$)|\.github/|\.release/|assets/|node_modules/|scripts/|tests/)#',
-	'#^(?:AGENTS\.md|CONTRIBUTING\.md|README\.md|RELEASE\.md|composer\.(?:json|lock)|package(?:-lock)?\.json|phpunit\.xml(?:\.dist)?|webpack\.config\.js|\.distignore|\.npmpackagejsonlintrc\.json)$#',
+	'#^(?:\.git(?:/|$)|\.github/|\.release/|assets/|docs/|node_modules/|scripts/|tests/)#',
+	'#^(?:DESIGN\.md|AGENTS\.md|CONTRIBUTING\.md|README\.md|RELEASE\.md|composer\.(?:json|lock)|package(?:-lock)?\.json|phpunit\.xml(?:\.dist)?|webpack\.config\.js|\.distignore|\.npmpackagejsonlintrc\.json)$#',
 	'#(?:^|/)\.phpunit[^/]*\.cache(?:/|$)#i',
 	'#^vendor/(?:bin/|composer/installers/|antecedent/|automattic/|brain/|dealerdirect/|doctrine/|hamcrest/|mockery/|myclabs/|nikic/|phar-io/|php-parallel-lint/|phpcompatibility/|phpcsstandards/|phpstan/|phpunit/|sebastian/|sirbrillig/|squizlabs/|theseer/|wp-coding-standards/|yoast/)#',
 	'#(?:^|/)[^/]+\.zip$#i',

@@ -59,6 +59,8 @@ final class Plugin {
 		$commands->register_hooks();
 		$receipts = new Application\CommandReceipts();
 		$receipts->register_hooks();
+		$workspace = new Admin\Workspace();
+		$workspace->register_hooks();
 
 		if ( is_admin() ) {
 			new Admin\Filters();
@@ -101,6 +103,7 @@ final class Plugin {
 	public function deactivate( $network_wide = false ) {
 		if ( ! $network_wide || ! is_multisite() ) {
 			wp_clear_scheduled_hook( 'cleanlinks_expire_command_receipts' );
+			wp_clear_scheduled_hook( 'cleanlinks_expire_imports' );
 			return;
 		}
 
@@ -112,6 +115,7 @@ final class Plugin {
 				switch_to_blog( $site );
 				try {
 					wp_clear_scheduled_hook( 'cleanlinks_expire_command_receipts' );
+			wp_clear_scheduled_hook( 'cleanlinks_expire_imports' );
 				} finally {
 					restore_current_blog();
 				}

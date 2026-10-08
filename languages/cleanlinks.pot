@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Mehul Gohil <hello@mehulgohil.com>\n"
-"POT-Creation-Date: 2026-09-30 18:01+0000\n"
+"POT-Creation-Date: 2026-10-08 14:13+0000\n"
 "Report-Msgid-Bugs-To: https://github.com/mehul0810/cleanlinks/issues/new\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -16,11 +16,11 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/Admin/Actions.php:59, src/Admin/Actions.php:60, src/Admin/Export.php:273, src/Admin/Export.php:281
+#: src/Admin/Actions.php:59, src/Admin/Actions.php:60, src/Admin/Export.php:269, src/Admin/Export.php:277, src/Admin/Workspace.php:36, src/Admin/Workspace.php:36
 msgid "Export"
 msgstr ""
 
-#: src/Admin/Actions.php:161
+#: src/Admin/Actions.php:161, src/Admin/Workspace.php:176, src/Admin/Workspace.php:234
 msgid "Copy URL"
 msgstr ""
 
@@ -28,39 +28,43 @@ msgstr ""
 msgid "Copied!"
 msgstr ""
 
-#: src/Admin/Actions.php:222
+#: src/Admin/Actions.php:170, src/Includes/LinkMetaBox.php:77
+msgid "Copy failed"
+msgstr ""
+
+#: src/Admin/Actions.php:223
 msgid "Viewed:"
 msgstr ""
 
-#: src/Admin/Export.php:109
+#: src/Admin/Export.php:105
 msgid "Security check failed."
 msgstr ""
 
-#: src/Admin/Export.php:109, src/Admin/Export.php:114, src/Admin/Export.php:125, src/Admin/Export.php:131, src/Admin/Export.php:139, src/Admin/Export.php:145, src/Admin/Export.php:163, src/Admin/Export.php:200, src/Admin/Export.php:209
+#: src/Admin/Export.php:105, src/Admin/Export.php:110, src/Admin/Export.php:121, src/Admin/Export.php:127, src/Admin/Export.php:135, src/Admin/Export.php:141, src/Admin/Export.php:159, src/Admin/Export.php:196, src/Admin/Export.php:205
 msgid "Error"
 msgstr ""
 
-#: src/Admin/Export.php:114
+#: src/Admin/Export.php:110
 msgid "You do not have permission."
 msgstr ""
 
-#: src/Admin/Export.php:125
+#: src/Admin/Export.php:121
 msgid "Filesystem API not available."
 msgstr ""
 
-#: src/Admin/Export.php:131
+#: src/Admin/Export.php:127
 msgid "Could not create a temp file."
 msgstr ""
 
-#: src/Admin/Export.php:139, src/Admin/Export.php:163, src/Admin/Export.php:200
+#: src/Admin/Export.php:135, src/Admin/Export.php:159, src/Admin/Export.php:196
 msgid "Could not write CSV file."
 msgstr ""
 
-#: src/Admin/Export.php:145, src/Admin/Export.php:209
+#: src/Admin/Export.php:141, src/Admin/Export.php:205
 msgid "Could not read CSV file."
 msgstr ""
 
-#: src/Admin/Export.php:277
+#: src/Admin/Export.php:273
 msgid "Using this tool, you can have a seamless experience to export your links to a CSV (Comma Separated Values) file with just a single click."
 msgstr ""
 
@@ -97,6 +101,498 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
+#: src/Admin/Workspace.php:31, src/Admin/Workspace.php:31
+msgid "CleanLinks"
+msgstr ""
+
+#: src/Admin/Workspace.php:32, src/Admin/Workspace.php:32, src/Admin/Workspace.php:119, src/Admin/Workspace.php:158
+msgid "All links"
+msgstr ""
+
+#: src/Admin/Workspace.php:33, src/Admin/Workspace.php:33, src/Admin/Workspace.php:118, src/Admin/Workspace.php:119
+msgid "Add link"
+msgstr ""
+
+#: src/Admin/Workspace.php:34, src/Admin/Workspace.php:34, src/Admin/Workspace.php:118, src/Admin/Workspace.php:119
+msgid "Bulk add"
+msgstr ""
+
+#: src/Admin/Workspace.php:35, src/Admin/Workspace.php:35, src/Includes/TaxoNomy.php:53
+msgid "Groups"
+msgstr ""
+
+#: src/Admin/Workspace.php:37, src/Admin/Workspace.php:37
+msgid "Classic editor"
+msgstr ""
+
+#: src/Admin/Workspace.php:66, src/Includes/LinkMetaBox.php:77
+msgid "Copied"
+msgstr ""
+
+#: src/Admin/Workspace.php:66
+msgid "Could not copy. Select the URL and copy it manually."
+msgstr ""
+
+#: src/Admin/Workspace.php:66
+msgid "Ignore / default"
+msgstr ""
+
+#: src/Admin/Workspace.php:66
+msgid "%1$s / %2$s batches; %3$s created"
+msgstr ""
+
+#: src/Admin/Workspace.php:66
+msgid "Request interrupted. Resume safely; saved links will not be created again."
+msgstr ""
+
+#: src/Admin/Workspace.php:83
+msgid "You do not have permission to make this change. Choose a permitted status or contact a site administrator."
+msgstr ""
+
+#: src/Admin/Workspace.php:84
+msgid "Use a UTF-8 CSV file up to 5 MB. Reselect uploaded files after an error."
+msgstr ""
+
+#: src/Admin/Workspace.php:85
+msgid "CSV headers must be distinct and unambiguous. Map duplicated destination columns explicitly."
+msgstr ""
+
+#: src/Admin/Workspace.php:86
+msgid "Choose valid CSV columns and map the destination field before previewing."
+msgstr ""
+
+#: src/Admin/Workspace.php:87
+msgid "This row has malformed CSV quotes or a different number of columns than the header."
+msgstr ""
+
+#: src/Admin/Workspace.php:88
+msgid "Use a valid WordPress slug up to 200 characters. Try lowercase words separated by hyphens."
+msgstr ""
+
+#: src/Admin/Workspace.php:89
+msgid "Choose existing groups. CSV group IDs must be positive numbers separated by |."
+msgstr ""
+
+#: src/Admin/Workspace.php:90
+msgid "Use true or false for the nofollow value."
+msgstr ""
+
+#: src/Admin/Workspace.php:91
+msgid "Choose Draft, Pending, Published or Private."
+msgstr ""
+
+#: src/Admin/Workspace.php:92
+msgid "Confirm the selected action before continuing."
+msgstr ""
+
+#: src/Admin/Workspace.php:93
+msgid "This save request expired. Review the existing links before starting another save."
+msgstr ""
+
+#: src/Admin/Workspace.php:94
+msgid "This request was already saved with different values. Review the existing links before saving again."
+msgstr ""
+
+#: src/Admin/Workspace.php:95
+msgid "Enter a valid HTTP or HTTPS destination. Unsafe destinations are blocked by WordPress URL validation."
+msgstr ""
+
+#: src/Admin/Workspace.php:96
+msgid "This slug already exists. Choose a different slug; the existing link has not been overwritten."
+msgstr ""
+
+#: src/Admin/Workspace.php:97
+msgid "Another preview row uses this slug. Change it or leave this row skipped."
+msgstr ""
+
+#: src/Admin/Workspace.php:98
+msgid "This link changed since you opened it. Reload the current values before saving again."
+msgstr ""
+
+#: src/Admin/Workspace.php:99
+msgid "Confirm the slug change. Existing bookmarks to the old URL may stop working."
+msgstr ""
+
+#: src/Admin/Workspace.php:100
+msgid "This workspace needs transactional storage and the native WordPress request-local cache. Persistent or custom object caches are not supported. Use the classic editor; its saves do not provide atomic rollback."
+msgstr ""
+
+#: src/Admin/Workspace.php:101
+msgid "Your session expired. Sign in and reload before trying again."
+msgstr ""
+
+#: src/Admin/Workspace.php:102
+msgid "Private import storage is full (5 jobs per account, 100 per site). Existing jobs expire after 24 hours; remove a finished job or try again after cleanup."
+msgstr ""
+
+#: src/Admin/Workspace.php:103
+msgid "An import request is already running. Wait a moment, then refresh or resume."
+msgstr ""
+
+#: src/Admin/Workspace.php:104
+msgid "This private import is unavailable or expired. Imports are retained for 24 hours."
+msgstr ""
+
+#: src/Admin/Workspace.php:105
+msgid "Map a destination column, or use a CSV header named destination."
+msgstr ""
+
+#: src/Admin/Workspace.php:106
+msgid "Use at most 10,000 rows per import."
+msgstr ""
+
+#: src/Admin/Workspace.php:108
+msgid "Check this value and try again (%s)."
+msgstr ""
+
+#: src/Admin/Workspace.php:114, src/Admin/Workspace.php:370
+msgid "You cannot manage links."
+msgstr ""
+
+#: src/Admin/Workspace.php:118
+msgid "Your links, under control."
+msgstr ""
+
+#: src/Admin/Workspace.php:118
+msgid "Branded short links. Clear destinations. Lifetime click counts."
+msgstr ""
+
+#: src/Admin/Workspace.php:119
+msgid "Link workspace"
+msgstr ""
+
+#: src/Admin/Workspace.php:122, src/Admin/Workspace.php:193
+msgid "Open classic editor"
+msgstr ""
+
+#: src/Admin/Workspace.php:158, src/Includes/PostTypeRegistrar.php:60
+msgid "Search links"
+msgstr ""
+
+#: src/Admin/Workspace.php:158, src/Includes/LinkMetaBox.php:87
+msgid "Status"
+msgstr ""
+
+#: src/Admin/Workspace.php:158
+msgid "All active statuses"
+msgstr ""
+
+#: src/Admin/Workspace.php:162
+msgid "Group"
+msgstr ""
+
+#: src/Admin/Workspace.php:163
+msgid "All groups"
+msgstr ""
+
+#: src/Admin/Workspace.php:164
+msgid "Filter"
+msgstr ""
+
+#: src/Admin/Workspace.php:164
+msgid "Reset"
+msgstr ""
+
+#: src/Admin/Workspace.php:167
+msgid "Selected links"
+msgstr ""
+
+#: src/Admin/Workspace.php:167
+msgid "Move to trash"
+msgstr ""
+
+#: src/Admin/Workspace.php:167
+msgid "Restore from trash"
+msgstr ""
+
+#: src/Admin/Workspace.php:167
+msgid "Confirm this action on selected links"
+msgstr ""
+
+#: src/Admin/Workspace.php:167
+msgid "Apply"
+msgstr ""
+
+#: src/Admin/Workspace.php:168
+msgid "Select all links on this page"
+msgstr ""
+
+#: src/Admin/Workspace.php:168, src/Admin/Workspace.php:176
+msgid "Link"
+msgstr ""
+
+#: src/Admin/Workspace.php:168, src/Admin/Workspace.php:176, src/Includes/LinkMetaBox.php:88
+msgid "Destination"
+msgstr ""
+
+#: src/Admin/Workspace.php:168, src/Admin/Workspace.php:176
+msgid "Status / groups"
+msgstr ""
+
+#: src/Admin/Workspace.php:168, src/Admin/Workspace.php:176
+msgid "Lifetime clicks"
+msgstr ""
+
+#: src/Admin/Workspace.php:176
+msgid "Select %s"
+msgstr ""
+
+#: src/Admin/Workspace.php:179
+msgid "No links to show"
+msgstr ""
+
+#: src/Admin/Workspace.php:179
+msgid "Try another filter, or add your first branded link."
+msgstr ""
+
+#: src/Admin/Workspace.php:181
+msgid "%s links"
+msgstr ""
+
+#: src/Admin/Workspace.php:202
+msgid "Reload current saved values"
+msgstr ""
+
+#: src/Admin/Workspace.php:205
+msgid "Back to links"
+msgstr ""
+
+#: src/Admin/Workspace.php:205
+msgid "Edit link"
+msgstr ""
+
+#: src/Admin/Workspace.php:205
+msgid "Add a link"
+msgstr ""
+
+#: src/Admin/Workspace.php:205
+msgid "Choose a destination and a memorable short URL. Draft links do not redirect publicly."
+msgstr ""
+
+#: src/Admin/Workspace.php:209
+msgid "Public http:// or https:// URL. Query parameters are preserved."
+msgstr ""
+
+#: src/Admin/Workspace.php:209
+msgid "Leave blank to generate from the title. Changing a saved slug changes its public URL."
+msgstr ""
+
+#: src/Admin/Workspace.php:209
+msgid "A name that helps you recognize this link."
+msgstr ""
+
+#: src/Admin/Workspace.php:215
+msgid "URL preview (confirmed when saved):"
+msgstr ""
+
+#: src/Admin/Workspace.php:215
+msgid "Enter a destination or slug to preview."
+msgstr ""
+
+#: src/Admin/Workspace.php:217
+msgid "Publication status"
+msgstr ""
+
+#: src/Admin/Workspace.php:224
+msgid "Existing groups"
+msgstr ""
+
+#: src/Admin/Workspace.php:230
+msgid "No groups yet. Manage groups from the CleanLinks menu."
+msgstr ""
+
+#: src/Admin/Workspace.php:232
+msgid "Mark this redirect as nofollow"
+msgstr ""
+
+#: src/Admin/Workspace.php:234
+msgid "I understand that changing the slug changes the public URL."
+msgstr ""
+
+#: src/Admin/Workspace.php:234
+msgid "Current short URL:"
+msgstr ""
+
+#: src/Admin/Workspace.php:234
+msgid "Lifetime clicks: %s. Only published links redirect publicly."
+msgstr ""
+
+#: src/Admin/Workspace.php:236
+msgid "Save link"
+msgstr ""
+
+#: src/Admin/Workspace.php:236
+msgid "Cancel"
+msgstr ""
+
+#: src/Admin/Workspace.php:247
+msgid "Bulk add links"
+msgstr ""
+
+#: src/Admin/Workspace.php:247
+msgid "1. Add URLs or CSV · 2. Review and correct · 3. Create selected links"
+msgstr ""
+
+#: src/Admin/Workspace.php:247
+msgid "Up to 10,000 rows / 5 MB. Draft by default. Existing slugs are skipped, never overwritten. Duplicate destinations are allowed with different slugs."
+msgstr ""
+
+#: src/Admin/Workspace.php:249
+msgid "Paste URLs, one per line"
+msgstr ""
+
+#: src/Admin/Workspace.php:249
+msgid "Or upload a UTF-8 CSV. Quoted commas and newlines are supported."
+msgstr ""
+
+#: src/Admin/Workspace.php:249
+msgid "CSV file"
+msgstr ""
+
+#: src/Admin/Workspace.php:249
+msgid "Columns: destination (required), title, slug, status, nofollow (true/false), groups (existing IDs separated by |). Export columns Title, Redirect From and Redirect To are recognized; IDs are ignored."
+msgstr ""
+
+#: src/Admin/Workspace.php:249
+msgid "Map CSV columns"
+msgstr ""
+
+#: src/Admin/Workspace.php:251
+msgid "Detect automatically"
+msgstr ""
+
+#: src/Admin/Workspace.php:253
+msgid "Preview without creating links"
+msgstr ""
+
+#: src/Admin/Workspace.php:253
+msgid "Preview and results are private to your account and expire after 24 hours. Destinations are not fetched."
+msgstr ""
+
+#: src/Admin/Workspace.php:264
+msgid "Review your import"
+msgstr ""
+
+#: src/Admin/Workspace.php:264
+msgid "Import progress and results"
+msgstr ""
+
+#: src/Admin/Workspace.php:264
+msgid "%1$d created · %2$d skipped · %3$d failed · %4$d invalid · %5$d ready"
+msgstr ""
+
+#: src/Admin/Workspace.php:264
+msgid "Save corrections and selection on each page before starting. Selected ready rows across all pages will be created. Each batch contains at most 50 links. Cancellation stops future batches; already-created links stay. Resume or retry keeps the original request keys."
+msgstr ""
+
+#: src/Admin/Workspace.php:270
+msgid "Row"
+msgstr ""
+
+#: src/Admin/Workspace.php:270, src/Admin/Workspace.php:277
+msgid "Destination / title"
+msgstr ""
+
+#: src/Admin/Workspace.php:270, src/Admin/Workspace.php:285
+msgid "Slug / publication"
+msgstr ""
+
+#: src/Admin/Workspace.php:270, src/Admin/Workspace.php:295
+msgid "Result"
+msgstr ""
+
+#: src/Admin/Workspace.php:275
+msgid "Include row %d"
+msgstr ""
+
+#: src/Admin/Workspace.php:291
+msgid "Group IDs (separate with |)"
+msgstr ""
+
+#: src/Admin/Workspace.php:291
+msgid "Nofollow"
+msgstr ""
+
+#: src/Admin/Workspace.php:291
+msgid "No"
+msgstr ""
+
+#: src/Admin/Workspace.php:291
+msgid "Yes"
+msgstr ""
+
+#: src/Admin/Workspace.php:306
+msgid "Save corrections and selection on this page"
+msgstr ""
+
+#: src/Admin/Workspace.php:308
+msgid "Import pages"
+msgstr ""
+
+#: src/Admin/Workspace.php:313
+msgid "Create selected links"
+msgstr ""
+
+#: src/Admin/Workspace.php:313
+msgid "Process next 50 links"
+msgstr ""
+
+#: src/Admin/Workspace.php:313
+msgid "Cancel remaining batches"
+msgstr ""
+
+#: src/Admin/Workspace.php:313
+msgid "Resume remaining batches"
+msgstr ""
+
+#: src/Admin/Workspace.php:313
+msgid "Retry failed rows only"
+msgstr ""
+
+#: src/Admin/Workspace.php:313
+msgid "Download error rows"
+msgstr ""
+
+#: src/Admin/Workspace.php:314
+msgid "Remove private preview/results"
+msgstr ""
+
+#: src/Admin/Workspace.php:320
+msgid "Create the selected valid rows with their previewed publication statuses"
+msgstr ""
+
+#: src/Admin/Workspace.php:325
+msgid "Run remaining batches"
+msgstr ""
+
+#: src/Admin/Workspace.php:333
+msgid "You cannot export links."
+msgstr ""
+
+#: src/Admin/Workspace.php:335
+msgid "Export links"
+msgstr ""
+
+#: src/Admin/Workspace.php:335
+msgid "Exports published links only: ID, Title, Redirect From and Redirect To. Lifetime click counts are not included."
+msgstr ""
+
+#: src/Admin/Workspace.php:417
+msgid "Saved. Your data is up to date."
+msgstr ""
+
+#: src/Admin/Workspace.php:453
+msgid "%1$d links updated; %2$d could not be updated. Restored links may return as drafts; review before publishing."
+msgstr ""
+
+#: src/Admin/Workspace.php:453
+msgid "Links to review (IDs): %s."
+msgstr ""
+
+#: src/Application/LinkInput.php:87
+msgid "The link could not be saved. Check the indicated field and try again."
+msgstr ""
+
 #: src/Includes/LinkMetaBox.php:36
 msgid "Redirect Link Settings"
 msgstr ""
@@ -123,22 +619,6 @@ msgstr ""
 
 #: src/Includes/LinkMetaBox.php:77, src/Includes/LinkMetaBox.php:79
 msgid "Copy short URL"
-msgstr ""
-
-#: src/Includes/LinkMetaBox.php:77
-msgid "Copied"
-msgstr ""
-
-#: src/Includes/LinkMetaBox.php:77
-msgid "Copy failed"
-msgstr ""
-
-#: src/Includes/LinkMetaBox.php:87
-msgid "Status"
-msgstr ""
-
-#: src/Includes/LinkMetaBox.php:88
-msgid "Destination"
 msgstr ""
 
 #: src/Includes/LinkMetaBox.php:88
@@ -185,6 +665,10 @@ msgstr ""
 msgid "Sends an X-Robots-Tag: nofollow header with the redirect."
 msgstr ""
 
+#: src/Includes/LinkMetadataCommand.php:92
+msgid "The link could not be saved."
+msgstr ""
+
 #: src/Includes/PostTypeRegistrar.php:50
 msgctxt "Post type general name"
 msgid "CleanLinks"
@@ -223,10 +707,6 @@ msgstr ""
 
 #: src/Includes/PostTypeRegistrar.php:59
 msgid "All Links"
-msgstr ""
-
-#: src/Includes/PostTypeRegistrar.php:60
-msgid "Search links"
 msgstr ""
 
 #: src/Includes/PostTypeRegistrar.php:61
@@ -323,8 +803,4 @@ msgstr ""
 
 #: src/Includes/TaxoNomy.php:52
 msgid "No groups found"
-msgstr ""
-
-#: src/Includes/TaxoNomy.php:53
-msgid "Groups"
 msgstr ""

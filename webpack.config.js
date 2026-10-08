@@ -20,6 +20,7 @@ const config = {
 	},
 	entry: {
 		admin: [ './assets/scss/admin/main.scss', './assets/js/admin/main.js' ],
+		workspace: [ './assets/scss/admin/workspace.scss', './assets/js/admin/workspace.js' ],
 	},
 	module: {
 		...defaultConfig.module,
