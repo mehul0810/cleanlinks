@@ -179,7 +179,7 @@ class Workspace {
 			echo '<tr><td colspan="5"><div class="cl-empty"><h3>' . esc_html__( 'No links to show', 'cleanlinks' ) . '</h3><p>' . esc_html__( 'Try another filter, or add your first branded link.', 'cleanlinks' ) . '</p></div></td></tr>';
 		}
 		echo '</tbody></table></form><div class="cl-pagination">' . esc_html( sprintf( __( '%s links', 'cleanlinks' ), number_format_i18n( $query->found_posts ) ) ) . ' ';
-		echo wp_kses_post( paginate_links( array( 'base' => add_query_arg( 'paged', '%#%', self::url( array( 's' => $search, 'status' => $status, 'group' => $group ) ) ), 'current' => $paged, 'total' => $query->max_num_pages ) ) );
+		echo wp_kses_post( (string) paginate_links( array( 'base' => add_query_arg( 'paged', '%#%', self::url( array( 's' => $search, 'status' => $status, 'group' => $group ) ) ), 'current' => $paged, 'total' => $query->max_num_pages ) ) );
 		echo '</div></section><p id="cl-live" role="status" aria-live="polite"></p>';
 	}
 

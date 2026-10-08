@@ -92,11 +92,23 @@ class CommandTransaction {
 		// A SAVEPOINT is discarded outside a transaction on MySQL and the SQLite adapter.
 		// Probe the actual connection state rather than assuming @@autocommit describes it.
 		$previous_suppression = $wpdb->suppress_errors( true );
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared -- Internally generated identifier; transaction-state probe has no application mutations.
-		$probe = $wpdb->query( 'SAVEPOINT ' . $this->scope . '_probe' );
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared -- Internally generated identifier; expected failure means there is no caller transaction.
-		$released = $wpdb->query( 'RELEASE SAVEPOINT ' . $this->scope . '_probe' );
-		$wpdb->suppress_errors( $previous_suppression );
+		try {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared -- Internally generated identifier; transaction-state probe has no application mutations.
+			$probe = $wpdb->query( 'SAVEPOINT ' . $this->scope . '_probe' );
+			try {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared -- Internally generated identifier; expected failure means there is no caller transaction.
+				$released = $wpdb->query( 'RELEASE SAVEPOINT ' . $this->scope . '_probe' );
+			} catch ( \mysqli_sql_exception $exception ) {
+				// Older WordPress leaves PHP 8.1 mysqli exception reporting enabled.
+				// Accept only the missing internally named savepoint, never another SQL failure.
+				if ( 1305 !== (int) $exception->getCode() || 'SAVEPOINT ' . $this->scope . '_probe does not exist' !== $exception->getMessage() ) {
+					throw $exception;
+				}
+				$released = false;
+			}
+		} finally {
+			$wpdb->suppress_errors( $previous_suppression );
+		}
 		if ( false === $probe ) {
 			return false;
 		}

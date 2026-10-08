@@ -16,6 +16,35 @@ class Test_Link_Commands extends WP_UnitTestCase {
 	private function input( $key = 'request_key_for_test_01', $slug = 'command-test' ) {
 		return array( 'request_key' => $this->key( $key ), 'destination' => 'https://example.org/a?one=1&two=%2F&two=hello+world', 'title' => 'Command test', 'slug' => $slug, 'status' => 'publish', 'nofollow' => true );
 	}
+	public function test_unexpected_probe_exceptions_restore_suppression_and_never_start_a_transaction() {
+		global $wpdb;
+		$original = $wpdb->suppress_errors;
+		$errors = array( 'runtime' );
+		if ( class_exists( 'mysqli_sql_exception' ) ) { $errors[] = 'sql'; }
+		foreach ( $errors as $error ) {
+			foreach ( array( false, true ) as $suppressed ) {
+				$started = 0;
+				$hook = static function ( $query ) use ( $error, &$started ) {
+					if ( 'START TRANSACTION' === $query ) { ++$started; }
+					if ( preg_match( '/^RELEASE SAVEPOINT cleanlinks_command_[0-9]+_probe$/', $query ) ) {
+						if ( 'sql' === $error ) { throw new \mysqli_sql_exception( 'Unrelated missing SQL object', 1305 ); }
+						throw new \RuntimeException( 'Unexpected probe failure' );
+					}
+					return $query;
+				};
+				$wpdb->suppress_errors( $suppressed );
+				add_filter( 'query', $hook, PHP_INT_MAX );
+				try {
+					$this->assertFalse( ( new \MG\CleanLinks\Application\CommandTransaction() )->begin() );
+					$this->assertSame( $suppressed, $wpdb->suppress_errors );
+					$this->assertSame( 0, $started );
+				} finally {
+					remove_filter( 'query', $hook, PHP_INT_MAX );
+					$wpdb->suppress_errors( $original );
+				}
+			}
+		}
+	}
 	public function test_unqualified_cache_rejects_commands_before_hooks_or_writes_even_if_flag_is_clear() {
 		global $wpdb;
 		$id = self::factory()->post->create( array( 'post_type' => 'cleanlinks' ) );

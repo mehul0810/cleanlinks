@@ -4,6 +4,8 @@ This candidate implements #115 management workspace, #51 single create, #50 edit
 
 Existing CPT IDs, slugs, destinations, statuses, metadata, counts, groups, URLs and extension hooks remain. No custom table or link-data migration is introduced. New coordination, receipt and private staging options are non-autoloaded. Reversible selection uses WordPress trash/restore; no permanent deletion action is added.
 
+Qualification fixes preserve the WordPress 5.5 minimum: the transaction-state probe recognizes only mysqli error 1305 with the exact missing internal savepoint message, restores wpdb suppression in finally, and leaves global mysqli reporting unchanged. Other SQL exceptions still fail closed. Empty/single-page pagination normalizes the null return to a string before HTML sanitization. Real strict-driver ownership/rollback proof and unexpected-exception/rendering regressions cover these boundaries.
+
 Five newer #112 maintenance changes were reconciled selectively: apostrophe-safe public redirects, post-core-sanitization query fidelity, copy-feedback recovery and corresponding regressions. The old metabox implementation was not copied over the merged shared service.
 
 The authoritative package command is `npm run package:release -- /absolute/path/cleanlinks-1.2.0-local-candidate.zip`. It builds assets, reconstructs production-only Composer dependencies and validates the exact ZIP. The validator rejects missing command/workspace/import assets and development docs/tests. Runtime metadata is synchronized at 1.2.0; this does not publish or designate a production release.
