@@ -1,6 +1,13 @@
 <?php
 require __DIR__ . '/bootstrap.php';
 use MG\CleanLinks\Application\LinkCommands;
+// Older core can print PHP deprecations before the final protocol line.
+function cleanlinks_runtime_response($output) {
+    $lines = preg_split('/\R/', trim($output));
+    $response = json_decode(end($lines), true);
+    if (!is_array($response) || !isset($response['status'])) { throw new RuntimeException('Invalid runtime response.'); }
+    return $response;
+}
 $service = new LinkCommands();
 $run = getenv('GITHUB_RUN_ID') ?: (string) time();
 $body = array('destination' => 'https://example.org/snapshot?a=1&b=%2F', 'title' => 'Snapshot original', 'slug' => 'snapshot-' . $run, 'status' => 'publish', 'request_key' => time() . '_snapshot_create_request_' . $run);
@@ -14,13 +21,13 @@ $process = proc_open(array(PHP_BINARY, __DIR__ . '/request.php'), array(0 => arr
 fwrite($pipes[0], wp_json_encode(array('probe' => 'core_update', 'id' => $saved['id']))); fclose($pipes[0]);
 $output = stream_get_contents($pipes[1]); fclose($pipes[1]);
 $error = stream_get_contents($pipes[2]); fclose($pipes[2]);
-if (proc_close($process) !== 0 || json_decode(trim($output), true)['status'] !== 200) { throw new RuntimeException('Core writer probe failed: ' . $error); }
+if (proc_close($process) !== 0 || cleanlinks_runtime_response($output)['status'] !== 200) { throw new RuntimeException('Core writer probe failed: ' . $error); }
 // Capacity must also use current reads despite the caller's established snapshot.
 $process = proc_open(array(PHP_BINARY, __DIR__ . '/request.php'), array(0 => array('pipe','r'), 1 => array('pipe','w'), 2 => array('pipe','w')), $pipes);
 $other = $body; $other['slug'] .= '-capacity'; $other['request_key'] = time() . '_capacity_create_request_' . $run;
 fwrite($pipes[0], wp_json_encode(array('body' => $other))); fclose($pipes[0]);
 $output = stream_get_contents($pipes[1]); fclose($pipes[1]); $error = stream_get_contents($pipes[2]); fclose($pipes[2]);
-if (proc_close($process) !== 0 || json_decode(trim($output), true)['status'] !== 200) { throw new RuntimeException('Capacity writer failed: ' . $error); }
+if (proc_close($process) !== 0 || cleanlinks_runtime_response($output)['status'] !== 200) { throw new RuntimeException('Capacity writer failed: ' . $error); }
 $transaction = new MG\CleanLinks\Application\CommandTransaction();
 if (!$transaction->begin()) { throw new RuntimeException('Capacity lock failed.'); }
 $ceiling = (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE %s FOR UPDATE", $wpdb->esc_like(MG\CleanLinks\Application\CommandReceipts::PREFIX) . '%'));
