@@ -63,6 +63,7 @@ class Workspace {
 		}
 		wp_enqueue_style( 'cleanlinks-workspace', CLEANLINKS_PLUGIN_URL . 'dist/workspace.css', array(), CLEANLINKS_VERSION );
 		wp_enqueue_script( 'cleanlinks-workspace', CLEANLINKS_PLUGIN_URL . 'dist/workspace.js', array(), CLEANLINKS_VERSION, true );
+		/* translators: 1: Completed batch count, 2: Total batch count, 3: Created link count. */
 		wp_localize_script( 'cleanlinks-workspace', 'cleanlinksWorkspace', array( 'ajax' => admin_url( 'admin-ajax.php' ), 'nonce' => wp_create_nonce( 'cleanlinks_workspace' ), 'copied' => __( 'Copied', 'cleanlinks' ), 'copyFailed' => __( 'Could not copy. Select the URL and copy it manually.', 'cleanlinks' ), 'ignore' => __( 'Ignore / default', 'cleanlinks' ), 'progress' => __( '%1$s / %2$s batches; %3$s created', 'cleanlinks' ), 'failed' => __( 'Request interrupted. Resume safely; saved links will not be created again.', 'cleanlinks' ) ) );
 	}
 
@@ -105,6 +106,7 @@ class Workspace {
 			'required_destination_column' => __( 'Map a destination column, or use a CSV header named destination.', 'cleanlinks' ),
 			'row_limit' => __( 'Use at most 10,000 rows per import.', 'cleanlinks' ),
 		);
+		/* translators: %s: Validation error code. */
 		return isset( $messages[ $code ] ) ? $messages[ $code ] : sprintf( __( 'Check this value and try again (%s).', 'cleanlinks' ), $code );
 	}
 
@@ -180,11 +182,13 @@ class Workspace {
 			$url = get_permalink( $post->ID );
 			$edit = self::url( array( 'view' => 'edit', 'id' => $post->ID, 's' => $search, 'status' => $status, 'group' => $group, 'paged' => $paged ) );
 			$terms = wp_get_object_terms( $post->ID, 'cleanlinks_groups', array( 'fields' => 'names' ) );
+			/* translators: %s: Link title. */
 			echo '<tr><td><input type="checkbox" name="ids[]" value="' . esc_attr( $post->ID ) . '" aria-label="' . esc_attr( sprintf( __( 'Select %s', 'cleanlinks' ), $post->post_title ) ) . '"></td><td data-label="' . esc_attr__( 'Link', 'cleanlinks' ) . '"><a class="cl-link-title" href="' . esc_url( $edit ) . '">' . esc_html( $post->post_title ? $post->post_title : $post->post_name ) . '</a><span class="cl-short-url">' . esc_html( $url ) . '</span><button type="button" class="button-link cl-copy" data-cl-copy="' . esc_attr( $url ) . '">' . esc_html__( 'Copy URL', 'cleanlinks' ) . '</button></td><td data-label="' . esc_attr__( 'Destination', 'cleanlinks' ) . '"><span class="cl-destination">' . esc_html( get_post_meta( $post->ID, 'cleanlink_redirect_url', true ) ) . '</span></td><td data-label="' . esc_attr__( 'Status / groups', 'cleanlinks' ) . '"><span class="cl-chip">' . esc_html( ucfirst( $post->post_status ) ) . '</span><span class="cl-groups">' . esc_html( is_wp_error( $terms ) ? '' : implode( ', ', $terms ) ) . '</span></td><td data-label="' . esc_attr__( 'Lifetime clicks', 'cleanlinks' ) . '">' . esc_html( number_format_i18n( (int) get_post_meta( $post->ID, 'cleanlink_redirect_count', true ) ) ) . '</td></tr>';
 		}
 		if ( ! $query->posts ) {
 			echo '<tr><td colspan="5"><div class="cl-empty"><h3>' . esc_html__( 'No links to show', 'cleanlinks' ) . '</h3><p>' . esc_html__( 'Try another filter, or add your first branded link.', 'cleanlinks' ) . '</p></div></td></tr>';
 		}
+		/* translators: %s: Localized number of matching links. */
 		echo '</tbody></table></form><div class="cl-pagination">' . esc_html( sprintf( __( '%s links', 'cleanlinks' ), number_format_i18n( $query->found_posts ) ) ) . ' ';
 		echo wp_kses_post( (string) paginate_links( array( 'base' => add_query_arg( 'paged', '%#%', self::url( array( 's' => $search, 'status' => $status, 'group' => $group ) ) ), 'current' => $paged, 'total' => $query->max_num_pages ) ) );
 		echo '</div></section><p id="cl-live" role="status" aria-live="polite"></p>';
@@ -239,6 +243,7 @@ class Workspace {
 		}
 		echo '</fieldset><label class="cl-check"><input type="checkbox" name="nofollow" value="1" ' . checked( $input['nofollow'], true, false ) . '> ' . esc_html__( 'Mark this redirect as nofollow', 'cleanlinks' ) . '</label>';
 		if ( $id ) {
+			/* translators: %s: Localized lifetime click count. */
 			echo '<label class="cl-check"><input type="checkbox" name="confirm_slug_change" value="1"> ' . esc_html__( 'I understand that changing the slug changes the public URL.', 'cleanlinks' ) . '</label><p>' . esc_html__( 'Current short URL:', 'cleanlinks' ) . ' ' . esc_html( get_permalink( $id ) ) . ' <button type="button" class="button-link" data-cl-copy="' . esc_attr( get_permalink( $id ) ) . '">' . esc_html__( 'Copy URL', 'cleanlinks' ) . '</button></p><p>' . esc_html( sprintf( __( 'Lifetime clicks: %s. Only published links redirect publicly.', 'cleanlinks' ), number_format_i18n( (int) get_post_meta( $id, 'cleanlink_redirect_count', true ) ) ) ) . '</p><p id="cl-live" role="status" aria-live="polite"></p>';
 		}
 		echo '</div><div class="cl-form-actions"><button class="button button-primary" ' . disabled( CommandTransaction::has_request_local_cache(), false, false ) . '>' . esc_html__( 'Save link', 'cleanlinks' ) . '</button><a href="' . esc_url( $back ) . '">' . esc_html__( 'Cancel', 'cleanlinks' ) . '</a></div></form></section>';
@@ -269,6 +274,7 @@ class Workspace {
 		$page = min( $job['pages'] - 1, max( 0, isset( $_GET['part'] ) ? absint( $_GET['part'] ) : 0 ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$rows = get_option( ImportJobs::PREFIX . $id . '_part_' . $page, array() );
 		$counts = $jobs->counts( $id, $job );
+		/* translators: 1: Created links, 2: Skipped rows, 3: Failed rows, 4: Invalid rows, 5: Ready rows. */
 		echo '<section class="cl-panel"><h2>' . esc_html( 'preview' === $job['state'] ? __( 'Review your import', 'cleanlinks' ) : __( 'Import progress and results', 'cleanlinks' ) ) . '</h2><p class="cl-import-summary" role="status">' . esc_html( sprintf( __( '%1$d created · %2$d skipped · %3$d failed · %4$d invalid · %5$d ready', 'cleanlinks' ), $counts['created'], $counts['skipped'], $counts['failed'], $counts['error'], $counts['ready'] ) ) . '</p><p>' . esc_html__( 'Save corrections and selection on each page before starting. Selected ready rows across all pages will be created. Each batch contains at most 50 links. Cancellation stops future batches; already-created links stay. Resume or retry keeps the original request keys.', 'cleanlinks' ) . '</p>';
 		if ( 'preview' === $job['state'] ) {
 			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
@@ -280,6 +286,7 @@ class Workspace {
 			$number = $page * ImportJobs::PAGE + $index + 1;
 			echo '<tr><td>' . esc_html( $number );
 			if ( 'preview' === $job['state'] ) {
+				/* translators: %d: Import row number. */
 				echo '<label><input type="checkbox" name="rows[' . esc_attr( $index ) . '][selected]" value="1" ' . checked( $row['selected'], true, false ) . '> <span class="screen-reader-text">' . esc_html( sprintf( __( 'Include row %d', 'cleanlinks' ), $number ) ) . '</span></label>';
 			}
 			echo '</td><td data-label="' . esc_attr__( 'Destination / title', 'cleanlinks' ) . '">';
@@ -458,7 +465,13 @@ class Workspace {
 			$result ? $done++ : $failed++;
 			if ( ! $result ) { $failed_ids[] = $id; }
 		}
-		return sprintf( __( '%1$d links updated; %2$d could not be updated. Restored links may return as drafts; review before publishing.', 'cleanlinks' ), $done, $failed ) . ( $failed_ids ? ' ' . sprintf( __( 'Links to review (IDs): %s.', 'cleanlinks' ), implode( ', ', $failed_ids ) ) : '' );
+		/* translators: 1: Number of updated links, 2: Number of links that could not be updated. */
+		$message = sprintf( __( '%1$d links updated; %2$d could not be updated. Restored links may return as drafts; review before publishing.', 'cleanlinks' ), $done, $failed );
+		if ( $failed_ids ) {
+			/* translators: %s: Comma-separated link IDs requiring review. */
+			$message .= ' ' . sprintf( __( 'Links to review (IDs): %s.', 'cleanlinks' ), implode( ', ', $failed_ids ) );
+		}
+		return $message;
 	}
 
 	/** AJAX does exactly one bounded batch; refresh/resume uses the same server job. */
