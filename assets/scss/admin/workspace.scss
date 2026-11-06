@@ -1,19 +1,30 @@
 .cl-workspace {
-	--cl-ink: #153c3a;
-	--cl-accent: #076f63;
+	--cl-ink: #182237;
+	--cl-accent: #144cc0;
 	max-width: none;
 	color: #1d2327;
+	margin-top: 0;
 
+	input:focus,
+	textarea:focus,
+	select:focus,
+	button:focus,
+	a:focus {
+		outline-offset: 2px;
+	}
+
+	// Offset WordPress gutters here; keep the content's native inset.
 	.cl-header {
 		display: flex;
 		justify-content: space-between;
 		gap: 16px;
 		align-items: center;
-		padding: 16px 20px;
-		background: #eaf5f2;
-		border: 1px solid #c8e0d9;
-		border-radius: 8px 8px 0 0;
-		margin: 16px 0 0;
+		padding: 10px 20px;
+		background: #fff;
+		border: 1px solid #e3e5e9;
+		margin: 0;
+		margin-inline-start: -22px;
+		margin-inline-end: -20px;
 	}
 
 	.cl-brand {
@@ -37,38 +48,57 @@
 		font-weight: 600;
 	}
 
-	.cl-brand p {
-		margin: 4px 0 0;
-		color: #50575e;
-	}
-
-	.cl-header-actions {
+	.cl-header-meta {
 		display: flex;
-		gap: 8px;
+		align-items: center;
+		gap: 20px;
 		flex-shrink: 0;
+		font-size: 13px;
+
+		.cl-version {
+			color: #50575e;
+		}
+
+		a {
+			display: inline-flex;
+			align-items: center;
+			gap: 4px;
+			color: var(--cl-accent);
+		}
+
 	}
 
 	.cl-nav {
 		display: flex;
 		gap: 4px;
 		padding: 0 12px;
-		margin-bottom: 16px;
+		margin: 0 0 16px;
+		margin-inline-start: -22px;
+		margin-inline-end: -20px;
 		background: #fff;
-		border: 1px solid #c8e0d9;
+		border: 1px solid #e3e5e9;
 		border-top: 0;
-		border-radius: 0 0 8px 8px;
 	}
 
 	.cl-nav a {
 		font-weight: 600;
+		color: var(--cl-accent);
 		text-decoration: none;
 		padding: 12px;
 		border-bottom: 3px solid transparent;
 	}
 
+	.cl-nav a:hover {
+		color: var(--cl-ink);
+	}
+
 	.cl-nav a[aria-current="page"] {
 		color: var(--cl-ink);
 		border-bottom-color: var(--cl-accent);
+	}
+
+	.cl-header-meta a:hover {
+		color: var(--cl-ink);
 	}
 
 	.cl-panel {
@@ -84,21 +114,60 @@
 		margin-top: 0;
 	}
 
-	.cl-filter,
-	.cl-selection {
-		display: flex;
-		align-items: end;
-		flex-wrap: wrap;
-		gap: 12px;
-		margin: 16px 0;
+	.cl-listing {
+		min-width: 0;
+		background: #fff;
+		padding: 20px;
 	}
 
-	.cl-selection {
+	.cl-list-heading {
+		display: flex;
+		align-items: baseline;
+		gap: 12px;
+		margin: 8px 0 14px;
+	}
+
+	.cl-list-heading h2 {
+		margin: 0;
+	}
+
+	.cl-list-count {
+		color: #50575e;
+		font-size: 13px;
+	}
+
+	.cl-listing .cl-filter,
+	.cl-listing .cl-selection {
+		display: flex;
+		align-items: flex-end;
+		flex-wrap: wrap;
+		gap: 12px;
+		margin: 0;
+	}
+
+	.cl-listing .cl-filter {
+		padding-bottom: 16px;
+		border-bottom: 1px solid #dcdcde;
+	}
+
+	.cl-listing .cl-selection {
 		align-items: center;
 		font-size: 12px;
-		padding: 12px;
-		background: #f6f7f7;
-		border-radius: 4px;
+		padding: 12px 0;
+	}
+
+	.cl-listing .cl-select-all,
+	.cl-listing .cl-confirm {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+	}
+
+	.cl-filter-actions {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		min-height: 32px;
 	}
 
 	.cl-filter label,
@@ -127,12 +196,49 @@
 		vertical-align: top;
 	}
 
-	.cl-table td:first-child {
+	.cl-listing .cl-table {
+		table-layout: fixed;
+	}
+
+	.cl-listing .cl-table th,
+	.cl-listing .cl-table td {
+		padding: 10px 8px;
+		overflow-wrap: anywhere;
+	}
+
+	.cl-listing .cl-table th:first-child,
+	.cl-listing .cl-table td:first-child {
+		width: 40px;
+	}
+
+	.cl-listing .cl-table th:nth-child(2) {
+		width: 26%;
+	}
+
+	.cl-listing .cl-table th:nth-child(3) {
+		width: 28%;
+	}
+
+	.cl-listing .cl-table th:nth-child(4) {
+		width: 12%;
+	}
+
+	.cl-listing .cl-table th:nth-child(5) {
+		width: 13%;
+	}
+
+	.cl-preview-scroll .cl-table td:first-child {
 		width: 28px;
 	}
 
-	.cl-table td:nth-child(2) {
+	.cl-preview-scroll .cl-table td:nth-child(2) {
 		width: 32%;
+	}
+
+	.cl-listing .cl-clicks {
+		width: 90px;
+		text-align: end;
+		font-variant-numeric: tabular-nums;
 	}
 
 	.cl-link-title {
@@ -141,16 +247,23 @@
 		font-size: 14px;
 	}
 
+	.cl-link-url {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		margin-top: 4px;
+	}
+
 	.cl-short-url,
 	.cl-destination,
 	.cl-groups {
 		display: block;
 		overflow-wrap: anywhere;
 		word-break: break-word;
-		margin-top: 6px;
 	}
 
 	.cl-short-url {
+		min-width: 0;
 		font-size: 12px;
 		color: #50575e;
 	}
@@ -160,20 +273,22 @@
 	}
 
 	.cl-copy {
-		margin-top: 8px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		flex: 0 0 28px;
+		width: 28px;
+		height: 28px;
 	}
 
-	.cl-chip {
+	.cl-listing .cl-chip {
 		display: inline-block;
-		background: #edf5f2;
-		color: #13594f;
-		border: 1px solid #d4e7df;
-		padding: 3px 8px;
-		border-radius: 20px;
+		color: var(--cl-ink);
+		padding: 2px 0;
 		font-size: 12px;
 	}
 
-	.cl-groups {
+	.cl-listing .cl-groups {
 		font-size: 12px;
 		color: #50575e;
 	}
@@ -183,7 +298,7 @@
 		align-items: center;
 		flex-wrap: wrap;
 		gap: 8px;
-		margin-top: 20px;
+		margin-top: 16px;
 	}
 
 	.page-numbers {
@@ -194,7 +309,7 @@
 	}
 
 	.page-numbers.current {
-		background: #153c3a;
+		background: var(--cl-ink);
 		color: #fff;
 	}
 
@@ -315,20 +430,18 @@
 		margin: 4px 0 10px;
 	}
 
-	input:focus,
-	textarea:focus,
-	select:focus,
-	button:focus,
-	a:focus {
-		outline-offset: 2px;
-	}
-
 	@media (max-width: 782px) {
 
+		.cl-header,
+		.cl-nav {
+			margin-inline-start: -10px;
+			margin-inline-end: -12px;
+		}
+
 		.cl-header {
-			padding: 14px 16px;
 			align-items: start;
 			flex-direction: column;
+			gap: 8px;
 		}
 
 		h1 {
@@ -359,28 +472,34 @@
 			padding: 12px 10px;
 		}
 
-		.cl-filter label:first-of-type {
-			flex-basis: auto;
+		.cl-listing .cl-filter {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			align-items: end;
 		}
 
-		.cl-filter {
-			align-items: stretch;
-			flex-direction: column;
+		.cl-listing .cl-filter > label {
+			min-width: 0;
+		}
+
+		.cl-listing .cl-filter > label:first-of-type,
+		.cl-listing .cl-filter-actions {
+			grid-column: 1 / -1;
 		}
 
 		.cl-filter select {
 			max-width: none;
 		}
 
-		.cl-table,
-		.cl-table tbody,
-		.cl-table tr,
-		.cl-table td {
+		.cl-preview-scroll .cl-table,
+		.cl-preview-scroll .cl-table tbody,
+		.cl-preview-scroll .cl-table tr,
+		.cl-preview-scroll .cl-table td {
 			display: block;
 			width: auto !important;
 		}
 
-		.cl-table thead {
+		.cl-preview-scroll .cl-table thead {
 			position: absolute;
 			width: 1px;
 			height: 1px;
@@ -388,19 +507,19 @@
 			clip-path: inset(50%);
 		}
 
-		.cl-table tr {
+		.cl-preview-scroll .cl-table tr {
 			border: 1px solid #dcdcde;
 			border-radius: 6px;
 			margin-bottom: 12px;
 			padding: 12px;
 		}
 
-		.cl-table td {
+		.cl-preview-scroll .cl-table td {
 			padding: 8px 0;
 			border: none;
 		}
 
-		.cl-table td[data-label]::before {
+		.cl-preview-scroll .cl-table td[data-label]::before {
 			content: attr(data-label);
 			display: block;
 			font-size: 12px;
@@ -414,6 +533,48 @@
 
 		.cl-selection {
 			gap: 16px;
+		}
+	}
+
+	@media (max-width: 700px) {
+
+		.cl-listing .cl-filter {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.cl-listing .cl-table,
+		.cl-listing .cl-table tbody,
+		.cl-listing .cl-table tr,
+		.cl-listing .cl-table td {
+			display: block;
+			width: 100% !important;
+		}
+
+		.cl-listing .cl-table thead {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			overflow: hidden;
+			clip-path: inset(50%);
+		}
+
+		.cl-listing .cl-table tr {
+			border-top: 1px solid #dcdcde;
+			padding: 8px 0;
+		}
+
+		.cl-listing .cl-table td {
+			padding: 6px 0;
+			border: 0;
+			text-align: start;
+		}
+
+		.cl-listing .cl-table td[data-label]::before {
+			content: attr(data-label);
+			display: block;
+			font-size: 12px;
+			color: #50575e;
+			margin-bottom: 4px;
 		}
 	}
 

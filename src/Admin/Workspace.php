@@ -10,12 +10,17 @@ use MG\CleanLinks\Application\ImportJobs;
 /** Server-rendered forms remain functional without JavaScript. */
 class Workspace {
 	const SLUG = 'cleanlinks';
+	private $screen_hooks = array();
+	private $notice_buffer_level = 0;
+	private $admin_notice_html = '';
 
 	/** Register navigation, controls and private maintenance. */
 	public function register_hooks() {
 		add_action( 'admin_init', array( $this, 'legacy_entry' ) );
 		add_filter( 'admin_url', array( $this, 'classic_url' ), 10, 2 );
 		add_action( 'admin_menu', array( $this, 'menu' ), 20 );
+		add_action( 'admin_notices', array( $this, 'begin_notice_capture' ), PHP_INT_MIN );
+		add_action( 'all_admin_notices', array( $this, 'end_notice_capture' ), PHP_INT_MAX );
 		add_action( 'admin_enqueue_scripts', array( $this, 'assets' ) );
 		add_action( 'admin_post_cleanlinks_workspace', array( $this, 'handle' ) );
 		add_action( 'wp_ajax_cleanlinks_import_step', array( $this, 'ajax_step' ) );
@@ -28,13 +33,36 @@ class Workspace {
 	/** Keep an explicit legacy fallback rather than disabling the CPT editor. */
 	public function menu() {
 		remove_menu_page( 'edit.php?post_type=cleanlinks' );
-		add_menu_page( __( 'CleanLinks', 'cleanlinks' ), __( 'CleanLinks', 'cleanlinks' ), 'edit_posts', self::SLUG, array( $this, 'render' ), 'dashicons-admin-links' );
-		add_submenu_page( self::SLUG, __( 'All links', 'cleanlinks' ), __( 'All links', 'cleanlinks' ), 'edit_posts', self::SLUG, array( $this, 'render' ) );
-		add_submenu_page( self::SLUG, __( 'Add link', 'cleanlinks' ), __( 'Add link', 'cleanlinks' ), 'edit_posts', 'cleanlinks-add', array( $this, 'render' ) );
-		add_submenu_page( self::SLUG, __( 'Bulk add', 'cleanlinks' ), __( 'Bulk add', 'cleanlinks' ), 'edit_posts', 'cleanlinks-bulk', array( $this, 'render' ) );
+		$this->screen_hooks = array_filter( array(
+			add_menu_page( __( 'CleanLinks', 'cleanlinks' ), __( 'CleanLinks', 'cleanlinks' ), 'edit_posts', self::SLUG, array( $this, 'render' ), 'dashicons-admin-links' ),
+			add_submenu_page( self::SLUG, __( 'All links', 'cleanlinks' ), __( 'All links', 'cleanlinks' ), 'edit_posts', self::SLUG, array( $this, 'render' ) ),
+			add_submenu_page( self::SLUG, __( 'Add link', 'cleanlinks' ), __( 'Add link', 'cleanlinks' ), 'edit_posts', 'cleanlinks-add', array( $this, 'render' ) ),
+			add_submenu_page( self::SLUG, __( 'Bulk add', 'cleanlinks' ), __( 'Bulk add', 'cleanlinks' ), 'edit_posts', 'cleanlinks-bulk', array( $this, 'render' ) ),
+		) );
 		add_submenu_page( self::SLUG, __( 'Groups', 'cleanlinks' ), __( 'Groups', 'cleanlinks' ), 'manage_categories', 'edit-tags.php?taxonomy=cleanlinks_groups&post_type=cleanlinks' );
 		add_submenu_page( self::SLUG, __( 'Export', 'cleanlinks' ), __( 'Export', 'cleanlinks' ), 'manage_options', 'cleanlinks-export', array( $this, 'export' ) );
 		add_submenu_page( self::SLUG, __( 'Classic editor', 'cleanlinks' ), __( 'Classic editor', 'cleanlinks' ), 'edit_posts', 'edit.php?post_type=cleanlinks&cleanlinks_classic=1' );
+	}
+
+	/** Hold standard notices until the workspace header has rendered. */
+	public function begin_notice_capture() {
+		if ( $this->notice_buffer_level ) {
+			return;
+		}
+		$screen = get_current_screen();
+		if ( $screen && in_array( $screen->id, $this->screen_hooks, true ) && current_user_can( 'edit_posts' ) ) {
+			ob_start();
+			$this->notice_buffer_level = ob_get_level();
+		}
+	}
+
+	/** Keep callback output in its original order without running hooks again. */
+	public function end_notice_capture() {
+		if ( $this->notice_buffer_level && ob_get_level() === $this->notice_buffer_level ) {
+			$this->admin_notice_html = ob_get_clean();
+		}
+		// If another callback owns a nested buffer, leave it untouched and let output flush normally.
+		$this->notice_buffer_level = 0;
 	}
 
 	/** Preserve explicit classic mode on the core list/editor navigation. */
@@ -117,15 +145,14 @@ class Workspace {
 		}
 		$page = isset( $_GET['page'] ) && is_string( $_GET['page'] ) ? sanitize_key( $_GET['page'] ) : self::SLUG; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$view = isset( $_GET['view'] ) && is_string( $_GET['view'] ) ? sanitize_key( $_GET['view'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		echo '<div class="wrap cl-workspace"><header class="cl-header"><div class="cl-brand"><img src="' . esc_url( CLEANLINKS_PLUGIN_URL . '.wordpress-org/icon-128x128.png' ) . '" width="44" height="44" alt=""><div><h1>CleanLinks</h1><p>' . esc_html__( 'Manage your branded links', 'cleanlinks' ) . '</p></div></div>';
-		if ( self::SLUG === $page && 'edit' !== $view ) {
-			echo '<div class="cl-header-actions"><a class="button" href="' . esc_url( self::url( array( 'page' => 'cleanlinks-bulk' ) ) ) . '">' . esc_html__( 'Bulk add', 'cleanlinks' ) . '</a><a class="button button-primary" href="' . esc_url( self::url( array( 'page' => 'cleanlinks-add' ) ) ) . '">' . esc_html__( 'Add link', 'cleanlinks' ) . '</a></div>';
-		}
+		echo '<div class="wrap cl-workspace"><header class="cl-header"><div class="cl-brand"><img src="' . esc_url( CLEANLINKS_PLUGIN_URL . 'images/icon-128x128.png' ) . '" width="44" height="44" alt=""><h1>CleanLinks</h1></div><div class="cl-header-meta"><span class="cl-version">v' . esc_html( CLEANLINKS_VERSION ) . '</span><a href="' . esc_url( 'https://github.com/mehul0810/cleanlinks#readme' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Documentation', 'cleanlinks' ) . '<span class="dashicons dashicons-external" aria-hidden="true"></span><span class="screen-reader-text">' . esc_html__( '(opens in a new tab)', 'cleanlinks' ) . '</span></a></div>';
 		echo '</header><nav class="cl-nav" aria-label="' . esc_attr__( 'Link workspace', 'cleanlinks' ) . '">';
 		foreach ( array( self::SLUG => __( 'All links', 'cleanlinks' ), 'cleanlinks-add' => __( 'Add link', 'cleanlinks' ), 'cleanlinks-bulk' => __( 'Bulk add', 'cleanlinks' ) ) as $target => $label ) {
 			echo '<a href="' . esc_url( self::url( array( 'page' => $target ) ) ) . '"' . ( $page === $target ? ' aria-current="page"' : '' ) . '>' . esc_html( $label ) . '</a>';
 		}
-		echo '</nav>';
+		echo '</nav><hr class="wp-header-end">';
+		echo $this->admin_notice_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Preserves already-rendered admin notice markup.
+		$this->admin_notice_html = '';
 		$this->notice();
 		if ( ! CommandTransaction::has_request_local_cache() ) {
 			echo '<div class="notice notice-warning"><p>' . esc_html( self::error_text( 'storage_unavailable' ) ) . ' <a href="' . esc_url( admin_url( 'edit.php?post_type=cleanlinks&cleanlinks_classic=1' ) ) . '">' . esc_html__( 'Open classic editor', 'cleanlinks' ) . '</a></p></div>';
@@ -164,17 +191,20 @@ class Workspace {
 			$args['tax_query'] = array( array( 'taxonomy' => 'cleanlinks_groups', 'field' => 'term_id', 'terms' => $group ) );
 		}
 		$query = new \WP_Query( $args );
-		echo '<section class="cl-panel"><h2>' . esc_html__( 'All links', 'cleanlinks' ) . '</h2><form method="get" class="cl-filter"><input type="hidden" name="page" value="cleanlinks"><label>' . esc_html__( 'Search links', 'cleanlinks' ) . '<input type="search" name="s" value="' . esc_attr( $search ) . '"></label><label>' . esc_html__( 'Status', 'cleanlinks' ) . '<select name="status"><option value="">' . esc_html__( 'All active statuses', 'cleanlinks' ) . '</option>';
+		$groups_sample = get_terms( array( 'taxonomy' => 'cleanlinks_groups', 'hide_empty' => false, 'fields' => 'ids', 'number' => 1 ) );
+		$has_groups = ! is_wp_error( $groups_sample ) && ! empty( $groups_sample );
+		/* translators: %s: Localized number of matching links. */
+		echo '<section class="cl-listing"><div class="cl-list-heading"><h2>' . esc_html__( 'All links', 'cleanlinks' ) . '</h2><span class="cl-list-count">' . esc_html( sprintf( _n( '%s link', '%s links', $query->found_posts, 'cleanlinks' ), number_format_i18n( $query->found_posts ) ) ) . '</span></div><form method="get" class="cl-filter"><input type="hidden" name="page" value="cleanlinks"><label>' . esc_html__( 'Search links', 'cleanlinks' ) . '<input type="search" name="s" value="' . esc_attr( $search ) . '"></label><label>' . esc_html__( 'Status', 'cleanlinks' ) . '<select name="status"><option value="">' . esc_html__( 'All active statuses', 'cleanlinks' ) . '</option>';
 		foreach ( $statuses as $item ) {
 			echo '<option value="' . esc_attr( $item ) . '" ' . selected( $status, $item, false ) . '>' . esc_html( ucfirst( $item ) ) . '</option>';
 		}
 		echo '</select></label><label>' . esc_html__( 'Group', 'cleanlinks' );
-		wp_dropdown_categories( array( 'taxonomy' => 'cleanlinks_groups', 'name' => 'group', 'hide_empty' => false, 'show_option_all' => __( 'All groups', 'cleanlinks' ), 'selected' => $group ) );
-		echo '</label><button class="button">' . esc_html__( 'Filter', 'cleanlinks' ) . '</button><a href="' . esc_url( self::url() ) . '">' . esc_html__( 'Reset', 'cleanlinks' ) . '</a></form>';
+		wp_dropdown_categories( array( 'taxonomy' => 'cleanlinks_groups', 'name' => 'group', 'hide_empty' => false, 'show_option_all' => $has_groups ? __( 'All groups', 'cleanlinks' ) : '', 'show_option_none' => $has_groups ? '' : __( 'All groups', 'cleanlinks' ), 'option_none_value' => 0, 'selected' => $group ) );
+		echo '</label><div class="cl-filter-actions"><button class="button">' . esc_html__( 'Filter', 'cleanlinks' ) . '</button><a href="' . esc_url( self::url() ) . '">' . esc_html__( 'Reset', 'cleanlinks' ) . '</a></div></form>';
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		$this->fields( 'selection' );
-		echo '<input type="hidden" name="return" value="' . esc_attr( self::url( array( 's' => $search, 'status' => $status, 'group' => $group, 'paged' => $paged ) ) ) . '"><div class="cl-selection"><label>' . esc_html__( 'Selected links', 'cleanlinks' ) . '<select name="selection_action"><option value="trash">' . esc_html__( 'Move to trash', 'cleanlinks' ) . '</option><option value="restore">' . esc_html__( 'Restore from trash', 'cleanlinks' ) . '</option></select></label><label><input type="checkbox" name="confirmed" value="1" required> ' . esc_html__( 'Confirm this action on selected links', 'cleanlinks' ) . '</label><button class="button">' . esc_html__( 'Apply', 'cleanlinks' ) . '</button></div>';
-		echo '<table class="cl-table"><thead><tr><th><input type="checkbox" data-cl-select-all aria-label="' . esc_attr__( 'Select all links on this page', 'cleanlinks' ) . '"></th><th>' . esc_html__( 'Link', 'cleanlinks' ) . '</th><th>' . esc_html__( 'Destination', 'cleanlinks' ) . '</th><th>' . esc_html__( 'Status / groups', 'cleanlinks' ) . '</th><th>' . esc_html__( 'Lifetime clicks', 'cleanlinks' ) . '</th></tr></thead><tbody>';
+		echo '<input type="hidden" name="return" value="' . esc_attr( self::url( array( 's' => $search, 'status' => $status, 'group' => $group, 'paged' => $paged ) ) ) . '"><div class="cl-selection"><label class="cl-select-all"><input type="checkbox" data-cl-select-all> ' . esc_html__( 'Select all on this page', 'cleanlinks' ) . '</label><label>' . esc_html__( 'Selected links', 'cleanlinks' ) . '<select name="selection_action"><option value="trash">' . esc_html__( 'Move to trash', 'cleanlinks' ) . '</option><option value="restore">' . esc_html__( 'Restore from trash', 'cleanlinks' ) . '</option></select></label><label class="cl-confirm"><input type="checkbox" name="confirmed" value="1" required> ' . esc_html__( 'Confirm this action on selected links', 'cleanlinks' ) . '</label><button class="button">' . esc_html__( 'Apply', 'cleanlinks' ) . '</button></div>';
+		echo '<table class="cl-table"><thead><tr><th scope="col" class="cl-select-cell"><span class="screen-reader-text">' . esc_html__( 'Select links', 'cleanlinks' ) . '</span></th><th scope="col">' . esc_html__( 'Link', 'cleanlinks' ) . '</th><th scope="col">' . esc_html__( 'Destination', 'cleanlinks' ) . '</th><th scope="col">' . esc_html__( 'Status', 'cleanlinks' ) . '</th><th scope="col">' . esc_html__( 'Groups', 'cleanlinks' ) . '</th><th scope="col" class="cl-clicks">' . esc_html__( 'Lifetime clicks', 'cleanlinks' ) . '</th></tr></thead><tbody>';
 		foreach ( $query->posts as $post ) {
 			if ( ! current_user_can( 'edit_post', $post->ID ) ) {
 				continue;
@@ -183,13 +213,12 @@ class Workspace {
 			$edit = self::url( array( 'view' => 'edit', 'id' => $post->ID, 's' => $search, 'status' => $status, 'group' => $group, 'paged' => $paged ) );
 			$terms = wp_get_object_terms( $post->ID, 'cleanlinks_groups', array( 'fields' => 'names' ) );
 			/* translators: %s: Link title. */
-			echo '<tr><td><input type="checkbox" name="ids[]" value="' . esc_attr( $post->ID ) . '" aria-label="' . esc_attr( sprintf( __( 'Select %s', 'cleanlinks' ), $post->post_title ) ) . '"></td><td data-label="' . esc_attr__( 'Link', 'cleanlinks' ) . '"><a class="cl-link-title" href="' . esc_url( $edit ) . '">' . esc_html( $post->post_title ? $post->post_title : $post->post_name ) . '</a><span class="cl-short-url">' . esc_html( $url ) . '</span><button type="button" class="button-link cl-copy" data-cl-copy="' . esc_attr( $url ) . '">' . esc_html__( 'Copy URL', 'cleanlinks' ) . '</button></td><td data-label="' . esc_attr__( 'Destination', 'cleanlinks' ) . '"><span class="cl-destination">' . esc_html( get_post_meta( $post->ID, 'cleanlink_redirect_url', true ) ) . '</span></td><td data-label="' . esc_attr__( 'Status / groups', 'cleanlinks' ) . '"><span class="cl-chip">' . esc_html( ucfirst( $post->post_status ) ) . '</span><span class="cl-groups">' . esc_html( is_wp_error( $terms ) ? '' : implode( ', ', $terms ) ) . '</span></td><td data-label="' . esc_attr__( 'Lifetime clicks', 'cleanlinks' ) . '">' . esc_html( number_format_i18n( (int) get_post_meta( $post->ID, 'cleanlink_redirect_count', true ) ) ) . '</td></tr>';
+			echo '<tr><td class="cl-select-cell"><input type="checkbox" name="ids[]" value="' . esc_attr( $post->ID ) . '" aria-label="' . esc_attr( sprintf( __( 'Select %s', 'cleanlinks' ), $post->post_title ) ) . '"></td><td data-label="' . esc_attr__( 'Link', 'cleanlinks' ) . '"><a class="cl-link-title" href="' . esc_url( $edit ) . '">' . esc_html( $post->post_title ? $post->post_title : $post->post_name ) . '</a><div class="cl-link-url"><span class="cl-short-url">' . esc_html( $url ) . '</span><button type="button" class="button-link cl-copy" data-cl-copy="' . esc_attr( $url ) . '" title="' . esc_attr__( 'Copy URL', 'cleanlinks' ) . '" aria-label="' . esc_attr__( 'Copy URL', 'cleanlinks' ) . '"><span class="dashicons dashicons-admin-page" aria-hidden="true"></span></button></div></td><td data-label="' . esc_attr__( 'Destination', 'cleanlinks' ) . '"><span class="cl-destination">' . esc_html( get_post_meta( $post->ID, 'cleanlink_redirect_url', true ) ) . '</span></td><td data-label="' . esc_attr__( 'Status', 'cleanlinks' ) . '"><span class="cl-chip">' . esc_html( ucfirst( $post->post_status ) ) . '</span></td><td data-label="' . esc_attr__( 'Groups', 'cleanlinks' ) . '"><span class="cl-groups">' . esc_html( ! is_wp_error( $terms ) && $terms ? implode( ', ', $terms ) : __( 'None', 'cleanlinks' ) ) . '</span></td><td class="cl-clicks" data-label="' . esc_attr__( 'Lifetime clicks', 'cleanlinks' ) . '">' . esc_html( number_format_i18n( (int) get_post_meta( $post->ID, 'cleanlink_redirect_count', true ) ) ) . '</td></tr>';
 		}
 		if ( ! $query->posts ) {
-			echo '<tr><td colspan="5"><div class="cl-empty"><h3>' . esc_html__( 'No links to show', 'cleanlinks' ) . '</h3><p>' . esc_html__( 'Try another filter, or add your first branded link.', 'cleanlinks' ) . '</p></div></td></tr>';
+			echo '<tr><td colspan="6"><div class="cl-empty"><h3>' . esc_html__( 'No links to show', 'cleanlinks' ) . '</h3><p>' . esc_html__( 'Try another filter, or add your first branded link.', 'cleanlinks' ) . '</p></div></td></tr>';
 		}
-		/* translators: %s: Localized number of matching links. */
-		echo '</tbody></table></form><div class="cl-pagination">' . esc_html( sprintf( __( '%s links', 'cleanlinks' ), number_format_i18n( $query->found_posts ) ) ) . ' ';
+		echo '</tbody></table></form><div class="cl-pagination">';
 		echo wp_kses_post( (string) paginate_links( array( 'base' => add_query_arg( 'paged', '%#%', self::url( array( 's' => $search, 'status' => $status, 'group' => $group ) ) ), 'current' => $paged, 'total' => $query->max_num_pages ) ) );
 		echo '</div></section><p id="cl-live" role="status" aria-live="polite"></p>';
 	}

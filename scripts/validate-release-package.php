@@ -64,6 +64,7 @@ $required_files = array(
 	'dist/workspace.asset.php',
 	'dist/workspace.css',
 	'dist/workspace.js',
+	'images/icon-128x128.png',
 	'uninstall.php',
 	'vendor/autoload.php',
 	'vendor/composer/autoload_classmap.php',
