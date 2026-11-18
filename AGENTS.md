@@ -4,7 +4,7 @@ Use this file as the repo-local source of truth for Codex and other agentic main
 
 ## Source Of Truth
 
-- GitHub releases/tags define the current production line. As of the first version of this guide, production is `1.0.3` on `main`.
+- Verify the production line against the latest published stable GitHub release and its tag. Check the WordPress.org listing and deploy result separately before claiming WordPress.org availability; a branch or candidate ZIP alone does not prove publication.
 - WordPress.org slug: `cleanlinks`.
 - Default branch: `main`.
 - Local development site may be `development.wp.local`, but branch, issue, release, and milestone decisions must be verified from GitHub and this repo before changes.
