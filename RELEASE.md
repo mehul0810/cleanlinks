@@ -6,7 +6,7 @@ CleanLinks is a WordPress.org plugin published under the `cleanlinks` slug. Keep
 
 - Production releases are GitHub releases/tags that trigger the WordPress.org deploy workflow.
 - The current default branch is `main`.
-- Latest known production line at the time this guide was added: `1.0.3`.
+- Verify the current production line against published stable GitHub release and tag evidence. Check the WordPress.org listing and the deploy result before claiming that version is available there.
 - Prerelease GitHub releases build a ZIP artifact but do not publish to WordPress.org.
 - Stable GitHub releases trigger `.github/workflows/deploy.yml`, which uses `10up/action-wordpress-plugin-deploy` with `SLUG=cleanlinks`.
 
