@@ -9,28 +9,23 @@ Stable tag: 1.1.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Create branded short links, manage redirects, cloak affiliate URLs, and export links via CSV – all from your WordPress dashboard.
+Create branded short links on your WordPress site. Group links, count clicks, and export published links to CSV.
 
 == Description ==
 
-**CleanLinks** is your all-in-one solution for creating branded, customizable short links directly within WordPress. Whether you’re managing affiliate campaigns, simplifying external URLs, or just looking for a professional way to share links, CleanLinks makes it easy.
-
-Designed to be lightweight, CleanLinks creates 301 redirects for links with a destination URL. It records link clicks, organizes links into groups, and exports link details to CSV. If a link has no destination URL, it redirects to the site home page with a 302 response.
+Create short links for affiliate URLs, campaigns, and resources you share often. Open **CleanLinks** in your WordPress dashboard to add and manage links on your site's domain.
 
 = Key Features =
 
-- **Branded Short Links** – Cloak long URLs under your own domain.
-- **CSV Export Tool** – Download published link IDs, titles, short URLs, and destination URLs in a CSV file. Click counts are not included.
-- **Click Tracking** – View total clicks for published links.
-- **Organize Your Links** – Group links with tags for easy management.
-- **SEO-Friendly** – Compatible with SEO and caching plugins.
-- **Developer Friendly** – Built using WordPress standards with hooks/filters.
+- **Groups:** Organize related links together.
+- **Click counts:** View total clicks for each published link in the links list.
+- **CSV export:** Download published links from **CleanLinks > Export**.
+- **Nofollow:** Optionally send an `X-Robots-Tag: nofollow` header with a redirect.
 
 = Minimum Requirements =
 
 - WordPress 5.5 or higher
 - PHP 8.1 or higher
-- MySQL 5.5 or higher
 
 = Automatic Installation =
 
@@ -44,37 +39,27 @@ Designed to be lightweight, CleanLinks creates 301 redirects for links with a de
 1. Download the CleanLinks plugin.
 2. Upload it to your `/wp-content/plugins/` directory via FTP or File Manager.
 3. Activate CleanLinks from the "Plugins" screen in your WordPress dashboard.
-4. Navigate to **CleanLinks** menu to start managing your branded links.
+4. Open **CleanLinks** in your WordPress dashboard.
 
 == Frequently Asked Questions ==
 
-= Can I export my published links? =
-Yes. The Export tool downloads a CSV with each published link's ID, title, short URL, and destination URL. It does not include click counts.
+= How do I export my links? =
+Go to **CleanLinks > Export** to download a CSV of published links. The file includes each link's ID, title, short URL, and destination URL. It does not include click counts.
 
 = Does CleanLinks support affiliate links? =
-Yes. You can create short links for affiliate destinations. Links with a destination use a 301 redirect, and you can organize them into groups.
+Yes. Add your affiliate URL, including its query parameters, as the destination for a short link.
 
-= Can I track clicks on my links? =
-Yes. Click tracking is available per link.
-
-= Is it compatible with caching and SEO plugins? =
-Yes, CleanLinks is fully compatible with popular caching and SEO plugins.
-
-== Screenshots ==
-
-1. Admin interface showing branded link management.
-2. Link settings with a destination URL and nofollow option.
-3. Export tool with one-click CSV export.
-4. Total click counts in the links list.
+= What happens when someone follows a short link? =
+A published link with a destination sends a permanent (301) redirect. If a published link has no destination, it sends a temporary (302) redirect to your homepage.
 
 == Changelog ==
 
 = 1.1.2 =
-* Show a saved-link overview and validate destination URLs in the Add/Edit Link editor.
-* Keep an existing destination when an edited URL is rejected, and preserve multiple query parameters in saved redirects.
-* Exclude CleanLinks links and group names from WordPress general exports while retaining the dedicated published-links CSV export.
-* Pin GitHub Actions to verified commits, restrict workflow token permissions, and check new high or critical npm advisory changes.
-* Correct descriptions of redirect and CSV behavior.
+* See the saved destination, publication status, and total clicks in the link editor. Copy the short URL after publishing.
+* See whether copying a short URL succeeded or failed.
+* Preserve encoded characters and repeated query parameters in redirect destinations.
+* Keep the saved destination when WordPress rejects a URL edit.
+* Exclude CleanLinks links and groups from Tools > Export. Published links are still available as CSV from CleanLinks > Export.
 
 = 1.1.1 =
 * **Security Improvements:** Neutralize spreadsheet formula-leading values in CSV exports and remediate Composer development-tool security advisories.
