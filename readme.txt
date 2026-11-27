@@ -55,6 +55,7 @@ A published link with a destination sends a permanent (301) redirect. If a publi
 == Changelog ==
 
 = 1.1.2 =
+* Remove current-site CleanLinks links, groups, and settings when the plugin is deleted.
 * See the saved destination, publication status, and total clicks in the link editor. Copy the short URL after publishing.
 * See whether copying a short URL succeeded or failed.
 * Preserve encoded characters and repeated query parameters in redirect destinations.

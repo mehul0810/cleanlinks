@@ -1,35 +1,17 @@
 <?php
-/**
- * CleanLinks | Uninstall.
- *
- * @package WordPress
- * @subpackage CleanLinks
- * @since 1.0.0
- *
- */
+/** CleanLinks uninstall entry point. */
 
-// Exit if accessed directly.
-if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
-    exit;
+if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) || WP_UNINSTALL_PLUGIN !== plugin_basename( __DIR__ . '/cleanlinks.php' ) ) {
+	exit;
 }
 
-// Delete all posts of custom post type
-$cleanlinks = get_posts([
-    'post_type' => 'cleanlinks',
-    'numberposts' => -1,
-]);
-foreach ($cleanlinks as $cleanlink) {
-    wp_delete_post($cleanlink->ID, true);
-}
+require_once __DIR__ . '/src/Uninstall.php';
 
-// Delete custom taxonomy terms
-$terms = get_terms([
-    'taxonomy' => 'cleanlinks_groups',
-    'hide_empty' => false,
-]);
-foreach ($terms as $cleanlinks_group) {
-    wp_delete_term($cleanlinks_group->term_id, 'cleanlinks_groups');
+$cleanlinks_result = \MG\CleanLinks\Uninstall::run();
+if ( is_wp_error( $cleanlinks_result ) ) {
+	$cleanlinks_details = $cleanlinks_result->get_error_data();
+	if ( 'recovery_required' === $cleanlinks_result->get_error_message() || get_option( \MG\CleanLinks\Uninstall::RECOVERY_OPTION ) ) {
+		wp_die( esc_html__( 'CleanLinks cleanup could not be verified. The plugin files remain. Restore a database backup before attempting deletion again; reinstalling or reverting code does not restore deleted data.', 'cleanlinks' ) );
+	}
+	wp_die( esc_html( sprintf( /* translators: 1: cleanup stage, 2: item ID. */ __( 'CleanLinks cleanup stopped at %1$s (ID %2$d). The plugin files remain. Resolve the problem and retry deletion. Restore a backup if deleted data is needed; reinstalling or reverting code does not restore it.', 'cleanlinks' ), $cleanlinks_result->get_error_message(), $cleanlinks_details['id'] ) ) );
 }
-
-// Delete plugin options
-delete_option('cleanlinks_settings');
