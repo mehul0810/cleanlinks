@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! defined( 'CLEANLINKS_VERSION' ) ) {
-	define( 'CLEANLINKS_VERSION', '1.1.1' );
+	define( 'CLEANLINKS_VERSION', '1.1.2' );
 }
 
 if ( ! defined( 'CLEANLINKS_PLUGIN_FILE' ) ) {

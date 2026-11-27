@@ -10,10 +10,10 @@ jobs:
             contents: read
             pull-requests: write
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
               with:
                   persist-credentials: false
-            - uses: mshick/add-pr-comment@v2
+            - uses: mshick/add-pr-comment@b8f338c590a895d50bcbfa6c5859251edc8952fc # v2
               with:
                   message: |
                       **Test on Playground**

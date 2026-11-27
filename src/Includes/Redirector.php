@@ -71,8 +71,10 @@ class Redirector {
 	public function perform_redirect( $redirect, $post_id ) {
 		if ( ! empty( $redirect ) ) {
 			$nofollow = get_post_meta( $post_id, 'cleanlink_redirect_nofollow', true );
+			// Preserve apostrophes in redirect URLs before WordPress strips them from Location.
+			$redirect = str_replace( "'", '%27', esc_url_raw( $redirect ) );
 
-			$redirected = wp_redirect( esc_url_raw( $redirect ), 301 ); // phpcs:ignore WordPressVIPMinimum.Security.ExitAfterRedirect.NoExit -- The caller exits immediately after this method returns.
+			$redirected = wp_redirect( $redirect, 301 ); // phpcs:ignore WordPressVIPMinimum.Security.ExitAfterRedirect.NoExit -- The caller exits immediately after this method returns.
 
 			if ( $redirected && '1' === $nofollow ) {
 				// Preserve the crawl directive without sending a response body before redirect headers.

@@ -493,6 +493,66 @@ class Test_Collaborators extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Redirect output preserves URL components through WordPress's final sanitization.
+	 */
+	public function test_redirector_preserves_multi_query_destination() {
+		$post_id  = $this->factory->post->create( array( 'post_type' => 'cleanlinks' ) );
+		$url      = 'https://1.1.1.1/echo%2Fsegment?keep=one&keep=two&encoded=%2F%2B&plus=a+b&quote=O\'Reilly&encoded_quote=O%27Reilly#section';
+		$expected = 'https://1.1.1.1/echo%2Fsegment?keep=one&keep=two&encoded=%2F%2B&plus=a+b&quote=O%27Reilly&encoded_quote=O%27Reilly#section';
+		$location = null;
+		$status   = null;
+		$stop     = static function ( $redirect_by, $code, $redirect_location ) use ( &$location, &$status ) {
+			$location = $redirect_location;
+			$status   = $code;
+			throw new \RuntimeException( 'Stop redirect after core sanitization.' );
+		};
+
+		update_post_meta( $post_id, 'cleanlink_redirect_url', $url );
+		add_filter( 'x_redirect_by', $stop, 10, 3 );
+		try {
+			$redirector = new Redirector();
+			$redirector->perform_redirect( $redirector->get_redirect_url( $post_id ), $post_id );
+			$this->fail( 'The redirect should stop after core sanitization.' );
+		} catch ( \RuntimeException $exception ) {
+			$this->assertSame( 'Stop redirect after core sanitization.', $exception->getMessage() );
+		} finally {
+			remove_filter( 'x_redirect_by', $stop, 10 );
+		}
+
+		$this->assertSame( $expected, $location );
+		$this->assertSame( 301, $status );
+	}
+
+	/**
+	 * WordPress's final redirect sanitizer continues to reject CRLF header injection.
+	 */
+	public function test_redirector_core_sanitization_rejects_crlf_header_injection() {
+		$post_id  = $this->factory->post->create( array( 'post_type' => 'cleanlinks' ) );
+		$location = null;
+		$inject   = static function ( $redirect, $code ) {
+			return $redirect . "\r\nX-Evil: injected";
+		};
+		$stop     = static function ( $redirect_by, $code, $redirect_location ) use ( &$location ) {
+			$location = $redirect_location;
+			throw new \RuntimeException( 'Stop redirect after core sanitization.' );
+		};
+
+		add_filter( 'wp_redirect', $inject, 10, 2 );
+		add_filter( 'x_redirect_by', $stop, 10, 3 );
+		try {
+			( new Redirector() )->perform_redirect( 'https://1.1.1.1/safe', $post_id );
+			$this->fail( 'The redirect should stop after core sanitization.' );
+		} catch ( \RuntimeException $exception ) {
+			$this->assertSame( 'Stop redirect after core sanitization.', $exception->getMessage() );
+		} finally {
+			remove_filter( 'wp_redirect', $inject, 10 );
+			remove_filter( 'x_redirect_by', $stop, 10 );
+		}
+
+		$this->assertSame( 'https://1.1.1.1/safeX-Evil:%20injected', $location );
+	}
+
+	/**
 	 * The input collaborator sanitizes nested scalar input.
 	 *
 	 * @since 1.1.1
@@ -522,7 +582,16 @@ class Test_Collaborators extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_url_validator_accepts_valid_urls_and_rejects_invalid_values() {
-		$this->assertSame( 'https://example.com/destination', UrlValidator::validate( ' https://example.com/destination ' ) );
+		$this->assertSame( 'https://1.1.1.1/destination', UrlValidator::validate( ' https://1.1.1.1/destination ' ) );
 		$this->assertFalse( UrlValidator::validate( 'not a URL' ) );
+	}
+
+	/**
+	 * URL storage must retain raw query separators, not HTML display entities.
+	 */
+	public function test_url_validator_preserves_query_string_bytes() {
+		$this->assertSame( 'https://1.1.1.1/?source=email&campaign=october', UrlValidator::validate( 'https://1.1.1.1/?source=email&campaign=october' ) );
+		$this->assertSame( 'https://1.1.1.1/?source=fish%26chips&campaign=october', UrlValidator::validate( 'https://1.1.1.1/?source=fish%26chips&campaign=october' ) );
+		$this->assertSame( 'https://1.1.1.1/?source=fish&amp;chips&campaign=october', UrlValidator::validate( 'https://1.1.1.1/?source=fish&amp;chips&campaign=october' ) );
 	}
 }

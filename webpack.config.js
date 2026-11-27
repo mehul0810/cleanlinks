@@ -1,11 +1,11 @@
 // Import the original config from the @wordpress/scripts package.
-const defaultConfig = require('@wordpress/scripts/config/webpack.config');
+const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
 
 // Import path to update the output path.
-const path = require('path');
+const path = require( 'path' );
 
 // Import the wpPot function from the wp-pot package.
-const wpPot = require('wp-pot');
+const wpPot = require( 'wp-pot' );
 
 // Set production mode.
 const isProduction = 'production' === process.env.NODE_ENV;
@@ -30,12 +30,12 @@ const config = {
 
 if ( isProduction && '1' !== process.env.CLEANLINKS_SKIP_WP_POT ) {
 	// POT file.
-	wpPot({
+	wpPot( {
 		package: 'CleanLinks',
 		domain: 'cleanlinks',
 		destFile: 'languages/cleanlinks.pot',
 		relativeTo: './',
-		src: ['./**/*.php', '!./includes/libraries/**/*', '!./vendor/**/*'],
+		src: [ './**/*.php', '!./includes/libraries/**/*', '!./vendor/**/*' ],
 		bugReport: 'https://github.com/mehul0810/cleanlinks/issues/new',
 		team: 'Mehul Gohil <hello@mehulgohil.com>',
 	} );

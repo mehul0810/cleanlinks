@@ -98,7 +98,7 @@ class PostTypeRegistrar {
 			'menu_icon'            => 'dashicons-admin-links',
 			'register_meta_box_cb' => $this->metabox_callback,
 			'supports'             => array( 'title' ),
-			'can_export'           => true,
+			'can_export'           => false,
 		);
 	}
 

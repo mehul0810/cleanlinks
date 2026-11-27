@@ -50,8 +50,47 @@ class LinkMetaBox {
 		$url      = get_post_meta( $post->ID, 'cleanlink_redirect_url', true );
 		$nofollow = get_post_meta( $post->ID, 'cleanlink_redirect_nofollow', true );
 
+		$this->render_link_overview( $post, $url );
 		$this->render_redirect_url_field( $url, $nofollow );
-		$this->render_access_count( $post->ID );
+	}
+
+	/**
+	 * Show the currently saved link without replacing WordPress publish controls.
+	 *
+	 * @param WP_Post $post The link post.
+	 * @param string  $url  The saved destination URL.
+	 * @return void
+	 */
+	private function render_link_overview( $post, $url ) {
+		$is_published = 'publish' === $post->post_status;
+		$short_url    = $is_published ? get_permalink( $post->ID ) : '';
+		$count        = Helpers::get_total_access_count( $post->ID );
+		$status       = get_post_status_object( $post->post_status );
+		$status_label = 'auto-draft' === $post->post_status ? __( 'Draft', 'cleanlinks' ) : ( $status ? $status->label : __( 'Not published', 'cleanlinks' ) );
+		?>
+		<section class="cleanlinks-link-overview" aria-label="<?php esc_attr_e( 'Saved link overview', 'cleanlinks' ); ?>">
+			<div class="cleanlinks-link-overview__url">
+				<span class="cleanlinks-link-overview__label"><?php esc_html_e( 'Short URL', 'cleanlinks' ); ?></span>
+				<?php if ( $short_url ) : ?>
+					<div class="cleanlinks-link-overview__value-row">
+						<code><?php echo esc_html( $short_url ); ?></code>
+						<button type="button" class="button cleanlinks--copy-button" data-url="<?php echo esc_url( $short_url ); ?>" data-default-text="<?php esc_attr_e( 'Copy short URL', 'cleanlinks' ); ?>" data-copied-text="<?php esc_attr_e( 'Copied', 'cleanlinks' ); ?>" data-copy-failed-text="<?php esc_attr_e( 'Copy failed', 'cleanlinks' ); ?>">
+							<span class="dashicons dashicons-admin-page" aria-hidden="true"></span>
+							<span class="cleanlinks--copy-button-text" aria-live="polite"><?php esc_html_e( 'Copy short URL', 'cleanlinks' ); ?></span>
+						</button>
+					</div>
+				<?php else : ?>
+					<p class="description"><?php esc_html_e( 'The short URL is available after publishing.', 'cleanlinks' ); ?></p>
+				<?php endif; ?>
+			</div>
+			<dl class="cleanlinks-link-overview__facts">
+				<div><dt><?php esc_html_e( 'Status', 'cleanlinks' ); ?></dt><dd><?php echo esc_html( $status_label ); ?></dd></div>
+				<div><dt><?php esc_html_e( 'Destination', 'cleanlinks' ); ?></dt><dd><?php echo $url ? esc_html( $url ) : esc_html__( 'Not set', 'cleanlinks' ); ?></dd></div>
+				<div><dt><?php esc_html_e( 'Default redirect', 'cleanlinks' ); ?></dt><dd><?php echo $is_published ? ( $url ? esc_html__( '301 permanent', 'cleanlinks' ) : esc_html__( '302 to site home', 'cleanlinks' ) ) : esc_html__( 'Available after publishing', 'cleanlinks' ); ?></dd></div>
+				<div><dt><?php esc_html_e( 'Total clicks', 'cleanlinks' ); ?></dt><dd><?php echo esc_html( number_format_i18n( absint( $count ) ) ); ?></dd></div>
+			</dl>
+		</section>
+		<?php
 	}
 
 	/**
@@ -66,47 +105,19 @@ class LinkMetaBox {
 	private function render_redirect_url_field( $url, $nofollow = '0' ) {
 		?>
 		<p>
-			<label for="cleanlink_redirect_url"><strong><?php esc_html_e( 'Destination URL:', 'cleanlinks' ); ?></strong>
-			<input placeholder="<?php esc_attr_e( 'Enter the full destination URL (e.g., https://example.com)', 'cleanlinks' ); ?>" class="widefat" type="url" name="cleanlink_redirect_url" id="cleanlink_redirect_url" value="<?php echo esc_attr( $url ); ?>" />
-			</label>
-			<span class="description">
-				<?php esc_html_e( 'Visitors will be redirected to this URL when they access your link.', 'cleanlinks' ); ?>
-			</span>
+			<label for="cleanlink_redirect_url"><strong><?php esc_html_e( 'Destination URL', 'cleanlinks' ); ?></strong></label>
+			<input placeholder="https://example.com" class="widefat" type="url" inputmode="url" name="cleanlink_redirect_url" id="cleanlink_redirect_url" aria-describedby="cleanlink_redirect_url_help cleanlink_redirect_url_error" value="<?php echo esc_attr( $url ); ?>" />
+			<span id="cleanlink_redirect_url_help" class="description"><?php esc_html_e( 'Enter a full http:// or https:// URL. If WordPress rejects a change, the saved destination stays unchanged. A published link without a destination redirects to the site home page.', 'cleanlinks' ); ?></span>
+			<span id="cleanlink_redirect_url_error" class="cleanlinks-link-error" role="alert" hidden><?php esc_html_e( 'Enter a full URL starting with https:// or http://.', 'cleanlinks' ); ?></span>
 		</p>
 
 		<p>
 			<label for="cleanlink_redirect_nofollow">
 				<input type="checkbox" name="cleanlink_redirect_nofollow" id="cleanlink_redirect_nofollow" value="1" <?php checked( $nofollow, '1' ); ?> />
-				<?php esc_html_e( 'Add nofollow to this redirect', 'cleanlinks' ); ?>
+				<?php esc_html_e( 'Ask search engines not to follow this link', 'cleanlinks' ); ?>
 			</label>
-			<span class="description"><?php esc_html_e( 'Check this option to prevent search engines from following this redirect.', 'cleanlinks' ); ?> </span>
+			<span class="description"><?php esc_html_e( 'Sends an X-Robots-Tag: nofollow header with the redirect.', 'cleanlinks' ); ?></span>
 		</p>
-		<?php
-	}
-
-	/**
-	 * Render the access count information.
-	 *
-	 * @since 1.1.1
-	 *
-	 * @param int $post_id The post ID.
-	 * @return void
-	 */
-	private function render_access_count( $post_id ) {
-		$count = Helpers::get_total_access_count( $post_id );
-		?>
-		<div class="cleanlinks--access-count">
-			<span class="dashicons dashicons-chart-bar"></span>
-			<?php
-			/* Translators: %1$s is the text before the count, %2$d is the count, %3$s is the text after the count. */
-			printf(
-				'%1$s %2$d %3$s',
-				esc_html__( 'This link has been visited', 'cleanlinks' ),
-				absint( $count ),
-				esc_html__( 'times', 'cleanlinks' )
-			);
-			?>
-		</div>
 		<?php
 	}
 }

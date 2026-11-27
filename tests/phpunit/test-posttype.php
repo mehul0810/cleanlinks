@@ -76,6 +76,7 @@ class Test_PostType extends WP_UnitTestCase {
 		$this->assertEquals( 'Link', $wp_post_types['cleanlinks']->labels->name_admin_bar );
 		$this->assertEquals( 1, $wp_post_types['cleanlinks']->publicly_queryable );
 		$this->assertEquals( 'post', $wp_post_types['cleanlinks']->capability_type );
+		$this->assertFalse( $wp_post_types['cleanlinks']->can_export );
 	}
 
 	/**
@@ -92,7 +93,7 @@ class Test_PostType extends WP_UnitTestCase {
 		wp_set_current_user( $user_id );
 		$_POST = array(
 			'cleanlink_redirect_nonce'    => wp_create_nonce( 'cleanlink-save-redirect-meta' ),
-			'cleanlink_redirect_url'      => 'https://example.com/destination',
+			'cleanlink_redirect_url'      => 'https://1.1.1.1/destination',
 			'cleanlink_redirect_nofollow' => '1',
 		);
 
@@ -103,16 +104,16 @@ class Test_PostType extends WP_UnitTestCase {
 			wp_set_current_user( 0 );
 		}
 
-		$this->assertSame( 'https://example.com/destination', get_post_meta( $post_id, 'cleanlink_redirect_url', true ) );
+		$this->assertSame( 'https://1.1.1.1/destination', get_post_meta( $post_id, 'cleanlink_redirect_url', true ) );
 		$this->assertSame( '1', get_post_meta( $post_id, 'cleanlink_redirect_nofollow', true ) );
 	}
 
 	/**
-	 * Test that an invalid URL removes previously stored redirect metadata.
+	 * An invalid URL must not erase a previously saved redirect.
 	 *
 	 * @since 1.1.1
 	 */
-	public function test_save_link_meta_removes_invalid_metadata() {
+	public function test_save_link_meta_preserves_metadata_for_invalid_url() {
 		$user_id  = self::factory()->user->create( array( 'role' => 'administrator' ) );
 		$post_id  = self::factory()->post->create( array( 'post_type' => 'cleanlinks' ) );
 		$post     = get_post( $post_id );
@@ -134,8 +135,88 @@ class Test_PostType extends WP_UnitTestCase {
 			wp_set_current_user( 0 );
 		}
 
-		$this->assertSame( '', get_post_meta( $post_id, 'cleanlink_redirect_url', true ) );
-		$this->assertSame( '', get_post_meta( $post_id, 'cleanlink_redirect_nofollow', true ) );
+		$this->assertSame( 'https://example.com/old-destination', get_post_meta( $post_id, 'cleanlink_redirect_url', true ) );
+		$this->assertSame( '1', get_post_meta( $post_id, 'cleanlink_redirect_nofollow', true ) );
+	}
+
+	/**
+	 * URLs rejected by WordPress safety checks must retain the saved destination.
+	 */
+	public function test_save_link_meta_preserves_metadata_for_unsafe_url() {
+		$user_id  = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$post_id  = self::factory()->post->create( array( 'post_type' => 'cleanlinks' ) );
+		$post     = get_post( $post_id );
+		$old_post = $_POST;
+
+		update_post_meta( $post_id, 'cleanlink_redirect_url', 'https://example.com/old-destination' );
+		update_post_meta( $post_id, 'cleanlink_redirect_nofollow', '1' );
+		wp_set_current_user( $user_id );
+		$_POST = array(
+			'cleanlink_redirect_nonce' => wp_create_nonce( 'cleanlink-save-redirect-meta' ),
+			'cleanlink_redirect_url'   => 'https://user:pass@example.com/',
+		);
+
+		try {
+			self::$class_instance->save_link_meta( $post_id, $post );
+		} finally {
+			$_POST = $old_post;
+			wp_set_current_user( 0 );
+		}
+
+		$this->assertSame( 'https://example.com/old-destination', get_post_meta( $post_id, 'cleanlink_redirect_url', true ) );
+		$this->assertSame( '1', get_post_meta( $post_id, 'cleanlink_redirect_nofollow', true ) );
+	}
+
+	/**
+	 * Saving a multi-query destination must retain URL separators in post meta.
+	 */
+	public function test_save_link_meta_preserves_multi_query_destination() {
+		$user_id  = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$post_id  = self::factory()->post->create( array( 'post_type' => 'cleanlinks' ) );
+		$post     = get_post( $post_id );
+		$old_post = $_POST;
+		$url      = 'https://1.1.1.1/?source=email&campaign=october';
+
+		wp_set_current_user( $user_id );
+		$_POST = array(
+			'cleanlink_redirect_nonce' => wp_create_nonce( 'cleanlink-save-redirect-meta' ),
+			'cleanlink_redirect_url'   => $url,
+		);
+
+		try {
+			self::$class_instance->save_link_meta( $post_id, $post );
+		} finally {
+			$_POST = $old_post;
+			wp_set_current_user( 0 );
+		}
+
+		$this->assertSame( $url, get_post_meta( $post_id, 'cleanlink_redirect_url', true ) );
+	}
+
+	/**
+	 * Saving an encoded destination must preserve its path, query, plus, and fragment.
+	 */
+	public function test_save_link_meta_preserves_encoded_destination_components() {
+		$user_id  = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$post_id  = self::factory()->post->create( array( 'post_type' => 'cleanlinks' ) );
+		$post     = get_post( $post_id );
+		$old_post = $_POST;
+		$url      = 'https://1.1.1.1/path%2F%2B?keep=one&keep=two&encoded=%2F%2B&plus=a+b#section';
+
+		wp_set_current_user( $user_id );
+		$_POST = array(
+			'cleanlink_redirect_nonce' => wp_create_nonce( 'cleanlink-save-redirect-meta' ),
+			'cleanlink_redirect_url'   => $url,
+		);
+
+		try {
+			self::$class_instance->save_link_meta( $post_id, $post );
+		} finally {
+			$_POST = $old_post;
+			wp_set_current_user( 0 );
+		}
+
+		$this->assertSame( $url, get_post_meta( $post_id, 'cleanlink_redirect_url', true ) );
 	}
 
 	/**

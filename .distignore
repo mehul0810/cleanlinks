@@ -14,6 +14,7 @@
 /vendor/composer/installers
 /wp-org-assets
 /.release
+.phpunit*.cache
 
 .scrutinizer.yml
 .travis.yml
