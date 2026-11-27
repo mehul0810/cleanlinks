@@ -3,6 +3,7 @@
 
 namespace MG\CleanLinks\Tests;
 
+use MG\CleanLinks\Includes\PostTypeRegistrar;
 use MG\CleanLinks\Uninstall;
 use WP_UnitTestCase;
 
@@ -32,9 +33,19 @@ class Test_Uninstall extends WP_UnitTestCase {
 		$empty = wp_insert_term( 'Empty', 'cleanlinks_groups' );
 		wp_set_object_terms( $other, (int) $group['term_id'], 'cleanlinks_groups' );
 		update_option( 'cleanlinks_settings', array( 'test' => true ) );
+		$post_type = get_post_type_object( 'cleanlinks' );
+		$taxonomy  = get_taxonomy( 'cleanlinks_groups' );
 		unregister_taxonomy( 'cleanlinks_groups' );
 		unregister_post_type( 'cleanlinks' );
-		$this->assertTrue( Uninstall::run() );
+		try {
+			$this->assertTrue( Uninstall::run() );
+		} finally {
+			if ( taxonomy_exists( 'cleanlinks_groups' ) ) {
+				unregister_taxonomy( 'cleanlinks_groups' );
+			}
+			( new PostTypeRegistrar( $post_type->register_meta_box_cb ) )->register();
+			register_taxonomy( 'cleanlinks_groups', $taxonomy->object_type, get_object_vars( $taxonomy ) );
+		}
 		foreach ( $ids as $id ) {
 			$this->assertNull( get_post( $id ) );
 			$this->assertSame( array(), get_post_meta( $id ) );
