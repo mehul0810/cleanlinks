@@ -41,6 +41,10 @@ Use the smallest reliable validation for the changed boundary, then broaden for 
 
 If a validation command fails because of pre-existing unrelated debt, document the exact failure and keep the PR scoped.
 
+## Uninstall And Recovery
+
+Deleting CleanLinks through WordPress removes its current-site links, groups and settings. Back up the database first if that data may be needed. If cleanup stops, resolve the reported problem and retry deletion. If cleanup cannot be verified or is interrupted, restore a database backup before retrying; reinstalling the plugin or reverting its code does not restore deleted data.
+
 ## Local Release Package
 
 Use `npm run package:release -- /tmp/cleanlinks-release.zip` as the authoritative local package command. The `npm run plugin-zip` command is an alias for the same builder. It mirrors the prerelease workflow by building npm assets, copying the release payload through `.distignore`, installing production-only Composer dependencies into the clean staging directory, and writing a validated ZIP. The builder never copies the developer's existing `vendor/` directory.
